@@ -12,15 +12,16 @@ function Window.new(opts, screenGui, flags)
     local accent = opts.Accent or Theme:Accent()
     Theme:SetAccent(accent)
 
-    -- ROOT WINDOW — background + corner + ClipsDescendants
-    -- Semua child ter-clip oleh win boundary, tidak perlu corner di child manapun
+    -- ROOT WINDOW
+    -- win background = titlebar color (#1a1a1e) so top corners look correct
+    -- body background = #141416 with UICorner covers bottom half
     local win = Instance.new("Frame")
     win.Name = "MuvaWindow"
-    win.BackgroundColor3 = Color.fromHex("#141416")
+    win.BackgroundColor3 = Color.fromHex("#1a1a1e")  -- same as titlebar
     win.BorderSizePixel  = 0
     win.Size     = UDim2.fromOffset(opts.Size and opts.Size.X or 560, opts.Size and opts.Size.Y or 540)
     win.Position = UDim2.fromOffset(80, 80)
-    win.ClipsDescendants = true
+    win.ClipsDescendants = false
     win.Parent   = screenGui
     self._win    = win
 
@@ -34,8 +35,7 @@ function Window.new(opts, screenGui, flags)
     winStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     winStroke.Parent          = win
 
-
-    -- TITLEBAR — UICorner for top corners, patched bottom corners to square
+    -- TITLEBAR — no UICorner, win background handles top corners
     local titlebar = Instance.new("Frame")
     titlebar.Name = "Titlebar"
     titlebar.BackgroundColor3 = Color.fromHex("#1a1a1e")
@@ -43,25 +43,6 @@ function Window.new(opts, screenGui, flags)
     titlebar.Size = UDim2.new(1, 0, 0, 46)
     titlebar.Parent = win
     self._titlebar = titlebar
-
-    local tbCorner = Instance.new("UICorner")
-    tbCorner.CornerRadius = UDim.new(0, 12)
-    tbCorner.Parent = titlebar
-
-    -- Patch bottom corners of titlebar back to square
-    local tbPatchBL = Instance.new("Frame")
-    tbPatchBL.BackgroundColor3 = Color.fromHex("#1a1a1e")
-    tbPatchBL.BorderSizePixel  = 0
-    tbPatchBL.Size             = UDim2.fromOffset(12, 12)
-    tbPatchBL.Position         = UDim2.new(0, 0, 1, -12)
-    tbPatchBL.Parent           = titlebar
-
-    local tbPatchBR = Instance.new("Frame")
-    tbPatchBR.BackgroundColor3 = Color.fromHex("#1a1a1e")
-    tbPatchBR.BorderSizePixel  = 0
-    tbPatchBR.Size             = UDim2.fromOffset(12, 12)
-    tbPatchBR.Position         = UDim2.new(1, -12, 1, -12)
-    tbPatchBR.Parent           = titlebar
 
     local tbDivider = Instance.new("Frame")
     tbDivider.BackgroundColor3 = Color.fromHex("#252528")
@@ -197,12 +178,13 @@ function Window.new(opts, screenGui, flags)
     btnMax.MouseButton1Click:Connect(function()   self:_toggleMaximize() end)
     btnClose.MouseButton1Click:Connect(function() self:_close() end)
 
-    -- BODY — UICorner radius 12 matches win, so bottom corners are rounded
+    -- BODY — covers full win, UICorner 12 gives rounded bottom corners
+    -- Background #141416 blends with win at bottom, different from titlebar at top
     local body = Instance.new("Frame")
     body.BackgroundColor3 = Color.fromHex("#141416")
     body.BorderSizePixel  = 0
-    body.Position         = UDim2.new(0, 0, 0, 46)
-    body.Size             = UDim2.new(1, 0, 1, -46)
+    body.Position         = UDim2.new(0, 0, 0, 0)
+    body.Size             = UDim2.new(1, 0, 1, 0)
     body.ClipsDescendants = true
     body.Parent           = win
 
@@ -210,48 +192,35 @@ function Window.new(opts, screenGui, flags)
     bodyCorner.CornerRadius = UDim.new(0, 12)
     bodyCorner.Parent       = body
 
+    -- Titlebar background patch: covers top of body so titlebar color shows
+    local tbBg = Instance.new("Frame")
+    tbBg.BackgroundColor3 = Color.fromHex("#1a1a1e")
+    tbBg.BorderSizePixel  = 0
+    tbBg.Size             = UDim2.new(1, 0, 0, 46)
+    tbBg.Position         = UDim2.new(0, 0, 0, 0)
+    tbBg.Parent           = body
+
     local bodyInner = body
 
-    -- SIDEBAR
+    -- SIDEBAR — no UICorner, body clips it cleanly
     local sidebar = Instance.new("Frame")
     sidebar.Name = "Sidebar"
     sidebar.BackgroundColor3 = Color.fromHex("#111113")
     sidebar.BorderSizePixel  = 0
-    sidebar.Size             = UDim2.new(0, 155, 1, 0)
+    sidebar.Position         = UDim2.new(0, 0, 0, 46)
+    sidebar.Size             = UDim2.new(0, 155, 1, -46)
     sidebar.ClipsDescendants = false
-    sidebar.Parent = bodyInner
-    self._sidebar = sidebar
-
-    -- UICorner rounds all 4 corners of sidebar; patch right corners back to square
-    local sidebarCorner = Instance.new("UICorner")
-    sidebarCorner.CornerRadius = UDim.new(0, 12)
-    sidebarCorner.Parent       = sidebar
-
-    -- Patch right corners and top-left corner back to square
-    -- (only bottom-left should be rounded on sidebar)
-    local sbPatches = {
-        { UDim2.new(0, 0,   0, 0),    "TopLeft"  },  -- top-left: square (titlebar covers it)
-        { UDim2.new(1, -12, 0, 0),    "TopRight" },  -- top-right: square
-        { UDim2.new(1, -12, 1, -12),  "BotRight" },  -- bottom-right: square
-    }
-    for _, p in ipairs(sbPatches) do
-        local patch = Instance.new("Frame")
-        patch.BackgroundColor3 = Color.fromHex("#111113")
-        patch.BorderSizePixel  = 0
-        patch.Size             = UDim2.fromOffset(12, 12)
-        patch.Position         = p[1]
-        patch.ZIndex           = 2
-        patch.Parent           = sidebar
-    end
+    sidebar.Parent           = body
+    self._sidebar            = sidebar
 
     -- Sidebar right divider
     local sbDivider = Instance.new("Frame")
     sbDivider.BackgroundColor3 = Color.fromHex("#1e1e22")
     sbDivider.BorderSizePixel  = 0
-    sbDivider.Size     = UDim2.new(0, 1, 1, 0)
-    sbDivider.Position = UDim2.new(0, 155, 0, 0)
+    sbDivider.Size     = UDim2.new(0, 1, 1, -46)
+    sbDivider.Position = UDim2.new(0, 155, 0, 46)
     sbDivider.ZIndex   = 2
-    sbDivider.Parent   = bodyInner
+    sbDivider.Parent   = body
 
     -- Search bar: top, absolute, 36px
     local searchOuter = Instance.new("Frame")
@@ -344,14 +313,14 @@ function Window.new(opts, screenGui, flags)
     userDivider.BorderSizePixel  = 0
     userDivider.Size             = UDim2.new(0, 155, 0, 1)
     userDivider.Position         = UDim2.new(0, 0, 1, -43)
-    userDivider.Parent           = bodyInner
+    userDivider.Parent           = body
 
     local userFrame = Instance.new("Frame")
     userFrame.BackgroundColor3   = Color.fromHex("#111113")
     userFrame.BorderSizePixel    = 0
     userFrame.Size               = UDim2.new(0, 155, 0, 42)
     userFrame.Position           = UDim2.new(0, 0, 1, -42)
-    userFrame.Parent             = bodyInner
+    userFrame.Parent             = body
 
     local userPad = Instance.new("UIPadding")
     userPad.PaddingLeft   = UDim.new(0, 10)
@@ -433,10 +402,10 @@ function Window.new(opts, screenGui, flags)
     local content = Instance.new("Frame")
     content.Name = "Content"
     content.BackgroundTransparency = 1
-    content.Position = UDim2.new(0, 155, 0, 0)
-    content.Size     = UDim2.new(1, -155, 1, 0)
+    content.Position = UDim2.new(0, 155, 0, 46)
+    content.Size     = UDim2.new(1, -155, 1, -46)
     content.ClipsDescendants = true
-    content.Parent   = bodyInner
+    content.Parent   = body
     self._content    = content
 
     if opts.Draggable ~= false then self:_buildDrag(titlebar, win, screenGui) end
