@@ -104,25 +104,21 @@ Section.AddToggle = function(self, opts)
 
     updateVisual(value, false)
 
-    local btn = Instance.new("TextButton")
-    btn.Size                    = UDim2.new(1, 0, 1, 0)
-    btn.BackgroundTransparency  = 1
-    btn.Text                    = ""
-    btn.ZIndex                  = 3
-    btn.Parent                  = card
-
-    btn.MouseButton1Click:Connect(function()
-        value = not value
-        updateVisual(value, true)
-        if flag then flag:_fire(value) end
-        if opts.Callback then pcall(opts.Callback, value) end
+    card.Active = true
+    card.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            value = not value
+            updateVisual(value, true)
+            if flag then flag:_fire(value) end
+            if opts.Callback then pcall(opts.Callback, value) end
+        end
     end)
 
-    btn.MouseEnter:Connect(function()
+    card.MouseEnter:Connect(function()
         Tween.fast(card, { BackgroundColor3 = Theme:BG(3) })
         stroke.Color = Theme:Border(1)
     end)
-    btn.MouseLeave:Connect(function()
+    card.MouseLeave:Connect(function()
         Tween.fast(card, { BackgroundColor3 = Theme:BG(2) })
         stroke.Color = Theme:Border(0)
     end)

@@ -4,8 +4,6 @@ Section.AddCheckbox = function(self, opts)
     local flag = self:_registerFlag(opts.ID, opts.Default or false)
 
     local card, stroke = self:_makeCard()
-    card.AutomaticSize = Enum.AutomaticSize.Y
-    card.Size = UDim2.new(1, 0, 0, 0)
 
     local row = Instance.new("UIListLayout")
     row.FillDirection       = Enum.FillDirection.Horizontal
@@ -16,7 +14,7 @@ Section.AddCheckbox = function(self, opts)
     -- Info
     local info = Instance.new("Frame")
     info.BackgroundTransparency = 1
-    info.Size                   = UDim2.new(1, -28, 1, 0)
+    info.Size                   = UDim2.new(1, -32, 0, 22)
     info.Parent                 = card
 
     local infoL = Instance.new("UIListLayout")
@@ -99,25 +97,21 @@ Section.AddCheckbox = function(self, opts)
 
     updateVisual(value, false)
 
-    local btn = Instance.new("TextButton")
-    btn.Size                   = UDim2.new(1, 0, 1, 0)
-    btn.BackgroundTransparency = 1
-    btn.Text                   = ""
-    btn.ZIndex                 = 3
-    btn.Parent                 = card
-
-    btn.MouseButton1Click:Connect(function()
-        value = not value
-        updateVisual(value, true)
-        if flag then flag:_fire(value) end
-        if opts.Callback then pcall(opts.Callback, value) end
+    card.Active = true
+    card.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            value = not value
+            updateVisual(value, true)
+            if flag then flag:_fire(value) end
+            if opts.Callback then pcall(opts.Callback, value) end
+        end
     end)
 
-    btn.MouseEnter:Connect(function()
+    card.MouseEnter:Connect(function()
         Tween.fast(card, { BackgroundColor3 = Theme:BG(3) })
         stroke.Color = Theme:Border(1)
     end)
-    btn.MouseLeave:Connect(function()
+    card.MouseLeave:Connect(function()
         Tween.fast(card, { BackgroundColor3 = Theme:BG(2) })
         stroke.Color = Theme:Border(0)
     end)

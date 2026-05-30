@@ -91,7 +91,6 @@ function Section:_makeCard(layoutOrder)
     card.BackgroundColor3       = Theme:BG(2)
     card.BorderSizePixel        = 0
     card.Size                   = UDim2.new(1, 0, 0, 38)
-    card.AutomaticSize          = Enum.AutomaticSize.Y
     card.LayoutOrder            = layoutOrder or #self._components + 10
     card.Parent                 = self._frame
 
