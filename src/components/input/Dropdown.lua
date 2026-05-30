@@ -324,8 +324,11 @@ Section.AddDropdown = function(self, opts)
         -- IgnoreGuiInset=false di DropSG: koordinat (0,0) = after inset
         -- trigger.AbsolutePosition dari window (IgnoreGuiInset=true): sudah exclude inset
         -- Jadi perlu kurangi inset.Y dari posisi Y agar sinkron
+        -- IgnoreGuiInset=false: Roblox subtract inset dari posisi yang diberikan.
+        -- Untuk kompensasi: tambah inset.Y agar actual position = yang diinginkan.
+        -- actual = set - inset.Y, jadi set = wanted + inset.Y
         local menuX = absPosBefore.X
-        local menuY = absPosBefore.Y + absSize.Y + 4 - inset.Y
+        local menuY = absPosBefore.Y + absSize.Y + 4 + inset.Y
         menu.Position = UDim2.fromOffset(menuX, menuY)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
 
