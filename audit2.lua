@@ -28,7 +28,7 @@ secAuto:AddToggle({
 })
 secAuto:AddSlider({
     ID = "FarmSpeed", Title = "Farm Speed",
-    Min = 1, Max = 100, Step = 1, Default = 45,
+    Min = 1, Max = 100, Step = 1, Default = 45, Suffix = "",
     Callback = function(v) print("Farm Speed:", v) end,
 })
 secAuto:AddNumberInput({

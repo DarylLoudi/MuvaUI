@@ -79,6 +79,18 @@ Section.AddDropdown = function(self, opts)
         return nil
     end
 
+    -- Invisible blocker — covers entire screen behind menu to block click-through
+    local blocker = Instance.new("TextButton")
+    blocker.BackgroundTransparency = 1
+    blocker.BorderSizePixel        = 0
+    blocker.Size                   = UDim2.new(1, 0, 1, 0)
+    blocker.Position               = UDim2.new(0, 0, 0, 0)
+    blocker.Text                   = ""
+    blocker.AutoButtonColor        = false
+    blocker.ZIndex                 = 998
+    blocker.Visible                = false
+    blocker.Parent                 = card  -- pindah ke ScreenGui saat open
+
     -- Menu: di-parent ke ScreenGui saat open agar tidak ter-clip ScrollingFrame
     local menu = Instance.new("Frame")
     menu.BackgroundColor3 = Theme:BG(3)
@@ -88,7 +100,7 @@ Section.AddDropdown = function(self, opts)
     menu.Visible          = false
     menu.ZIndex           = 999
     menu.ClipsDescendants = false
-    menu.Parent           = card  -- sementara di card, pindah ke ScreenGui saat open
+    menu.Parent           = card
 
     local menuCorner = Instance.new("UICorner")
     menuCorner.CornerRadius = UDim.new(0, 7)
@@ -247,8 +259,10 @@ Section.AddDropdown = function(self, opts)
 
     _close = function()
         open = false
-        menu.Visible = false
-        menu.Parent  = card
+        menu.Visible    = false
+        menu.Parent     = card
+        blocker.Visible = false
+        blocker.Parent  = card
         Tween.fast(arrow, { Rotation = 0 })
         arrow.TextColor3 = Theme:Text(3)
         trigStroke.Color = Theme:Border(1)
@@ -278,12 +292,15 @@ Section.AddDropdown = function(self, opts)
         local absPos  = trigger.AbsolutePosition
         local absSize = trigger.AbsoluteSize
 
-        -- Parent ke ScreenGui dengan DisplayOrder tinggi agar selalu di atas window
-        menu.Parent   = getDropSG()
+        local sg = getDropSG()
 
-        -- Kedua ScreenGui (window dan dropdown) pakai IgnoreGuiInset=true
-        -- sehingga AbsolutePosition trigger dan koordinat menu sudah sinkron.
-        -- Tidak perlu adjustment inset.
+        -- Blocker full-screen di belakang menu, block click-through
+        blocker.Parent  = sg
+        blocker.Visible = true
+        blocker.MouseButton1Click:Connect(function() _close() end)
+
+        -- Menu di atas blocker
+        menu.Parent   = sg
         menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
 
