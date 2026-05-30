@@ -227,7 +227,7 @@ Section.AddDropdown = function(self, opts)
                     valLbl.Text = item
                     if flag then flag:_fire(item) end
                     if opts.Callback then pcall(opts.Callback, item) end
-                    closeMenu()
+                    _close()
                 end)
 
                 table.insert(allBtns, row)
@@ -244,10 +244,9 @@ Section.AddDropdown = function(self, opts)
 
     local open = false
 
-    local function closeMenu()
+    local function _close()
         open = false
         menu.Visible = false
-        -- Kembalikan parent ke card agar tidak menumpuk di ScreenGui
         menu.Parent  = card
         Tween.fast(arrow, { Rotation = 0 })
         arrow.TextColor3 = Theme:Text(3)
@@ -281,11 +280,10 @@ Section.AddDropdown = function(self, opts)
         -- Parent ke ScreenGui dengan DisplayOrder tinggi agar selalu di atas window
         menu.Parent   = getDropSG()
 
-        -- IgnoreGuiInset=true: AbsolutePosition trigger sudah exclude inset (36px)
-        -- ScreenGui dengan IgnoreGuiInset=true: (0,0) = include inset area
-        -- Jadi perlu tambah inset.Y agar posisi sejajar
-        local inset = game:GetService("GuiService"):GetGuiInset()
-        menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4 + inset.Y)
+        -- Kedua ScreenGui (window dan dropdown) pakai IgnoreGuiInset=true
+        -- sehingga AbsolutePosition trigger dan koordinat menu sudah sinkron.
+        -- Tidak perlu adjustment inset.
+        menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
 
         buildItems(nil)
@@ -296,7 +294,7 @@ Section.AddDropdown = function(self, opts)
     end
 
     trigger.MouseButton1Click:Connect(function()
-        if open then closeMenu() else openMenu() end
+        if open then _close() else openMenu() end
     end)
 
     if searchBox then
@@ -315,7 +313,7 @@ Section.AddDropdown = function(self, opts)
                 local size = menu.AbsoluteSize
                 if pos.X < abs.X or pos.X > abs.X + size.X or
                    pos.Y < abs.Y or pos.Y > abs.Y + size.Y then
-                    closeMenu()
+                    _close()
                 end
             end)
         end

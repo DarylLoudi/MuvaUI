@@ -306,8 +306,7 @@ Section.AddMultiDropdown = function(self, opts)
             local absPos  = trigger.AbsolutePosition
             local absSize = trigger.AbsoluteSize
             menu.Parent   = getDropSG()
-            local inset   = game:GetService("GuiService"):GetGuiInset()
-            menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4 + inset.Y)
+            menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
             menu.Size     = UDim2.fromOffset(absSize.X, menu.AbsoluteSize.Y)
             buildMenu()
             menu.Visible     = true
