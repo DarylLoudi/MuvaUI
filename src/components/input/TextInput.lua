@@ -4,16 +4,17 @@ Section.AddTextInput = function(self, opts)
     local flag = self:_registerFlag(opts.ID, opts.Default or "")
 
     local card, stroke = self:_makeCard()
-    card.Size = UDim2.new(1, 0, 0, 64)
+    card.Size = UDim2.new(1, 0, 0, 60)
 
-    local col = Instance.new("UIListLayout")
-    col.FillDirection = Enum.FillDirection.Vertical
-    col.Padding       = UDim.new(0, 5)
-    col.Parent        = card
+    -- Remove default padding, ganti dengan manual positioning
+    for _, c in ipairs(card:GetChildren()) do
+        if c:IsA("UIPadding") then c:Destroy() end
+    end
 
     local title = Instance.new("TextLabel")
     title.BackgroundTransparency = 1
-    title.Size                   = UDim2.new(1, 0, 0, 13)
+    title.Size                   = UDim2.new(1, -24, 0, 14)
+    title.Position               = UDim2.new(0, 12, 0, 10)
     title.Text                   = opts.Title or ""
     title.Font                   = Enum.Font.GothamMedium
     title.TextSize               = 14
@@ -25,7 +26,8 @@ Section.AddTextInput = function(self, opts)
     local wrap = Instance.new("Frame")
     wrap.BackgroundColor3 = Theme:BG(1)
     wrap.BorderSizePixel  = 0
-    wrap.Size             = UDim2.new(1, 0, 0, 28)
+    wrap.Size             = UDim2.new(1, -24, 0, 28)
+    wrap.Position         = UDim2.new(0, 12, 0, 28)
     wrap.Parent           = card
 
     local wrapCorner = Instance.new("UICorner")

@@ -21,6 +21,18 @@ Section.AddInfoDisplay = function(self, opts)
     card.Size          = UDim2.new(1, 0, 0, 0)
     card.AutomaticSize = Enum.AutomaticSize.Y
 
+    -- Remove default padding, pakai padding manual di dalam
+    for _, c in ipairs(card:GetChildren()) do
+        if c:IsA("UIPadding") then c:Destroy() end
+    end
+
+    local outerPad = Instance.new("UIPadding")
+    outerPad.PaddingLeft   = UDim.new(0, 12)
+    outerPad.PaddingRight  = UDim.new(0, 12)
+    outerPad.PaddingTop    = UDim.new(0, 8)
+    outerPad.PaddingBottom = UDim.new(0, 8)
+    outerPad.Parent        = card
+
     local col = Instance.new("UIListLayout")
     col.FillDirection = Enum.FillDirection.Vertical
     col.Padding       = UDim.new(0, 0)
