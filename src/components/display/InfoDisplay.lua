@@ -60,10 +60,7 @@ Section.AddInfoDisplay = function(self, opts)
         row.Size                   = UDim2.new(1, 0, 0, 24)
         row.Parent                 = card
 
-        local rowLayout = Instance.new("UIListLayout")
-        rowLayout.FillDirection     = Enum.FillDirection.Horizontal
-        rowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-        rowLayout.Parent            = row
+        -- Tidak pakai UIListLayout agar key kiri + value kanan bisa space-between
 
         -- Bottom divider (not on last row)
         if not isLast then
@@ -77,7 +74,8 @@ Section.AddInfoDisplay = function(self, opts)
 
         local keyLbl = Instance.new("TextLabel")
         keyLbl.BackgroundTransparency = 1
-        keyLbl.Size                   = UDim2.new(0.45, 0, 1, 0)
+        keyLbl.Size                   = UDim2.new(0.5, 0, 1, 0)
+        keyLbl.Position               = UDim2.new(0, 0, 0, 0)
         keyLbl.Text                   = rowOpts.Key or ""
         keyLbl.Font                   = Enum.Font.Gotham
         keyLbl.TextSize               = 13
@@ -95,6 +93,8 @@ Section.AddInfoDisplay = function(self, opts)
             badgeFrame.BorderSizePixel  = 0
             badgeFrame.Size             = UDim2.fromOffset(0, 18)
             badgeFrame.AutomaticSize    = Enum.AutomaticSize.X
+            badgeFrame.Position         = UDim2.new(1, 0, 0.5, -9)
+            badgeFrame.AnchorPoint      = Vector2.new(1, 0)
             badgeFrame.Parent           = row
 
             local bCorner = Instance.new("UICorner")
@@ -119,12 +119,14 @@ Section.AddInfoDisplay = function(self, opts)
         else
             local valLbl = Instance.new("TextLabel")
             valLbl.BackgroundTransparency = 1
-            valLbl.Size                   = UDim2.new(0.55, 0, 1, 0)
+            valLbl.Size                   = UDim2.new(0.5, 0, 1, 0)
+            valLbl.Position               = UDim2.new(0.5, 0, 0, 0)
             valLbl.Text                   = tostring(rowOpts.Value or "")
             valLbl.Font                   = Enum.Font.Gotham
             valLbl.TextSize               = 13
             valLbl.TextColor3             = Theme:Text(2)
             valLbl.TextXAlignment         = Enum.TextXAlignment.Right
+            valLbl.TextTruncate           = Enum.TextTruncate.AtEnd
             valLbl.Parent                 = row
 
             rowObjects[rowOpts.Key] = { lbl = valLbl }

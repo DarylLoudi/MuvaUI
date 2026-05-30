@@ -29,7 +29,7 @@ Section.AddToggle = function(self, opts)
 
     local title = Instance.new("TextLabel")
     title.BackgroundTransparency = 1
-    title.Size                   = UDim2.new(1, 0, 0, 17)
+    title.Size                   = UDim2.new(1, 0, 0, 14)
     title.Text                   = opts.Title or ""
     title.Font                   = Enum.Font.GothamMedium
     title.TextSize               = 14
