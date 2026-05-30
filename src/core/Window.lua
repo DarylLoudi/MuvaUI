@@ -29,9 +29,10 @@ function Window.new(opts, screenGui, flags)
     winCorner.Parent = win
 
     local winStroke = Instance.new("UIStroke")
-    winStroke.Color = Color.fromHex("#252528")
-    winStroke.Thickness = 1
-    winStroke.Parent = win
+    winStroke.Color           = Color.fromHex("#252528")
+    winStroke.Thickness       = 1
+    winStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    winStroke.Parent          = win
 
 
     -- TITLEBAR — no UICorner needed, win clips everything
