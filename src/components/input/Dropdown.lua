@@ -279,7 +279,7 @@ Section.AddDropdown = function(self, opts)
         sg.ResetOnSpawn   = false
         sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
         sg.DisplayOrder   = 1100  -- lebih tinggi dari window (999)
-        sg.IgnoreGuiInset = true
+        sg.IgnoreGuiInset = false
         pcall(function() sg.Parent = CoreGui end)
         _dropSG = sg
         return sg
@@ -313,14 +313,16 @@ Section.AddDropdown = function(self, opts)
         print(string.format("[DD-OPEN] AFTER reparent: trigger=(%.0f,%.0f)",
             absPosAfter.X, absPosAfter.Y))
 
-        -- Posisi: pakai nilai BEFORE karena lebih stabil
+        -- IgnoreGuiInset=false di DropSG: koordinat (0,0) = after inset
+        -- trigger.AbsolutePosition dari window (IgnoreGuiInset=true): sudah exclude inset
+        -- Jadi perlu kurangi inset.Y dari posisi Y agar sinkron
         local menuX = absPosBefore.X
-        local menuY = absPosBefore.Y + absSize.Y + 4
+        local menuY = absPosBefore.Y + absSize.Y + 4 - inset.Y
         menu.Position = UDim2.fromOffset(menuX, menuY)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
 
-        print(string.format("[DD-OPEN] menu set to pos=(%.0f,%.0f) size=(%.0f,?)",
-            menuX, menuY, absSize.X))
+        print(string.format("[DD-OPEN] menu set to pos=(%.0f,%.0f) size=(%.0f,?) inset.Y=%.0f",
+            menuX, menuY, absSize.X, inset.Y))
 
         -- Setelah build, print AbsolutePosition menu yang sesungguhnya
         buildItems(nil)
