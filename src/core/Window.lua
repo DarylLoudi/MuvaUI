@@ -12,25 +12,35 @@ function Window.new(opts, screenGui, flags)
     local accent = opts.Accent or Theme:Accent()
     Theme:SetAccent(accent)
 
-    -- ROOT WINDOW
+    -- ROOT WINDOW — transparent container, hanya untuk sizing/dragging/stroke
+    -- Background warna dihandle oleh titlebar dan body agar tidak ada double-layer di corner
     local win = Instance.new("Frame")
     win.Name = "MuvaWindow"
-    win.BackgroundColor3 = Color.fromHex("#141416")
+    win.BackgroundTransparency = 1
     win.BorderSizePixel  = 0
     win.Size     = UDim2.fromOffset(opts.Size and opts.Size.X or 560, opts.Size and opts.Size.Y or 540)
     win.Position = UDim2.fromOffset(80, 80)
-    win.ClipsDescendants = true
+    win.ClipsDescendants = false
     win.Parent   = screenGui
     self._win    = win
 
+    -- Stroke frame terpisah dengan corner — ini yang visible sebagai border window
+    local winBorder = Instance.new("Frame")
+    winBorder.Name                 = "WinBorder"
+    winBorder.BackgroundTransparency = 1
+    winBorder.BorderSizePixel      = 0
+    winBorder.Size                 = UDim2.new(1, 0, 1, 0)
+    winBorder.ZIndex               = 10
+    winBorder.Parent               = win
+
     local winCorner = Instance.new("UICorner")
     winCorner.CornerRadius = UDim.new(0, 12)
-    winCorner.Parent = win
+    winCorner.Parent = winBorder
 
     local winStroke = Instance.new("UIStroke")
     winStroke.Color = Color.fromHex("#252528")
     winStroke.Thickness = 1
-    winStroke.Parent = win
+    winStroke.Parent = winBorder
 
     -- TITLEBAR
     local titlebar = Instance.new("Frame")
@@ -188,14 +198,29 @@ function Window.new(opts, screenGui, flags)
     btnMax.MouseButton1Click:Connect(function()   self:_toggleMaximize() end)
     btnClose.MouseButton1Click:Connect(function() self:_close() end)
 
-    -- BODY (sidebar + content)
+    -- BODY — covers full window area, has corner radius to match win shape
     local body = Instance.new("Frame")
     body.BackgroundColor3 = Color.fromHex("#141416")
     body.BorderSizePixel  = 0
-    body.Position = UDim2.new(0, 0, 0, 46)
-    body.Size     = UDim2.new(1, 0, 1, -46)
+    body.Position         = UDim2.new(0, 0, 0, 0)
+    body.Size             = UDim2.new(1, 0, 1, 0)
     body.ClipsDescendants = true
-    body.Parent = win
+    body.Parent           = win
+
+    local bodyCorner = Instance.new("UICorner")
+    bodyCorner.CornerRadius = UDim.new(0, 12)
+    bodyCorner.Parent       = body
+
+    -- Content area starts below titlebar
+    local contentOffset = Instance.new("Frame")
+    contentOffset.BackgroundTransparency = 1
+    contentOffset.BorderSizePixel        = 0
+    contentOffset.Position               = UDim2.new(0, 0, 0, 46)
+    contentOffset.Size                   = UDim2.new(1, 0, 1, -46)
+    contentOffset.ClipsDescendants       = true
+    contentOffset.Parent                 = body
+    -- Reassign body reference for all sidebar/content children
+    local bodyInner = contentOffset
 
     -- SIDEBAR
     local sidebar = Instance.new("Frame")
@@ -204,7 +229,7 @@ function Window.new(opts, screenGui, flags)
     sidebar.BorderSizePixel  = 0
     sidebar.Size             = UDim2.new(0, 155, 1, 0)
     sidebar.ClipsDescendants = false  -- body handles clipping
-    sidebar.Parent = body
+    sidebar.Parent = bodyInner
     self._sidebar = sidebar
 
     -- Sidebar right divider
@@ -214,7 +239,7 @@ function Window.new(opts, screenGui, flags)
     sbDivider.Size     = UDim2.new(0, 1, 1, 0)
     sbDivider.Position = UDim2.new(0, 155, 0, 0)
     sbDivider.ZIndex   = 2
-    sbDivider.Parent   = body
+    sbDivider.Parent   = bodyInner
 
     -- Search bar: top, absolute, 36px
     local searchOuter = Instance.new("Frame")
@@ -307,14 +332,14 @@ function Window.new(opts, screenGui, flags)
     userDivider.BorderSizePixel  = 0
     userDivider.Size             = UDim2.new(0, 155, 0, 1)
     userDivider.Position         = UDim2.new(0, 0, 1, -43)
-    userDivider.Parent           = body
+    userDivider.Parent           = bodyInner
 
     local userFrame = Instance.new("Frame")
     userFrame.BackgroundColor3   = Color.fromHex("#111113")
     userFrame.BorderSizePixel    = 0
     userFrame.Size               = UDim2.new(0, 155, 0, 42)
     userFrame.Position           = UDim2.new(0, 0, 1, -42)
-    userFrame.Parent             = body
+    userFrame.Parent             = bodyInner
 
     local userPad = Instance.new("UIPadding")
     userPad.PaddingLeft   = UDim.new(0, 10)
@@ -399,7 +424,7 @@ function Window.new(opts, screenGui, flags)
     content.Position = UDim2.new(0, 155, 0, 0)
     content.Size     = UDim2.new(1, -155, 1, 0)
     content.ClipsDescendants = true
-    content.Parent   = body
+    content.Parent   = bodyInner
     self._content    = content
 
     if opts.Draggable ~= false then self:_buildDrag(titlebar, win, screenGui) end
