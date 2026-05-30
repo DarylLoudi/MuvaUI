@@ -294,6 +294,11 @@ Section.AddDropdown = function(self, opts)
 
         local sg = getDropSG()
 
+        -- DEBUG
+        local inset = game:GetService("GuiService"):GetGuiInset()
+        print(string.format("[DD] trigger AbsPos=(%.0f,%.0f) AbsSize=(%.0f,%.0f) inset=(%.0f,%.0f) sg.IgnoreGuiInset=%s",
+            absPos.X, absPos.Y, absSize.X, absSize.Y, inset.X, inset.Y, tostring(sg.IgnoreGuiInset)))
+
         -- Blocker full-screen di belakang menu, block click-through
         blocker.Parent  = sg
         blocker.Visible = true
@@ -303,6 +308,10 @@ Section.AddDropdown = function(self, opts)
         menu.Parent   = sg
         menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
+
+        print(string.format("[DD] menu.Position=(%.0f,%.0f) menu.Size=(%.0f,%.0f)",
+            menu.Position.X.Offset, menu.Position.Y.Offset,
+            menu.Size.X.Offset, menu.Size.Y.Offset))
 
         buildItems(nil)
         menu.Visible = true
