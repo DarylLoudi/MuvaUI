@@ -194,7 +194,7 @@ function Window.new(opts, screenGui, flags)
     sidebar.BackgroundColor3 = Color.fromHex("#111113")
     sidebar.BorderSizePixel  = 0
     sidebar.Size = UDim2.new(0, 155, 1, 0)
-    sidebar.ClipsDescendants = false
+    sidebar.ClipsDescendants = true
     sidebar.Parent = body
     self._sidebar = sidebar
 
@@ -396,10 +396,15 @@ function Window.new(opts, screenGui, flags)
     if opts.Resizable ~= false then self:_buildResizeHandle(win) end
 
     -- MINIMIZED FLOATING ICON
+    -- Bersihkan instance lama jika ada (dari run sebelumnya)
+    for _, v in ipairs(screenGui:GetChildren()) do
+        if v.Name == "MiniIcon" then v:Destroy() end
+    end
+
     local miniIcon = Instance.new("TextButton")
     miniIcon.Name = "MiniIcon"
     miniIcon.Size = UDim2.fromOffset(44, 44)
-    miniIcon.Position = UDim2.new(0, 16, 1, -60)
+    miniIcon.Position = UDim2.new(0, 20, 1, -64)
     miniIcon.BackgroundColor3 = accent
     miniIcon.BorderSizePixel  = 0
     miniIcon.Text = "M"
@@ -409,7 +414,7 @@ function Window.new(opts, screenGui, flags)
     miniIcon.AutoButtonColor = false
     miniIcon.Visible = false
     miniIcon.ZIndex  = 20
-    miniIcon.Parent  = screenGui
+    miniIcon.Parent  = screenGui  -- tetap di screenGui agar tidak ter-clip oleh win
     self._miniIcon   = miniIcon
 
     local miniCorner = Instance.new("UICorner")
