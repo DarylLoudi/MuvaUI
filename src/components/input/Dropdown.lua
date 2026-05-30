@@ -168,6 +168,7 @@ Section.AddDropdown = function(self, opts)
 
     local selected = default
     local allBtns  = {}
+    local _close   -- forward declare agar bisa dipakai dalam buildItems closure
 
     local function buildItems(filter)
         for _, b in ipairs(allBtns) do b:Destroy() end
@@ -244,7 +245,7 @@ Section.AddDropdown = function(self, opts)
 
     local open = false
 
-    local function _close()
+    _close = function()
         open = false
         menu.Visible = false
         menu.Parent  = card
