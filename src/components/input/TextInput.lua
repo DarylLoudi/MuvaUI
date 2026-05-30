@@ -4,17 +4,17 @@ Section.AddTextInput = function(self, opts)
     local flag = self:_registerFlag(opts.ID, opts.Default or "")
 
     local card, stroke = self:_makeCard()
-    card.Size = UDim2.new(1, 0, 0, 60)
+    card.Size = UDim2.new(1, 0, 0, 40)
 
-    -- Remove default padding, ganti dengan manual positioning
     for _, c in ipairs(card:GetChildren()) do
-        if c:IsA("UIPadding") then c:Destroy() end
+        if c:IsA("UIPadding") or c:IsA("UIListLayout") then c:Destroy() end
     end
 
+    -- Label kiri
     local title = Instance.new("TextLabel")
     title.BackgroundTransparency = 1
-    title.Size                   = UDim2.new(1, -24, 0, 14)
-    title.Position               = UDim2.new(0, 12, 0, 10)
+    title.Size                   = UDim2.new(0.45, -8, 1, 0)
+    title.Position               = UDim2.new(0, 12, 0, 0)
     title.Text                   = opts.Title or ""
     title.Font                   = Enum.Font.GothamMedium
     title.TextSize               = 14
@@ -22,12 +22,12 @@ Section.AddTextInput = function(self, opts)
     title.TextXAlignment         = Enum.TextXAlignment.Left
     title.Parent                 = card
 
-    -- Input wrapper
+    -- Input wrapper kanan
     local wrap = Instance.new("Frame")
     wrap.BackgroundColor3 = Theme:BG(1)
     wrap.BorderSizePixel  = 0
-    wrap.Size             = UDim2.new(1, -24, 0, 28)
-    wrap.Position         = UDim2.new(0, 12, 0, 28)
+    wrap.Size             = UDim2.new(0.55, -12, 0, 26)
+    wrap.Position         = UDim2.new(0.45, 0, 0.5, -13)
     wrap.Parent           = card
 
     local wrapCorner = Instance.new("UICorner")
@@ -62,7 +62,7 @@ Section.AddTextInput = function(self, opts)
         Tween.fast(wrapStroke, { Color = Theme:Accent() })
     end)
 
-    box.FocusLost:Connect(function(enterPressed)
+    box.FocusLost:Connect(function()
         Tween.fast(wrapStroke, { Color = Theme:Border(1) })
         if flag then flag:_fire(box.Text) end
         if opts.Callback then pcall(opts.Callback, box.Text) end

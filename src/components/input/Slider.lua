@@ -11,45 +11,39 @@ Section.AddSlider = function(self, opts)
     local flag    = self:_registerFlag(opts.ID, default)
 
     local card, stroke = self:_makeCard()
-    card.Size          = UDim2.new(1, 0, 0, 52)
+    card.Size          = UDim2.new(1, 0, 0, 48)
     card.AutomaticSize = Enum.AutomaticSize.None
 
-    -- Remove card's horizontal UIListLayout, use manual positioning
     for _, c in ipairs(card:GetChildren()) do
-        if c:IsA("UIListLayout") then c:Destroy() end
+        if c:IsA("UIListLayout") or c:IsA("UIPadding") then c:Destroy() end
     end
 
-    -- Title row
-    local titleRow = Instance.new("Frame")
-    titleRow.BackgroundTransparency = 1
-    titleRow.Size                   = UDim2.new(1, 0, 0, 18)
-    titleRow.Position               = UDim2.new(0, 0, 0, 0)
-    titleRow.Parent                 = card
-
+    -- Title + value pada baris atas
     local titleLbl = Instance.new("TextLabel")
     titleLbl.BackgroundTransparency = 1
-    titleLbl.Size                   = UDim2.new(1, -50, 1, 0)
+    titleLbl.Size                   = UDim2.new(1, -62, 0, 16)
+    titleLbl.Position               = UDim2.new(0, 12, 0, 8)
     titleLbl.Text                   = opts.Title or ""
     titleLbl.Font                   = Enum.Font.GothamMedium
     titleLbl.TextSize               = 14
     titleLbl.TextColor3             = Theme:Text(1)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
-    titleLbl.Parent                 = titleRow
+    titleLbl.Parent                 = card
 
     local valueLbl = Instance.new("TextLabel")
     valueLbl.BackgroundTransparency = 1
-    valueLbl.Size                   = UDim2.fromOffset(50, 18)
-    valueLbl.Position               = UDim2.new(1, -50, 0, 0)
+    valueLbl.Size                   = UDim2.fromOffset(50, 16)
+    valueLbl.Position               = UDim2.new(1, -62, 0, 8)
     valueLbl.Font                   = Enum.Font.GothamBold
     valueLbl.TextSize               = 14
     valueLbl.TextColor3             = Theme:Accent()
     valueLbl.TextXAlignment         = Enum.TextXAlignment.Right
-    valueLbl.Parent                 = titleRow
+    valueLbl.Parent                 = card
 
-    -- Track
+    -- Track di baris bawah
     local track = Instance.new("Frame")
-    track.Size             = UDim2.new(1, 0, 0, 4)
-    track.Position         = UDim2.new(0, 0, 0, 26)
+    track.Size             = UDim2.new(1, -24, 0, 4)
+    track.Position         = UDim2.new(0, 12, 0, 32)
     track.BackgroundColor3 = Theme:BG(4)
     track.BorderSizePixel  = 0
     track.Parent           = card
