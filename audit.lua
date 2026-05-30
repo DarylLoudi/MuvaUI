@@ -281,3 +281,25 @@ secTable:AddTable({
 })
 
 print("[MuvaUI Audit] All components loaded.")
+
+-- Debug: print ukuran dan posisi frame-frame kritis setelah layout selesai
+task.delay(0.5, function()
+    local sg = game:GetService("CoreGui"):FindFirstChild("MuvaUI_MuvaUI")
+    if not sg then print("[DEBUG] ScreenGui not found") return end
+    local w = sg:FindFirstChild("MuvaWindow")
+    if not w then print("[DEBUG] MuvaWindow not found") return end
+    print("[DEBUG] Win AbsoluteSize:", w.AbsoluteSize)
+    print("[DEBUG] Win AbsolutePosition:", w.AbsolutePosition)
+    local body = w:FindFirstChild("Frame")  -- body is first Frame child
+    for _, c in ipairs(w:GetChildren()) do
+        if c:IsA("Frame") and c.Name ~= "Titlebar" then
+            print("[DEBUG] body AbsoluteSize:", c.AbsoluteSize, "AbsPos:", c.AbsolutePosition)
+            -- Find userFrame
+            for _, uf in ipairs(c:GetChildren()) do
+                if uf:IsA("Frame") and uf.Size.Y.Offset == 42 then
+                    print("[DEBUG] userFrame AbsoluteSize:", uf.AbsoluteSize, "AbsPos:", uf.AbsolutePosition)
+                end
+            end
+        end
+    end
+end)

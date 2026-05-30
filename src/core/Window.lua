@@ -298,7 +298,6 @@ function Window.new(opts, screenGui, flags)
     userDivider.BorderSizePixel  = 0
     userDivider.Size             = UDim2.new(0, 155, 0, 1)
     userDivider.Position         = UDim2.new(0, 0, 1, -43)
-    userDivider.ZIndex           = 2
     userDivider.Parent           = body
 
     local userFrame = Instance.new("Frame")
@@ -306,7 +305,6 @@ function Window.new(opts, screenGui, flags)
     userFrame.BorderSizePixel    = 0
     userFrame.Size               = UDim2.new(0, 155, 0, 42)
     userFrame.Position           = UDim2.new(0, 0, 1, -42)
-    userFrame.ZIndex             = 2
     userFrame.Parent             = body
 
     local userPad = Instance.new("UIPadding")
