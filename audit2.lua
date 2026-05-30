@@ -1,5 +1,5 @@
 -- MuvaUI Audit2 — Window Preview replica
-local AUDIT_VERSION = "2.5"
+local AUDIT_VERSION = "2.6"
 local LIB_URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/MuvaUI.lua?t=" .. tostring(os.time())
 print("[Audit2 v" .. AUDIT_VERSION .. "] Loading MuvaUI...")
 local MuvaUI = loadstring(game:HttpGet(LIB_URL, true))()

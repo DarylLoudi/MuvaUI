@@ -288,36 +288,55 @@ Section.AddDropdown = function(self, opts)
     local function openMenu()
         open = true
 
-        -- Baca posisi SEBELUM pindah parent
-        local absPos  = trigger.AbsolutePosition
-        local absSize = trigger.AbsoluteSize
+        local sg      = getDropSG()
+        local inset   = game:GetService("GuiService"):GetGuiInset()
 
-        local sg = getDropSG()
+        -- Baca SEBELUM reparent
+        local absPosBefore = trigger.AbsolutePosition
+        local absSize      = trigger.AbsoluteSize
 
-        -- DEBUG
-        local inset = game:GetService("GuiService"):GetGuiInset()
-        print(string.format("[DD] trigger AbsPos=(%.0f,%.0f) AbsSize=(%.0f,%.0f) inset=(%.0f,%.0f) sg.IgnoreGuiInset=%s",
-            absPos.X, absPos.Y, absSize.X, absSize.Y, inset.X, inset.Y, tostring(sg.IgnoreGuiInset)))
+        print(string.format("[DD-OPEN] BEFORE reparent: trigger=(%.0f,%.0f) size=(%.0f,%.0f)",
+            absPosBefore.X, absPosBefore.Y, absSize.X, absSize.Y))
+        print(string.format("[DD-OPEN] inset=(%.0f,%.0f) sg.IgnoreGuiInset=%s card.Parent=%s",
+            inset.X, inset.Y, tostring(sg.IgnoreGuiInset), tostring(card.Parent)))
 
-        -- Blocker full-screen di belakang menu, block click-through
+        -- Blocker
         blocker.Parent  = sg
         blocker.Visible = true
         blocker.MouseButton1Click:Connect(function() _close() end)
 
-        -- Menu di atas blocker
-        menu.Parent   = sg
-        menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
+        -- Reparent menu
+        menu.Parent = sg
+
+        -- Baca SETELAH reparent
+        local absPosAfter = trigger.AbsolutePosition
+        print(string.format("[DD-OPEN] AFTER reparent: trigger=(%.0f,%.0f)",
+            absPosAfter.X, absPosAfter.Y))
+
+        -- Posisi: pakai nilai BEFORE karena lebih stabil
+        local menuX = absPosBefore.X
+        local menuY = absPosBefore.Y + absSize.Y + 4
+        menu.Position = UDim2.fromOffset(menuX, menuY)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
 
-        print(string.format("[DD] menu.Position=(%.0f,%.0f) menu.Size=(%.0f,%.0f)",
-            menu.Position.X.Offset, menu.Position.Y.Offset,
-            menu.Size.X.Offset, menu.Size.Y.Offset))
+        print(string.format("[DD-OPEN] menu set to pos=(%.0f,%.0f) size=(%.0f,?)",
+            menuX, menuY, absSize.X))
 
+        -- Setelah build, print AbsolutePosition menu yang sesungguhnya
         buildItems(nil)
         menu.Visible = true
+
+        task.defer(function()
+            print(string.format("[DD-OPEN] menu.AbsolutePosition ACTUAL=(%.0f,%.0f) AbsoluteSize=(%.0f,%.0f)",
+                menu.AbsolutePosition.X, menu.AbsolutePosition.Y,
+                menu.AbsoluteSize.X, menu.AbsoluteSize.Y))
+            print(string.format("[DD-OPEN] trigger.AbsolutePosition CURRENT=(%.0f,%.0f)",
+                trigger.AbsolutePosition.X, trigger.AbsolutePosition.Y))
+        end)
+
         Tween.fast(arrow, { Rotation = 180 })
-        arrow.TextColor3  = Theme:Accent()
-        trigStroke.Color  = Theme:Accent()
+        arrow.TextColor3 = Theme:Accent()
+        trigStroke.Color = Theme:Accent()
     end
 
     trigger.MouseButton1Click:Connect(function()
