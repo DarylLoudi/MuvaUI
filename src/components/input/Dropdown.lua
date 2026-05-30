@@ -262,17 +262,16 @@ Section.AddDropdown = function(self, opts)
         local absPos  = trigger.AbsolutePosition
         local absSize = trigger.AbsoluteSize
 
-        print("[DD] trigger AbsPos:", absPos, "AbsSize:", absSize)
-
         -- Pindah parent ke ScreenGui agar tidak ter-clip ScrollingFrame
         local sg = getScreenGui(trigger)
         if sg then menu.Parent = sg end
 
-        -- Set posisi tepat di bawah trigger
-        menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
+        -- AbsolutePosition sudah include GuiInset (36px).
+        -- ScreenGui pakai IgnoreGuiInset=true jadi (0,0) = top-left layar termasuk inset.
+        -- Perlu kurangi inset agar posisi tidak double-offset.
+        local inset = game:GetService("GuiService"):GetGuiInset()
+        menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4 - inset.Y)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
-
-        print("[DD] menu.Position:", menu.Position, "menu.Parent:", menu.Parent)
 
         buildItems(nil)
         menu.Visible = true
