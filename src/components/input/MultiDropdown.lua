@@ -85,11 +85,21 @@ Section.AddMultiDropdown = function(self, opts)
     arrow.TextColor3             = Theme:Text(3)
     arrow.Parent                 = trigger
 
-    -- Dropdown menu — parented to ScreenGui so it floats above all other UI
+    -- Helper: traverse up to find ScreenGui
+    local function getScreenGui(inst)
+        local p = inst
+        while p do
+            if p:IsA("ScreenGui") then return p end
+            p = p.Parent
+        end
+        return nil
+    end
+
+    -- Menu di-parent ke ScreenGui saat open agar tidak ter-clip ScrollingFrame
     local menu = Instance.new("ScrollingFrame")
     menu.BackgroundColor3      = Theme:BG(3)
     menu.BorderSizePixel       = 0
-    menu.Size                  = UDim2.fromOffset(0, 0)
+    menu.Size                  = UDim2.fromOffset(200, 0)
     menu.Position              = UDim2.fromOffset(0, 0)
     menu.CanvasSize            = UDim2.new(0, 0, 0, 0)
     menu.AutomaticCanvasSize   = Enum.AutomaticSize.Y
@@ -98,7 +108,7 @@ Section.AddMultiDropdown = function(self, opts)
     menu.Visible               = false
     menu.ZIndex                = 999
     menu.ClipsDescendants      = false
-    menu.Parent                = game:GetService("CoreGui")
+    menu.Parent                = card
 
     local menuCorner = Instance.new("UICorner")
     menuCorner.CornerRadius = UDim.new(0, 7)
@@ -272,8 +282,7 @@ Section.AddMultiDropdown = function(self, opts)
         end
 
         local menuH = math.min(count, 6) * 30 + 8
-        local menuW = trigger.AbsoluteSize.X
-        menu.Size   = UDim2.fromOffset(menuW, menuH)
+        menu.Size   = UDim2.fromOffset(trigger.AbsoluteSize.X, menuH)
     end
 
     local open = false
@@ -282,11 +291,14 @@ Section.AddMultiDropdown = function(self, opts)
         if open then
             open = false
             menu.Visible     = false
+            menu.Parent      = card
             arrow.TextColor3 = Theme:Text(3)
             trigStroke.Color = Theme:Border(1)
             Tween.fast(arrow, { Rotation = 0 })
         else
             open = true
+            local sg = getScreenGui(trigger)
+            if sg then menu.Parent = sg end
             local absPos  = trigger.AbsolutePosition
             local absSize = trigger.AbsoluteSize
             menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
@@ -310,6 +322,7 @@ Section.AddMultiDropdown = function(self, opts)
                    pos.Y < abs.Y or pos.Y > abs.Y + size.Y then
                     open = false
                     menu.Visible     = false
+                    menu.Parent      = card
                     arrow.TextColor3 = Theme:Text(3)
                     trigStroke.Color = Theme:Border(1)
                     Tween.fast(arrow, { Rotation = 0 })

@@ -439,7 +439,7 @@ function Window.new(opts, screenGui, flags)
     content.BackgroundTransparency = 1
     content.Position = UDim2.new(0, 185, 0, 0)
     content.Size     = UDim2.new(1, -185, 1, 0)
-    content.ClipsDescendants = true
+    content.ClipsDescendants = false
     content.Parent   = bodyInner
     self._content    = content
 

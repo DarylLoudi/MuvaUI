@@ -69,16 +69,26 @@ Section.AddDropdown = function(self, opts)
     arrow.TextColor3             = Theme:Text(3)
     arrow.Parent                 = trigger
 
-    -- Dropdown menu — parented to ScreenGui so it floats above all other UI
+    -- Helper: traverse up to find ScreenGui
+    local function getScreenGui(inst)
+        local p = inst
+        while p do
+            if p:IsA("ScreenGui") then return p end
+            p = p.Parent
+        end
+        return nil
+    end
+
+    -- Menu: di-parent ke ScreenGui saat open agar tidak ter-clip ScrollingFrame
     local menu = Instance.new("Frame")
     menu.BackgroundColor3 = Theme:BG(3)
     menu.BorderSizePixel  = 0
-    menu.Size             = UDim2.fromOffset(0, 0)
+    menu.Size             = UDim2.fromOffset(200, 0)
     menu.Position         = UDim2.fromOffset(0, 0)
     menu.Visible          = false
     menu.ZIndex           = 999
     menu.ClipsDescendants = false
-    menu.Parent           = game:GetService("CoreGui")
+    menu.Parent           = card  -- sementara di card, pindah ke ScreenGui saat open
 
     local menuCorner = Instance.new("UICorner")
     menuCorner.CornerRadius = UDim.new(0, 7)
@@ -95,7 +105,7 @@ Section.AddDropdown = function(self, opts)
         local searchWrap = Instance.new("Frame")
         searchWrap.BackgroundTransparency = 1
         searchWrap.Size                   = UDim2.new(1, 0, 0, 32)
-        searchWrap.ZIndex                 = 51
+        searchWrap.ZIndex                 = 1000
         searchWrap.Parent                 = menu
 
         local sPad = Instance.new("UIPadding")
@@ -116,7 +126,7 @@ Section.AddDropdown = function(self, opts)
         sBox.TextSize          = 11
         sBox.TextColor3        = Theme:Text(0)
         sBox.ClearTextOnFocus  = false
-        sBox.ZIndex            = 52
+        sBox.ZIndex            = 1001
         sBox.Parent            = searchWrap
 
         local sCorner = Instance.new("UICorner")
@@ -148,7 +158,7 @@ Section.AddDropdown = function(self, opts)
     list.AutomaticCanvasSize     = Enum.AutomaticSize.Y
     list.ScrollBarThickness      = 2
     list.ScrollBarImageColor3    = Theme:BG(4)
-    list.ZIndex                  = 51
+    list.ZIndex                  = 1000
     list.Parent                  = menu
 
     local listLayout = Instance.new("UIListLayout")
@@ -171,7 +181,7 @@ Section.AddDropdown = function(self, opts)
                 row.Size                   = UDim2.new(1, 0, 0, 30)
                 row.Text                   = ""
                 row.AutoButtonColor        = false
-                row.ZIndex                 = 52
+                row.ZIndex                 = 1001
                 row.Parent                 = list
 
                 local pad = Instance.new("UIPadding")
@@ -187,7 +197,7 @@ Section.AddDropdown = function(self, opts)
                 lbl.TextSize               = 13
                 lbl.TextColor3             = item == selected and Theme:Accent() or Theme:Text(2)
                 lbl.TextXAlignment         = Enum.TextXAlignment.Left
-                lbl.ZIndex                 = 53
+                lbl.ZIndex                 = 1002
                 lbl.Parent                 = row
 
                 if item == selected then
@@ -199,7 +209,7 @@ Section.AddDropdown = function(self, opts)
                     check.TextSize               = 13
                     check.Font                   = Enum.Font.GothamBold
                     check.TextColor3             = Theme:Accent()
-                    check.ZIndex                 = 53
+                    check.ZIndex                 = 1002
                     check.Parent                 = row
                 end
 
@@ -224,37 +234,47 @@ Section.AddDropdown = function(self, opts)
                 count = count + 1
             end
         end
-        -- Resize menu based on trigger width and item count
+
         local itemH    = 30
         local maxItems = math.min(count, 6)
         local menuH    = (maxItems * itemH) + (searchable and 33 or 0) + 8
-        local menuW    = trigger.AbsoluteSize.X
-        menu.Size      = UDim2.fromOffset(menuW, menuH)
+        menu.Size      = UDim2.fromOffset(trigger.AbsoluteSize.X, menuH)
         list.Size      = UDim2.new(1, 0, 1, searchable and -33 or 0)
     end
 
     local open = false
 
+    local function closeMenu()
+        open = false
+        menu.Visible = false
+        -- Kembalikan parent ke card agar tidak menumpuk di ScreenGui
+        menu.Parent  = card
+        Tween.fast(arrow, { Rotation = 0 })
+        arrow.TextColor3 = Theme:Text(3)
+        trigStroke.Color = Theme:Border(1)
+        if searchBox then searchBox.Text = "" end
+    end
+
     local function openMenu()
         open = true
-        -- Position menu below trigger using absolute screen coordinates
+
+        -- Pindah parent ke ScreenGui agar tidak ter-clip
+        local sg = getScreenGui(trigger)
+        if sg then
+            menu.Parent = sg
+        end
+
+        -- Hitung posisi absolut di bawah trigger
+        -- IgnoreGuiInset = true di ScreenGui window, jadi tidak perlu kurangi inset
         local absPos  = trigger.AbsolutePosition
         local absSize = trigger.AbsoluteSize
         menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
+
         buildItems(nil)
         menu.Visible = true
         Tween.fast(arrow, { Rotation = 180 })
         arrow.TextColor3  = Theme:Accent()
         trigStroke.Color  = Theme:Accent()
-    end
-
-    function closeMenu()
-        open = false
-        menu.Visible = false
-        Tween.fast(arrow, { Rotation = 0 })
-        arrow.TextColor3 = Theme:Text(3)
-        trigStroke.Color = Theme:Border(1)
-        if searchBox then searchBox.Text = "" end
     end
 
     trigger.MouseButton1Click:Connect(function()
@@ -267,11 +287,11 @@ Section.AddDropdown = function(self, opts)
         end)
     end
 
-    -- Close on outside click via UserInputService
+    -- Close on outside click
     game:GetService("UserInputService").InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 and open then
             task.defer(function()
-                local pos = game:GetService("UserInputService"):GetMouseLocation()
+                local pos  = game:GetService("UserInputService"):GetMouseLocation()
                 local abs  = menu.AbsolutePosition
                 local size = menu.AbsoluteSize
                 if pos.X < abs.X or pos.X > abs.X + size.X or
