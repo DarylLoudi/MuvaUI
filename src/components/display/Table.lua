@@ -213,20 +213,12 @@ Section.AddTable = function(self, opts)
         rowLayout.SortOrder     = Enum.SortOrder.LayoutOrder
         rowLayout.Parent        = rowFrame
 
-        -- Hover
-        local hoverBtn = Instance.new("TextButton")
-        hoverBtn.BackgroundTransparency = 1
-        hoverBtn.BorderSizePixel        = 0
-        hoverBtn.Size                   = UDim2.new(1, 0, 1, 0)
-        hoverBtn.Text                   = ""
-        hoverBtn.ZIndex                 = 2
-        hoverBtn.AutoButtonColor        = false
-        hoverBtn.Parent                 = rowFrame
-
-        hoverBtn.MouseEnter:Connect(function()
+        -- Hover via Frame events (no overlay btn — would break UIListLayout)
+        rowFrame.Active = true
+        rowFrame.MouseEnter:Connect(function()
             Tween.fast(rowFrame, { BackgroundColor3 = Theme:BG(3) })
         end)
-        hoverBtn.MouseLeave:Connect(function()
+        rowFrame.MouseLeave:Connect(function()
             rowFrame.BackgroundColor3 = rowIndex % 2 == 0 and Theme:BG(0) or Theme:BG(1)
         end)
 

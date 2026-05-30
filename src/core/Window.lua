@@ -19,7 +19,7 @@ function Window.new(opts, screenGui, flags)
     win.BorderSizePixel  = 0
     win.Size     = UDim2.fromOffset(opts.Size and opts.Size.X or 560, opts.Size and opts.Size.Y or 540)
     win.Position = UDim2.fromOffset(80, 80)
-    win.ClipsDescendants = false
+    win.ClipsDescendants = true
     win.Parent   = screenGui
     self._win    = win
 
@@ -44,13 +44,6 @@ function Window.new(opts, screenGui, flags)
     local tbCorner = Instance.new("UICorner")
     tbCorner.CornerRadius = UDim.new(0, 12)
     tbCorner.Parent = titlebar
-
-    local tbSquare = Instance.new("Frame")
-    tbSquare.BackgroundColor3 = Color.fromHex("#1a1a1e")
-    tbSquare.BorderSizePixel  = 0
-    tbSquare.Size = UDim2.new(1, 0, 0.5, 0)
-    tbSquare.Position = UDim2.new(0, 0, 0.5, 0)
-    tbSquare.Parent = titlebar
 
     local tbDivider = Instance.new("Frame")
     tbDivider.BackgroundColor3 = Color.fromHex("#252528")
@@ -305,11 +298,13 @@ function Window.new(opts, screenGui, flags)
     userFrame.Position = UDim2.new(0, 0, 1, -42)
     userFrame.Parent   = sidebar
 
+    -- Divider diparent ke sidebar (bukan userFrame) agar tidak masuk UIListLayout horizontal
     local userDivider = Instance.new("Frame")
     userDivider.BackgroundColor3 = Color.fromHex("#1e1e22")
     userDivider.BorderSizePixel  = 0
-    userDivider.Size = UDim2.new(1, 0, 0, 1)
-    userDivider.Parent = userFrame
+    userDivider.Size     = UDim2.new(1, 0, 0, 1)
+    userDivider.Position = UDim2.new(0, 0, 1, -43)
+    userDivider.Parent   = sidebar
 
     local userPad = Instance.new("UIPadding")
     userPad.PaddingLeft   = UDim.new(0, 10)
