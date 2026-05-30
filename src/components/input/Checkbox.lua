@@ -4,6 +4,8 @@ Section.AddCheckbox = function(self, opts)
     local flag = self:_registerFlag(opts.ID, opts.Default or false)
 
     local card, stroke = self:_makeCard()
+    card.AutomaticSize = Enum.AutomaticSize.Y
+    card.Size = UDim2.new(1, 0, 0, 0)
 
     local row = Instance.new("UIListLayout")
     row.FillDirection       = Enum.FillDirection.Horizontal

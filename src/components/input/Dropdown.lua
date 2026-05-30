@@ -8,10 +8,13 @@ Section.AddDropdown = function(self, opts)
 
     local card, stroke = self:_makeCard()
     card.ClipsDescendants = false
+    card.AutomaticSize    = Enum.AutomaticSize.Y
+    card.Size             = UDim2.new(1, 0, 0, 0)
 
     local col = Instance.new("UIListLayout")
     col.FillDirection = Enum.FillDirection.Vertical
     col.Padding       = UDim.new(0, 5)
+    col.SortOrder     = Enum.SortOrder.LayoutOrder
     col.Parent        = card
 
     local title = Instance.new("TextLabel")

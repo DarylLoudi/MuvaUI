@@ -8,6 +8,8 @@ Section.AddNumberInput = function(self, opts)
     local flag    = self:_registerFlag(opts.ID, default)
 
     local card, stroke = self:_makeCard()
+    card.AutomaticSize = Enum.AutomaticSize.Y
+    card.Size = UDim2.new(1, 0, 0, 0)
 
     local row = Instance.new("UIListLayout")
     row.FillDirection     = Enum.FillDirection.Horizontal

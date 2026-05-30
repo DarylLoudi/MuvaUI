@@ -4,6 +4,8 @@ Section.AddTextInput = function(self, opts)
     local flag = self:_registerFlag(opts.ID, opts.Default or "")
 
     local card, stroke = self:_makeCard()
+    card.AutomaticSize = Enum.AutomaticSize.Y
+    card.Size = UDim2.new(1, 0, 0, 0)
 
     local col = Instance.new("UIListLayout")
     col.FillDirection = Enum.FillDirection.Vertical

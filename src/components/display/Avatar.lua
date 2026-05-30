@@ -10,6 +10,8 @@ Section.AddAvatar = function(self, opts)
     local txsz = TEXT_MAP[opts.Size] or TEXT_MAP.Medium
 
     local card, stroke = self:_makeCard()
+    card.AutomaticSize = Enum.AutomaticSize.Y
+    card.Size = UDim2.new(1, 0, 0, 0)
 
     local row = Instance.new("UIListLayout")
     row.FillDirection     = Enum.FillDirection.Horizontal

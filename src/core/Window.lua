@@ -144,8 +144,8 @@ function Window.new(opts, screenGui, flags)
     sbDivider.BorderSizePixel  = 0
     sbDivider.Size             = UDim2.new(0, 1, 1, 0)
     sbDivider.Position         = UDim2.new(1, -1, 0, 0)
-    sbDivider.ZIndex           = 2
-    sbDivider.Parent           = sidebar
+    sbDivider.ZIndex           = 5
+    sbDivider.Parent           = body
 
     -- Content area
     local content = Instance.new("Frame")

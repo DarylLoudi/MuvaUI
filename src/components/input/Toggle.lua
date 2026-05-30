@@ -5,6 +5,15 @@ Section.AddToggle = function(self, opts)
 
     local card, stroke = self:_makeCard()
 
+    -- Horizontal row layout
+    local layout = Instance.new("UIListLayout")
+    layout.FillDirection        = Enum.FillDirection.Horizontal
+    layout.VerticalAlignment    = Enum.VerticalAlignment.Center
+    layout.HorizontalAlignment  = Enum.HorizontalAlignment.Left
+    layout.Padding              = UDim.new(0, 8)
+    layout.SortOrder            = Enum.SortOrder.LayoutOrder
+    layout.Parent               = card
+
     -- Info (left, fills remaining space)
     local info = Instance.new("Frame")
     info.BackgroundTransparency = 1
