@@ -1,6 +1,6 @@
 -- MuvaUI Full Audit Script
-local URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/MuvaUI.lua"
-local MuvaUI = loadstring(game:HttpGet(URL))()
+local URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/MuvaUI.lua?t=" .. tostring(os.time())
+local MuvaUI = loadstring(game:HttpGet(URL, true))()
 
 local win = MuvaUI:CreateWindow({
     Title    = "MuvaUI",
