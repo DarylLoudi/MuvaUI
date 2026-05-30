@@ -8,6 +8,19 @@ Library.Flags   = {}
 Library._windows = {}
 
 function Library:CreateWindow(opts)
+    -- Cleanup instance lama agar tidak ada ghost UI dari run sebelumnya
+    for _, v in ipairs(CoreGui:GetChildren()) do
+        if v.Name:find("MuvaUI") then v:Destroy() end
+    end
+    pcall(function()
+        local pg = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
+        if pg then
+            for _, v in ipairs(pg:GetChildren()) do
+                if v.Name:find("MuvaUI") then v:Destroy() end
+            end
+        end
+    end)
+
     -- Buat ScreenGui di CoreGui (aman dari character reset)
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name                  = "MuvaUI_" .. (opts.Title or "Window")

@@ -19,7 +19,7 @@ function Window.new(opts, screenGui, flags)
     win.BorderSizePixel  = 0
     win.Size     = UDim2.fromOffset(opts.Size and opts.Size.X or 560, opts.Size and opts.Size.Y or 540)
     win.Position = UDim2.fromOffset(80, 80)
-    win.ClipsDescendants = true
+    win.ClipsDescendants = false
     win.Parent   = screenGui
     self._win    = win
 
