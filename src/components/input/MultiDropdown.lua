@@ -85,20 +85,20 @@ Section.AddMultiDropdown = function(self, opts)
     arrow.TextColor3             = Theme:Text(3)
     arrow.Parent                 = trigger
 
-    -- Dropdown menu
+    -- Dropdown menu — parented to ScreenGui so it floats above all other UI
     local menu = Instance.new("ScrollingFrame")
     menu.BackgroundColor3      = Theme:BG(3)
     menu.BorderSizePixel       = 0
-    menu.Size                  = UDim2.new(1, 0, 0, 0)
-    menu.Position              = UDim2.new(0, 0, 1, 4)
+    menu.Size                  = UDim2.fromOffset(0, 0)
+    menu.Position              = UDim2.fromOffset(0, 0)
     menu.CanvasSize            = UDim2.new(0, 0, 0, 0)
     menu.AutomaticCanvasSize   = Enum.AutomaticSize.Y
     menu.ScrollBarThickness    = 2
     menu.ScrollBarImageColor3  = Theme:BG(4)
     menu.Visible               = false
-    menu.ZIndex                = 50
-    menu.ClipsDescendants      = true
-    menu.Parent                = trigger
+    menu.ZIndex                = 999
+    menu.ClipsDescendants      = false
+    menu.Parent                = game:GetService("CoreGui")
 
     local menuCorner = Instance.new("UICorner")
     menuCorner.CornerRadius = UDim.new(0, 7)
@@ -272,7 +272,8 @@ Section.AddMultiDropdown = function(self, opts)
         end
 
         local menuH = math.min(count, 6) * 30 + 8
-        menu.Size = UDim2.new(1, 0, 0, menuH)
+        local menuW = trigger.AbsoluteSize.X
+        menu.Size   = UDim2.fromOffset(menuW, menuH)
     end
 
     local open = false
@@ -286,6 +287,9 @@ Section.AddMultiDropdown = function(self, opts)
             Tween.fast(arrow, { Rotation = 0 })
         else
             open = true
+            local absPos  = trigger.AbsolutePosition
+            local absSize = trigger.AbsoluteSize
+            menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
             buildMenu()
             menu.Visible     = true
             arrow.TextColor3 = Theme:Accent()

@@ -69,16 +69,16 @@ Section.AddDropdown = function(self, opts)
     arrow.TextColor3             = Theme:Text(3)
     arrow.Parent                 = trigger
 
-    -- Dropdown menu
+    -- Dropdown menu — parented to ScreenGui so it floats above all other UI
     local menu = Instance.new("Frame")
     menu.BackgroundColor3 = Theme:BG(3)
     menu.BorderSizePixel  = 0
-    menu.Size             = UDim2.new(1, 0, 0, 0)
-    menu.Position         = UDim2.new(0, 0, 1, 4)
+    menu.Size             = UDim2.fromOffset(0, 0)
+    menu.Position         = UDim2.fromOffset(0, 0)
     menu.Visible          = false
-    menu.ZIndex           = 50
+    menu.ZIndex           = 999
     menu.ClipsDescendants = false
-    menu.Parent           = trigger
+    menu.Parent           = game:GetService("CoreGui")
 
     local menuCorner = Instance.new("UICorner")
     menuCorner.CornerRadius = UDim.new(0, 7)
@@ -224,11 +224,12 @@ Section.AddDropdown = function(self, opts)
                 count = count + 1
             end
         end
-        -- Resize menu height (max 5 visible items + search)
+        -- Resize menu based on trigger width and item count
         local itemH    = 30
         local maxItems = math.min(count, 6)
         local menuH    = (maxItems * itemH) + (searchable and 33 or 0) + 8
-        menu.Size      = UDim2.new(1, 0, 0, menuH)
+        local menuW    = trigger.AbsoluteSize.X
+        menu.Size      = UDim2.fromOffset(menuW, menuH)
         list.Size      = UDim2.new(1, 0, 1, searchable and -33 or 0)
     end
 
@@ -236,6 +237,10 @@ Section.AddDropdown = function(self, opts)
 
     local function openMenu()
         open = true
+        -- Position menu below trigger using absolute screen coordinates
+        local absPos  = trigger.AbsolutePosition
+        local absSize = trigger.AbsoluteSize
+        menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
         buildItems(nil)
         menu.Visible = true
         Tween.fast(arrow, { Rotation = 180 })
