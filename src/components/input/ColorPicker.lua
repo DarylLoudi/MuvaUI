@@ -72,16 +72,63 @@ Section.AddColorPicker = function(self, opts)
     pvStroke.Thickness = 2
     pvStroke.Parent    = previewBtn
 
+    -- Helper: get ScreenGui
+    local function getScreenGui(inst)
+        local p = inst
+        while p do
+            if p:IsA("ScreenGui") then return p end
+            p = p.Parent
+        end
+        return nil
+    end
+
+    -- Helper: auto-position popup agar tidak keluar batas layar
+    local function autoPosition(popup, anchor, popupW, popupH)
+        local sg = getScreenGui(anchor)
+        -- Reparent ke ScreenGui baru dengan DisplayOrder tinggi
+        local CoreGui = game:GetService("CoreGui")
+        for _, v in ipairs(CoreGui:GetChildren()) do
+            if v.Name == "MuvaUI_Popup" then pcall(function() v:Destroy() end) end
+        end
+        local psg = Instance.new("ScreenGui")
+        psg.Name           = "MuvaUI_Popup"
+        psg.ResetOnSpawn   = false
+        psg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        psg.DisplayOrder   = 1100
+        psg.IgnoreGuiInset = false
+        pcall(function() psg.Parent = CoreGui end)
+        popup.Parent = psg
+
+        local absPos  = anchor.AbsolutePosition
+        local absSize = anchor.AbsoluteSize
+        local screenW = workspace.CurrentCamera.ViewportSize.X
+        local screenH = workspace.CurrentCamera.ViewportSize.Y
+
+        -- Hitung X: default ke kanan anchor, kalau tidak muat geser ke kiri
+        local posX = absPos.X + absSize.X + 6
+        if posX + popupW > screenW then
+            posX = absPos.X - popupW - 6
+        end
+
+        -- Hitung Y: default sejajar top anchor, kalau tidak muat geser ke atas
+        local posY = absPos.Y
+        if posY + popupH > screenH then
+            posY = screenH - popupH - 8
+        end
+
+        popup.Position = UDim2.fromOffset(posX, posY)
+        return psg
+    end
+
     -- Palette popup
     local palette = Instance.new("Frame")
     palette.BackgroundColor3 = Theme:BG(3)
     palette.BorderSizePixel  = 0
     palette.Size             = UDim2.fromOffset(220, 0)
     palette.AutomaticSize    = Enum.AutomaticSize.Y
-    palette.Position         = UDim2.new(1, 6, 0, 0)
     palette.Visible          = false
     palette.ZIndex           = 60
-    palette.Parent           = previewBtn
+    palette.Parent           = previewBtn  -- sementara, pindah saat open
 
     local palCorner = Instance.new("UICorner")
     palCorner.CornerRadius = UDim.new(0, 10)
@@ -307,10 +354,19 @@ Section.AddColorPicker = function(self, opts)
 
     -- Toggle palette open/close
     local open = false
+    local _palSG = nil
     previewBtn.MouseButton1Click:Connect(function()
         open = not open
-        palette.Visible = open
-        pvStroke.Color  = open and Theme:Accent() or Theme:Border(1)
+        if open then
+            -- Auto-position: estimasi height 300px untuk palette
+            _palSG = autoPosition(palette, previewBtn, 220, 300)
+            palette.Visible = true
+        else
+            palette.Visible = false
+            palette.Parent  = previewBtn
+            if _palSG then pcall(function() _palSG:Destroy() end) _palSG = nil end
+        end
+        pvStroke.Color = open and Theme:Accent() or Theme:Border(1)
     end)
 
     previewBtn.MouseEnter:Connect(function()

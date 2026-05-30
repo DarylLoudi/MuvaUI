@@ -307,8 +307,20 @@ Section.AddMultiDropdown = function(self, opts)
             local absPos  = trigger.AbsolutePosition
             local absSize = trigger.AbsoluteSize
             menu.Parent   = getDropSG()
-            menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
-            menu.Size     = UDim2.fromOffset(absSize.X, menu.AbsoluteSize.Y)
+
+            local screenW  = workspace.CurrentCamera.ViewportSize.X
+            local screenH  = workspace.CurrentCamera.ViewportSize.Y
+            local menuW    = absSize.X
+            local estMenuH = math.min(#items, 6) * 30 + 8
+
+            local menuX = absPos.X
+            if menuX + menuW > screenW then menuX = screenW - menuW - 4 end
+
+            local menuY = absPos.Y + absSize.Y + 4
+            if menuY + estMenuH > screenH then menuY = absPos.Y - estMenuH - 4 end
+
+            menu.Position = UDim2.fromOffset(menuX, menuY)
+            menu.Size     = UDim2.fromOffset(menuW, 0)
             buildMenu()
             menu.Visible     = true
             arrow.TextColor3 = Theme:Accent()

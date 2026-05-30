@@ -310,10 +310,25 @@ Section.AddDropdown = function(self, opts)
         -- Reparent menu
         menu.Parent = sg
 
+        local screenW = workspace.CurrentCamera.ViewportSize.X
+        local screenH = workspace.CurrentCamera.ViewportSize.Y
+        local menuW   = absSize.X
+
+        -- Auto X: kalau menu keluar kanan layar, geser ke kiri
         local menuX = absPosBefore.X
+        if menuX + menuW > screenW then
+            menuX = screenW - menuW - 4
+        end
+
+        -- Auto Y: kalau menu keluar bawah layar, munculkan ke atas trigger
+        local estMenuH = 200
         local menuY = absPosBefore.Y + absSize.Y + 4
+        if menuY + estMenuH > screenH then
+            menuY = absPosBefore.Y - estMenuH - 4
+        end
+
         menu.Position = UDim2.fromOffset(menuX, menuY)
-        menu.Size     = UDim2.fromOffset(absSize.X, 0)
+        menu.Size     = UDim2.fromOffset(menuW, 0)
 
         buildItems(nil)
         menu.Visible = true
