@@ -19,7 +19,7 @@ function Window.new(opts, screenGui, flags)
     win.BorderSizePixel  = 0
     win.Size     = UDim2.fromOffset(opts.Size and opts.Size.X or 560, opts.Size and opts.Size.Y or 540)
     win.Position = UDim2.fromOffset(80, 80)
-    win.ClipsDescendants = false
+    win.ClipsDescendants = true
     win.Parent   = screenGui
     self._win    = win
 
@@ -44,6 +44,15 @@ function Window.new(opts, screenGui, flags)
     local tbCorner = Instance.new("UICorner")
     tbCorner.CornerRadius = UDim.new(0, 12)
     tbCorner.Parent = titlebar
+
+    -- Cover rounded bottom corners of titlebar with a square rect
+    local tbBottomSquare = Instance.new("Frame")
+    tbBottomSquare.BackgroundColor3   = Color.fromHex("#1a1a1e")
+    tbBottomSquare.BorderSizePixel    = 0
+    tbBottomSquare.Size               = UDim2.new(1, 0, 0, 13)
+    tbBottomSquare.Position           = UDim2.new(0, 0, 1, -13)
+    tbBottomSquare.ZIndex             = 1
+    tbBottomSquare.Parent             = titlebar
 
     local tbDivider = Instance.new("Frame")
     tbDivider.BackgroundColor3 = Color.fromHex("#252528")
