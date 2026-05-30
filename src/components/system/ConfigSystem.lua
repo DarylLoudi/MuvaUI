@@ -100,6 +100,7 @@ function ConfigSystem.attach(win, config, flags)
             local infoLayout = Instance.new("UIListLayout")
             infoLayout.FillDirection     = Enum.FillDirection.Vertical
             infoLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        infoLayout.Padding          = UDim.new(0, 2)
             infoLayout.Parent            = info
 
             local nameLbl = Instance.new("TextLabel")

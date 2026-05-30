@@ -94,6 +94,7 @@ Section.AddAvatar = function(self, opts)
         local infoL = Instance.new("UIListLayout")
         infoL.FillDirection     = Enum.FillDirection.Vertical
         infoL.VerticalAlignment = Enum.VerticalAlignment.Center
+    infoL.Padding           = UDim.new(0, 2)
         infoL.Parent            = info
 
         local lbl = Instance.new("TextLabel")
