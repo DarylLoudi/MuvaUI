@@ -262,6 +262,8 @@ Section.AddDropdown = function(self, opts)
         local absPos  = trigger.AbsolutePosition
         local absSize = trigger.AbsoluteSize
 
+        print("[DD] trigger AbsPos:", absPos, "AbsSize:", absSize)
+
         -- Pindah parent ke ScreenGui agar tidak ter-clip ScrollingFrame
         local sg = getScreenGui(trigger)
         if sg then menu.Parent = sg end
@@ -269,6 +271,8 @@ Section.AddDropdown = function(self, opts)
         -- Set posisi tepat di bawah trigger
         menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
+
+        print("[DD] menu.Position:", menu.Position, "menu.Parent:", menu.Parent)
 
         buildItems(nil)
         menu.Visible = true
