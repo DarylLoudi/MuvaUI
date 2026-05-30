@@ -46,7 +46,7 @@ Section.AddColorPicker = function(self, opts)
     if opts.Desc then
         local desc = Instance.new("TextLabel")
         desc.BackgroundTransparency = 1
-        desc.Size                   = UDim2.new(1, 0, 0, 12)
+        desc.Size                   = UDim2.new(1, 0, 0, 14)
         desc.Text                   = opts.Desc
         desc.Font                   = Enum.Font.Gotham
         desc.TextSize               = 12
