@@ -1,6 +1,9 @@
 -- MuvaUI Audit2 — Window Preview replica
-local URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/MuvaUI.lua?t=" .. tostring(os.time())
-local MuvaUI = loadstring(game:HttpGet(URL, true))()
+local AUDIT_VERSION = "2.5"
+local LIB_URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/MuvaUI.lua?t=" .. tostring(os.time())
+print("[Audit2 v" .. AUDIT_VERSION .. "] Loading MuvaUI...")
+local MuvaUI = loadstring(game:HttpGet(LIB_URL, true))()
+print("[Audit2 v" .. AUDIT_VERSION .. "] MuvaUI loaded. Starting UI build...")
 
 local win = MuvaUI:CreateWindow({
     Title    = "MuvaUI",
@@ -154,4 +157,4 @@ secPrefs:AddToggle({
     Callback = function(v) print("Sound Effects:", v) end,
 })
 
-print("[MuvaUI Audit2] All tabs loaded.")
+print("[Audit2 v" .. AUDIT_VERSION .. "] All tabs loaded. UI ready.")
