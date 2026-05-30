@@ -79,7 +79,7 @@ Section.AddDropdown = function(self, opts)
         return nil
     end
 
-    -- Invisible blocker — covers entire screen behind menu to block click-through
+    -- Invisible blocker — covers entire screen, ZIndex di bawah menu
     local blocker = Instance.new("TextButton")
     blocker.BackgroundTransparency = 1
     blocker.BorderSizePixel        = 0
@@ -89,7 +89,10 @@ Section.AddDropdown = function(self, opts)
     blocker.AutoButtonColor        = false
     blocker.ZIndex                 = 998
     blocker.Visible                = false
-    blocker.Parent                 = card  -- pindah ke ScreenGui saat open
+    blocker.Parent                 = card
+
+    -- Connect sekali saja
+    blocker.MouseButton1Click:Connect(function() _close() end)
 
     -- Menu: di-parent ke ScreenGui saat open agar tidak ter-clip ScrollingFrame
     local menu = Instance.new("Frame")
@@ -308,10 +311,9 @@ Section.AddDropdown = function(self, opts)
         print(string.format("[DD-OPEN] inset=(%.0f,%.0f) sg.IgnoreGuiInset=%s card.Parent=%s",
             inset.X, inset.Y, tostring(sg.IgnoreGuiInset), tostring(card.Parent)))
 
-        -- Blocker
+        -- Blocker full-screen di belakang menu
         blocker.Parent  = sg
         blocker.Visible = true
-        blocker.MouseButton1Click:Connect(function() _close() end)
 
         -- Reparent menu
         menu.Parent = sg
@@ -363,20 +365,7 @@ Section.AddDropdown = function(self, opts)
         end)
     end
 
-    -- Close on outside click
-    game:GetService("UserInputService").InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and open then
-            task.defer(function()
-                local pos  = game:GetService("UserInputService"):GetMouseLocation()
-                local abs  = menu.AbsolutePosition
-                local size = menu.AbsoluteSize
-                if pos.X < abs.X or pos.X > abs.X + size.X or
-                   pos.Y < abs.Y or pos.Y > abs.Y + size.Y then
-                    _close()
-                end
-            end)
-        end
-    end)
+    -- Outside click handled by blocker button
 
     card.MouseEnter:Connect(function()
         Tween.fast(card, { BackgroundColor3 = Theme:BG(3) })
