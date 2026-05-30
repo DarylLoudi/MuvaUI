@@ -125,7 +125,7 @@ Section.AddTable = function(self, opts)
     bodyLayout.Parent        = body
 
     -- State
-    local allRows   = {}
+    local allRows   = opts.Rows or {}
     local sortCol   = nil
     local sortAsc   = true
     local headerBtns = {}

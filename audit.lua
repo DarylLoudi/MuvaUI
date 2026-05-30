@@ -1,6 +1,4 @@
 -- MuvaUI Full Audit Script
--- Memuat semua komponen yang tersedia untuk audit visual
-
 local URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/MuvaUI.lua"
 local MuvaUI = loadstring(game:HttpGet(URL))()
 
@@ -22,19 +20,16 @@ secToggles:AddToggle({
     Default = true,
     Callback = function(v) print("Toggle1:", v) end,
 })
-
 secToggles:AddToggle({
     ID = "Toggle2", Title = "Auto Collect",
     Default = false,
     Callback = function(v) print("Toggle2:", v) end,
 })
-
 secToggles:AddCheckbox({
     ID = "Check1", Title = "Show ESP", Desc = "Draw boxes on players",
     Default = true,
     Callback = function(v) print("Check1:", v) end,
 })
-
 secToggles:AddCheckbox({
     ID = "Check2", Title = "Aimbot",
     Default = false,
@@ -48,13 +43,11 @@ secSliders:AddSlider({
     Min = 16, Max = 200, Step = 1, Default = 16, Suffix = " st",
     Callback = function(v) print("Speed:", v) end,
 })
-
 secSliders:AddSlider({
     ID = "JumpPower", Title = "Jump Power",
     Min = 0, Max = 500, Step = 5, Default = 50, Suffix = " jp",
     Callback = function(v) print("Jump:", v) end,
 })
-
 secSliders:AddNumberInput({
     ID = "Delay", Title = "Loop Delay",
     Min = 0, Max = 60, Step = 0.5, Default = 1,
@@ -67,7 +60,6 @@ secText:AddTextInput({
     ID = "PlayerName", Title = "Target Player", Placeholder = "Enter username...",
     Callback = function(v) print("Target:", v) end,
 })
-
 secText:AddTextarea({
     ID = "Notes", Title = "Notes", Placeholder = "Write notes here...",
     Callback = function(v) print("Notes:", v) end,
@@ -81,7 +73,6 @@ secDropdowns:AddDropdown({
     Default = "PvP",
     Callback = function(v) print("Mode:", v) end,
 })
-
 secDropdowns:AddMultiDropdown({
     ID = "Features", Title = "Active Features",
     Options = { "Auto Fish", "Auto Cast", "Auto Shake", "Instant Bobber", "Anti AFK" },
@@ -95,7 +86,6 @@ secOther:AddKeybind({
     ID = "ToggleKey", Title = "Toggle GUI", Default = Enum.KeyCode.RightShift,
     Callback = function(k) print("Keybind:", k) end,
 })
-
 secOther:AddColorPicker({
     ID = "AccentColor", Title = "Accent Color",
     Default = Color3.fromRGB(168, 85, 247),
@@ -109,42 +99,33 @@ local tabDisplay = win:AddTab({ Title = "Display", Icon = "⬡" })
 
 local secButtons = tabDisplay:AddSection({ Title = "Button" })
 
-secButtons:AddButton({
-    Title = "Default Button",
+secButtons:AddButton({ Title = "Default Button",
     Callback = function() MuvaUI:Notify({ Title = "Clicked", Body = "Default button pressed", Type = "info" }) end,
 })
-
-secButtons:AddButton({
-    Title = "Success Action", Style = "success",
+secButtons:AddButton({ Title = "Success Action", Style = "Success",
     Callback = function() MuvaUI:Notify({ Title = "Success", Body = "Config saved", Type = "success" }) end,
 })
-
-secButtons:AddButton({
-    Title = "Danger Action", Style = "danger",
+secButtons:AddButton({ Title = "Danger Action", Style = "Danger",
     Callback = function() MuvaUI:Notify({ Title = "Danger", Body = "Script stopped", Type = "error" }) end,
 })
-
-secButtons:AddButton({
-    Title = "Ghost Button", Style = "ghost",
+secButtons:AddButton({ Title = "Ghost Button", Style = "Ghost",
     Callback = function() MuvaUI:Notify({ Title = "Ghost", Body = "Ghost clicked", Type = "info" }) end,
 })
-
-secButtons:AddButton({
-    Title = "Warn Action", Style = "warn",
+secButtons:AddButton({ Title = "Warn Action", Style = "Warn",
     Callback = function() MuvaUI:Notify({ Title = "Warning", Body = "Rate limit approaching", Type = "warn" }) end,
 })
 
 local secBadges = tabDisplay:AddSection({ Title = "Badge & Tag" })
 
-secBadges:AddBadge({ Title = "v1.0.0", Style = "purple" })
-secBadges:AddBadge({ Title = "Online",  Style = "green"  })
-secBadges:AddBadge({ Title = "Error",   Style = "red"    })
-secBadges:AddBadge({ Title = "Warn",    Style = "yellow" })
-secBadges:AddBadge({ Title = "Info",    Style = "blue"   })
+secBadges:AddBadge({ Title = "v1.0.0",  Color = "Purple", Value = "Purple" })
+secBadges:AddBadge({ Title = "Status",   Color = "Green",  Value = "Online"  })
+secBadges:AddBadge({ Title = "Error",    Color = "Red",    Value = "Error"   })
+secBadges:AddBadge({ Title = "Warning",  Color = "Yellow", Value = "Warn"    })
+secBadges:AddBadge({ Title = "Info",     Color = "Blue",   Value = "Info"    })
 
-secBadges:AddTag({ Title = "Script Hub", Removable = true })
-secBadges:AddTag({ Title = "Roblox",     Removable = true })
-secBadges:AddTag({ Title = "v1.0",       Removable = true })
+secBadges:AddTag({ Tags = { "Script Hub", "Roblox", "v1.0" }, Removable = true,
+    Callback = function(tags) print("Tags:", table.concat(tags, ", ")) end,
+})
 
 local secProgress = tabDisplay:AddSection({ Title = "Progress Bar" })
 
@@ -169,7 +150,6 @@ secText2:AddParagraph({
     Title = "About",
     Body  = "MuvaUI adalah UI library untuk Roblox executor. Dibuat untuk kemudahan dan estetika.",
 })
-
 secText2:AddCodeBlock({
     Code = 'local win = MuvaUI:CreateWindow({ Title = "MuvaUI" })\nlocal tab = win:AddTab({ Title = "Main" })',
 })
@@ -193,20 +173,16 @@ local tabLayout = win:AddTab({ Title = "Layout", Icon = "⚙" })
 
 local secStacks = tabLayout:AddSection({ Title = "HStack & VStack" })
 
-secStacks:AddHStack({
-    Children = function(stack)
-        stack:AddButton({ Title = "A", Callback = function() end })
-        stack:AddButton({ Title = "B", Callback = function() end })
-        stack:AddButton({ Title = "C", Callback = function() end })
-    end,
-})
+-- HStack: return stack proxy, panggil AddX langsung
+local hstack = secStacks:AddHStack({})
+hstack:AddButton({ Title = "A", Callback = function() end })
+hstack:AddButton({ Title = "B", Callback = function() end })
+hstack:AddButton({ Title = "C", Callback = function() end })
 
-secStacks:AddVStack({
-    Children = function(stack)
-        stack:AddToggle({ ID = "VS1", Title = "Option A", Default = false, Callback = function() end })
-        stack:AddToggle({ ID = "VS2", Title = "Option B", Default = true,  Callback = function() end })
-    end,
-})
+-- VStack: return stack proxy, panggil AddX langsung
+local vstack = secStacks:AddVStack({})
+vstack:AddToggle({ ID = "VS1", Title = "Option A", Default = false, Callback = function() end })
+vstack:AddToggle({ ID = "VS2", Title = "Option B", Default = true,  Callback = function() end })
 
 local secSpace = tabLayout:AddSection({ Title = "Space" })
 secSpace:AddSpace({ Height = 32 })
@@ -214,27 +190,23 @@ secSpace:AddSpace({ Height = 32 })
 local secAccordion = tabLayout:AddSection({ Title = "Accordion" })
 
 secAccordion:AddAccordion({
-    Items = {
-        {
-            Title = "⚙ General Settings",
-            Open  = true,
-            Content = function(body)
-                body:AddToggle({ ID = "AccNotif", Title = "Enable Notifications", Default = true, Callback = function() end })
-            end,
-        },
-        {
-            Title = "◈ Combat Options",
-            Content = function(body)
-                body:AddSlider({ ID = "AccRange", Title = "Attack Range", Min = 1, Max = 50, Default = 10, Callback = function() end })
-            end,
-        },
-        {
-            Title = "⬡ Teleport Zones",
-            Content = function(body)
-                body:AddButton({ Title = "Add Zone", Callback = function() end })
-            end,
-        },
-    },
+    Title = "⚙ General Settings",
+    Open  = true,
+    Content = function(body)
+        body:AddToggle({ ID = "AccNotif", Title = "Enable Notifications", Default = true, Callback = function() end })
+    end,
+})
+secAccordion:AddAccordion({
+    Title = "◈ Combat Options",
+    Content = function(body)
+        body:AddSlider({ ID = "AccRange", Title = "Attack Range", Min = 1, Max = 50, Default = 10, Callback = function() end })
+    end,
+})
+secAccordion:AddAccordion({
+    Title = "⬡ Teleport Zones",
+    Content = function(body)
+        body:AddButton({ Title = "Add Zone", Callback = function() end })
+    end,
 })
 
 -- ════════════════════════════════════════════
@@ -244,45 +216,29 @@ local tabOverlay = win:AddTab({ Title = "Overlay", Icon = "◇" })
 
 local secOverlay = tabOverlay:AddSection({ Title = "Toast / Notify" })
 
-secOverlay:AddButton({
-    Title = "Show Info Toast",
-    Callback = function()
-        MuvaUI:Notify({ Title = "Info", Body = "Library berhasil diload", Type = "info", Duration = 3 })
-    end,
+secOverlay:AddButton({ Title = "Show Info Toast",
+    Callback = function() MuvaUI:Notify({ Title = "Info", Body = "Library berhasil diload", Type = "info", Duration = 3 }) end,
 })
-
-secOverlay:AddButton({
-    Title = "Show Success Toast", Style = "success",
-    Callback = function()
-        MuvaUI:Notify({ Title = "Success", Body = "Config tersimpan", Type = "success", Duration = 3 })
-    end,
+secOverlay:AddButton({ Title = "Show Success Toast", Style = "Success",
+    Callback = function() MuvaUI:Notify({ Title = "Success", Body = "Config tersimpan", Type = "success", Duration = 3 }) end,
 })
-
-secOverlay:AddButton({
-    Title = "Show Error Toast", Style = "danger",
-    Callback = function()
-        MuvaUI:Notify({ Title = "Error", Body = "Koneksi gagal", Type = "error", Duration = 3 })
-    end,
+secOverlay:AddButton({ Title = "Show Error Toast", Style = "Danger",
+    Callback = function() MuvaUI:Notify({ Title = "Error", Body = "Koneksi gagal", Type = "error", Duration = 3 }) end,
 })
-
-secOverlay:AddButton({
-    Title = "Show Warn Toast", Style = "warn",
-    Callback = function()
-        MuvaUI:Notify({ Title = "Warning", Body = "Hati-hati rate limit", Type = "warn", Duration = 3 })
-    end,
+secOverlay:AddButton({ Title = "Show Warn Toast", Style = "Warn",
+    Callback = function() MuvaUI:Notify({ Title = "Warning", Body = "Hati-hati rate limit", Type = "warn", Duration = 3 }) end,
 })
 
 local secDialog = tabOverlay:AddSection({ Title = "Dialog" })
 
-secDialog:AddButton({
-    Title = "Open Confirm Dialog", Style = "danger",
+secDialog:AddButton({ Title = "Open Confirm Dialog", Style = "Danger",
     Callback = function()
         win:Dialog({
-            Title  = "Stop All Scripts?",
-            Body   = "Semua script yang berjalan akan dihentikan.",
+            Title = "Stop All Scripts?",
+            Body  = "Semua script yang berjalan akan dihentikan.",
             Buttons = {
-                { Text = "Cancel",  Style = "ghost",   Callback = function() end },
-                { Text = "Confirm", Style = "danger",  Callback = function()
+                { Text = "Cancel",  Style = "Ghost",  Callback = function() end },
+                { Text = "Confirm", Style = "Danger", Callback = function()
                     MuvaUI:Notify({ Title = "Stopped", Body = "Semua script dihentikan", Type = "error" })
                 end },
             },
