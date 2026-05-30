@@ -1,0 +1,137 @@
+-- Toggle: ON/OFF switch
+Section.AddToggle = function(self, opts)
+    assert(type(opts) == "table", "AddToggle: opts must be a table")
+    local flag = self:_registerFlag(opts.ID, opts.Default or false)
+
+    local card, stroke = self:_makeCard()
+
+    -- Info (left, fills remaining space)
+    local info = Instance.new("Frame")
+    info.BackgroundTransparency = 1
+    info.Size                   = UDim2.new(1, -50, 1, 0)
+    info.LayoutOrder            = 1
+    info.Parent                 = card
+
+    local infoLayout = Instance.new("UIListLayout")
+    infoLayout.FillDirection    = Enum.FillDirection.Vertical
+    infoLayout.VerticalAlignment= Enum.VerticalAlignment.Center
+    infoLayout.Parent           = info
+
+    local title = Instance.new("TextLabel")
+    title.BackgroundTransparency = 1
+    title.Size                   = UDim2.new(1, 0, 0, 14)
+    title.Text                   = opts.Title or ""
+    title.Font                   = Enum.Font.Gotham
+    title.TextSize               = 11
+    title.TextColor3             = Theme:Text(1)
+    title.TextXAlignment         = Enum.TextXAlignment.Left
+    title.Parent                 = info
+
+    if opts.Desc then
+        local desc = Instance.new("TextLabel")
+        desc.BackgroundTransparency = 1
+        desc.Size                   = UDim2.new(1, 0, 0, 12)
+        desc.Text                   = opts.Desc
+        desc.Font                   = Enum.Font.Gotham
+        desc.TextSize               = 9
+        desc.TextColor3             = Theme:Text(4)
+        desc.TextXAlignment         = Enum.TextXAlignment.Left
+        desc.Parent                 = info
+    end
+
+    -- Toggle track (right)
+    local track = Instance.new("Frame")
+    track.Size              = UDim2.fromOffset(34, 19)
+    track.BackgroundColor3  = Theme:BG(4)
+    track.BorderSizePixel   = 0
+    track.LayoutOrder       = 2
+    track.Parent            = card
+
+    local trackCorner = Instance.new("UICorner")
+    trackCorner.CornerRadius = UDim.new(1, 0)
+    trackCorner.Parent       = track
+
+    local trackStroke = Instance.new("UIStroke")
+    trackStroke.Color     = Theme:Border(1)
+    trackStroke.Thickness = 1
+    trackStroke.Parent    = track
+
+    -- Knob
+    local knob = Instance.new("Frame")
+    knob.Size             = UDim2.fromOffset(13, 13)
+    knob.Position         = UDim2.fromOffset(2, 3)
+    knob.BackgroundColor3 = Color3.new(1, 1, 1)
+    knob.BorderSizePixel  = 0
+    knob.ZIndex           = 2
+    knob.Parent           = track
+
+    local knobCorner = Instance.new("UICorner")
+    knobCorner.CornerRadius = UDim.new(1, 0)
+    knobCorner.Parent       = knob
+
+    local value = opts.Default or false
+
+    local function updateVisual(val, animated)
+        if val then
+            if animated then
+                Tween.play(track, { BackgroundColor3 = Theme:Accent() })
+                Tween.play(knob,  { Position = UDim2.fromOffset(19, 3) })
+            else
+                track.BackgroundColor3 = Theme:Accent()
+                knob.Position          = UDim2.fromOffset(19, 3)
+            end
+            trackStroke.Color = Theme:Accent()
+        else
+            if animated then
+                Tween.play(track, { BackgroundColor3 = Theme:BG(4) })
+                Tween.play(knob,  { Position = UDim2.fromOffset(2, 3) })
+            else
+                track.BackgroundColor3 = Theme:BG(4)
+                knob.Position          = UDim2.fromOffset(2, 3)
+            end
+            trackStroke.Color = Theme:Border(1)
+        end
+    end
+
+    updateVisual(value, false)
+
+    local btn = Instance.new("TextButton")
+    btn.Size                    = UDim2.new(1, 0, 1, 0)
+    btn.BackgroundTransparency  = 1
+    btn.Text                    = ""
+    btn.ZIndex                  = 3
+    btn.Parent                  = card
+
+    btn.MouseButton1Click:Connect(function()
+        value = not value
+        updateVisual(value, true)
+        if flag then flag:_fire(value) end
+        if opts.Callback then pcall(opts.Callback, value) end
+    end)
+
+    btn.MouseEnter:Connect(function()
+        Tween.fast(card, { BackgroundColor3 = Theme:BG(3) })
+        stroke.Color = Theme:Border(1)
+    end)
+    btn.MouseLeave:Connect(function()
+        Tween.fast(card, { BackgroundColor3 = Theme:BG(2) })
+        stroke.Color = Theme:Border(0)
+    end)
+
+    Theme:OnAccentChanged(function(accent)
+        if value then
+            track.BackgroundColor3 = accent
+            trackStroke.Color      = accent
+        end
+    end)
+
+    if flag then
+        flag:OnChanged(function(v)
+            value = v
+            updateVisual(v, true)
+        end)
+    end
+
+    table.insert(self._components, card)
+    return card
+end

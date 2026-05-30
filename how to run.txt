@@ -1,0 +1,120 @@
+═══════════════════════════════════════════════
+  MuvaUI — How to Run & Development Guide
+═══════════════════════════════════════════════
+
+
+── STRUKTUR PROJECT ────────────────────────────
+
+  MuvaUI/
+    src/                  ← edit code di sini
+      util/               ← Signal, Color, Tween helpers
+      core/               ← Library, Window, Tab, Section, Flag, Theme
+      components/         ← semua 39 komponen (belum semua selesai)
+        input/
+        display/
+        layout/
+        overlay/
+        system/
+        feedback/
+    build.py              ← script untuk build
+    MuvaUI.lua            ← OUTPUT — jangan edit manual
+    mockup.html           ← visual reference / audit
+    docs/api-design.md    ← dokumentasi API lengkap
+
+
+── CARA BUILD ──────────────────────────────────
+
+  Setiap kali kamu edit file di src/, jalankan:
+
+    python3 build.py
+
+  Ini akan concat semua file Lua menjadi satu MuvaUI.lua.
+  Output akan muncul di terminal seperti ini:
+
+    [OK] Built MuvaUI.lua — 9/40 files, 40.9 KB
+         >> C:\Users\daryl\Downloads\MuvaUI\MuvaUI.lua
+
+  Catatan: file yang belum dibuat akan di-skip dengan peringatan [WARN].
+  Itu normal selama komponen belum diimplementasi semua.
+
+
+── CARA TEST DI ROBLOX (EXECUTOR) ─────────────
+
+  1. Buka Roblox game di executor kamu (Synapse, KRNL, dll)
+
+  2. Upload MuvaUI.lua ke GitHub raw atau hosting lain,
+     lalu jalankan di executor:
+
+       local MuvaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/USERNAME/REPO/main/MuvaUI.lua"))()
+
+  3. Atau untuk test lokal tanpa upload, pakai file executor
+     yang support readfile():
+
+       local MuvaUI = loadstring(readfile("C:/Users/daryl/Downloads/MuvaUI/MuvaUI.lua"))()
+
+
+── CARA TEST DI ROBLOX STUDIO (OPSIONAL) ───────
+
+  Catatan: MuvaUI dirancang untuk executor (loadstring + CoreGui),
+  bukan ModuleScript. Tapi bisa di-test di Studio dengan:
+
+  1. Buka Script di StarterPlayerScripts
+  2. Copy-paste isi MuvaUI.lua ke atas script, lalu pakai langsung:
+
+       local Window = Library:CreateWindow({ Title = "Test" })
+
+
+── CARA AUDIT VISUAL ───────────────────────────
+
+  Buka mockup.html di browser untuk melihat semua komponen:
+
+    C:\Users\daryl\Downloads\MuvaUI\mockup.html
+
+  Ini adalah source of truth visual sebelum implementasi Lua.
+  Semua komponen, warna, dan behavior di Lua harus cocok dengan mockup.
+
+
+── STATUS IMPLEMENTASI ─────────────────────────
+
+  SELESAI:
+    [x] util/Signal.lua
+    [x] util/Color.lua
+    [x] util/Tween.lua
+    [x] core/Flag.lua
+    [x] core/Theme.lua
+    [x] core/Section.lua
+    [x] core/Tab.lua
+    [x] core/Window.lua
+    [x] core/Library.lua
+    [x] build.py
+    [x] docs/api-design.md
+
+  SELESAI (lanjutan):
+    [x] components/input/    (Toggle, Checkbox, Slider, NumberInput,
+                              TextInput, Textarea, Dropdown, MultiDropdown,
+                              Keybind, ColorPicker)
+    [x] components/display/  (Button, Badge, Tag, ProgressBar, InfoDisplay,
+                              Paragraph, CodeBlock, Divider, Tooltip,
+                              Avatar, Table, Separator)
+    [x] components/layout/   (HStack, VStack, Space, Accordion)
+    [x] components/overlay/  (Dialog, Popup, Toast)
+    [x] components/system/   (Webhook)
+    [x] components/feedback/ (StateRenderer)
+
+  STATUS: 40/40 files — MuvaUI.lua siap (205.5 KB)
+
+  NEXT STEPS:
+    [ ] Test di executor — loadstring MuvaUI.lua dan verifikasi tiap komponen
+    [ ] Upload ke GitHub dan test via HttpGet
+    [ ] Buat contoh script usage (example.lua)
+
+
+── DOCS ────────────────────────────────────────
+
+  Lihat docs/api-design.md untuk:
+  - Semua method dan parameter tiap komponen
+  - Pola callback dan Flag system
+  - File structure lengkap
+
+
+═══════════════════════════════════════════════

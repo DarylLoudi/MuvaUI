@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MuvaUI — Component Audit</title>
+<style>
+/* ─── RESET ───────────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --accent:#A855F7;
+  --accent-rgb:168,85,247;
+  --accent-dim:rgba(168,85,247,0.15);
+  --accent-border:rgba(168,85,247,0.3);
+  --accent-glow:rgba(168,85,247,0.35);
+  --accent-dark:#7C3AED;
+}
+body {
+  background:#0a0a0c;
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  color:#e0e0e0;
+  min-height:100vh;
+}
+
+/* ─── AUDIT LAYOUT ────────────────────────────────────────── */
+.audit-layout { display:flex; min-height:100vh; }
+.audit-nav {
+  width:200px; background:#0e0e10; border-right:1px solid #1a1a1e;
+  padding:16px 0; position:sticky; top:0; height:100vh; overflow-y:auto; flex-shrink:0;
+}
+.audit-nav-title { font-size:10px; font-weight:700; color:#444; text-transform:uppercase; letter-spacing:1px; padding:0 16px 10px; }
+.audit-nav a {
+  display:flex; align-items:center; gap:8px; padding:7px 16px;
+  font-size:11.5px; color:#555; text-decoration:none; transition:all 0.12s;
+  border-left:2px solid transparent;
+}
+.audit-nav a:hover { color:#ccc; background:#141416; }
+.audit-nav a.active { color:#c084fc; border-left-color:var(--accent); background:rgba(168,85,247,0.06); }
+.audit-nav-sep { height:1px; background:#1a1a1e; margin:6px 0; }
+.audit-main { flex:1; padding:32px; overflow-x:hidden; }
+.audit-header { margin-bottom:32px; padding-bottom:16px; border-bottom:1px solid #1a1a1e; }
+.audit-header h1 { font-size:20px; font-weight:700; color:#f0f0f0; }
+.audit-header p  { font-size:12px; color:#555; margin-top:4px; }
+
+/* ─── COMPONENT GROUP ─────────────────────────────────────── */
+.comp-group { margin-bottom:48px; scroll-margin-top:32px; }
+.comp-group-title { font-size:13px; font-weight:700; color:#f0f0f0; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+.comp-group-title span { font-size:10px; font-weight:600; color:var(--accent); background:var(--accent-dim); border:1px solid var(--accent-border); padding:2px 8px; border-radius:20px; }
+.comp-group-desc { font-size:11px; color:#444; margin-bottom:14px; }
+.comp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; }
+.comp-grid-wide { grid-template-columns:1fr; }
+.full-width { grid-column:1/-1; }
+.divider-text { display:flex; align-items:center; gap:8px; font-size:9.5px; color:#333; text-transform:uppercase; letter-spacing:0.7px; margin-bottom:6px; }
+.divider-text::before,.divider-text::after { content:''; flex:1; height:1px; background:#1e1e22; }
+
+/* ─── SHARED COMP CARD ────────────────────────────────────── */
+.comp {
+  background:#141416; border:1px solid #1e1e22; border-radius:8px;
+  padding:10px 12px; display:flex; align-items:center;
+  justify-content:space-between; gap:10px; transition:border-color 0.15s; position:relative;
+}
+.comp:hover { border-color:#2a2a2e; }
+.comp-info { flex:1; min-width:0; }
+.comp-name { font-size:11.5px; color:#ddd; font-weight:500; }
+.comp-desc { font-size:10px; color:#444; margin-top:2px; }
+
+/* ─── TOGGLE ──────────────────────────────────────────────── */
+.toggle {
+  width:34px; height:19px; border-radius:10px; background:#252528; cursor:pointer;
+  position:relative; transition:background 0.2s; flex-shrink:0; border:1px solid #333;
+}
+.toggle.on { background:var(--accent); border-color:var(--accent); box-shadow:0 0 8px var(--accent-glow); }
+.toggle::after {
+  content:''; position:absolute; width:13px; height:13px; border-radius:50%;
+  background:#fff; top:2px; left:2px; transition:transform 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.5);
+}
+.toggle.on::after { transform:translateX(15px); }
+
+/* ─── CHECKBOX ────────────────────────────────────────────── */
+.checkbox {
+  width:16px; height:16px; border-radius:4px; border:1.5px solid #333; background:#0e0e10;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all 0.15s; font-size:9px; color:transparent;
+}
+.checkbox.checked { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 0 6px var(--accent-glow); }
+
+/* ─── SLIDER ──────────────────────────────────────────────── */
+.slider-group { display:flex; align-items:center; gap:7px; min-width:140px; }
+input[type=range] {
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:4px; border-radius:2px; background:#252528; outline:none; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:13px; height:13px; border-radius:50%;
+  background:var(--accent); cursor:pointer; box-shadow:0 0 6px var(--accent-glow);
+}
+.slider-val { font-size:11px; color:var(--accent); font-weight:700; min-width:30px; text-align:right; }
+
+/* ─── NUMBER INPUT ────────────────────────────────────────── */
+.number-input { display:flex; align-items:center; background:#0e0e10; border:1px solid #252528; border-radius:6px; overflow:hidden; transition:border-color 0.15s; }
+.number-input:focus-within { border-color:var(--accent); }
+.ni-btn { width:26px; height:30px; background:#1a1a1e; border:none; color:#aaa; font-size:14px; cursor:pointer; transition:all 0.12s; font-family:inherit; display:flex; align-items:center; justify-content:center; }
+.ni-btn:hover { background:#252528; color:#fff; }
+.ni-val { width:50px; background:none; border:none; outline:none; color:#e0e0e0; font-size:11px; text-align:center; font-family:inherit; }
+
+/* ─── TEXT INPUT ──────────────────────────────────────────── */
+.textinput {
+  background:#0e0e10; border:1px solid #252528; border-radius:6px;
+  padding:6px 10px; color:#e0e0e0; font-size:11px; outline:none;
+  transition:all 0.15s; font-family:inherit;
+}
+.textinput:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(var(--accent-rgb),0.1); }
+.textinput::placeholder { color:#333; }
+
+/* ─── TEXTAREA ────────────────────────────────────────────── */
+.textarea {
+  background:#0e0e10; border:1px solid #252528; border-radius:6px;
+  padding:8px 10px; color:#e0e0e0; font-size:11px; outline:none;
+  transition:all 0.15s; font-family:inherit; width:100%; resize:vertical; min-height:70px; line-height:1.5;
+}
+.textarea:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(var(--accent-rgb),0.1); }
+.textarea::placeholder { color:#333; }
+
+/* ─── DROPDOWN ────────────────────────────────────────────── */
+.dropdown-wrap { position:relative; }
+.dropdown-trigger {
+  background:#0e0e10; border:1px solid #252528; border-radius:6px;
+  padding:6px 10px; color:#ccc; font-size:11px; display:flex; align-items:center; gap:7px;
+  cursor:pointer; min-width:150px; transition:all 0.15s; user-select:none;
+}
+.dropdown-trigger:hover,.dropdown-trigger.open { border-color:var(--accent); color:#e0e0e0; }
+.dt-val { flex:1; }
+.dt-arrow { color:#555; font-size:9px; transition:transform 0.2s; }
+.dropdown-trigger.open .dt-arrow { transform:rotate(180deg); color:var(--accent); }
+.dropdown-menu {
+  position:absolute; right:0; top:calc(100% + 4px);
+  background:#1c1c20; border:1px solid #2e2e36; border-radius:8px; overflow:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,0.6); min-width:170px; z-index:999;
+  display:none; flex-direction:column; animation:dropIn 0.12s ease;
+}
+.dropdown-menu.open { display:flex; }
+.dd-item { padding:8px 12px; font-size:11px; color:#aaa; cursor:pointer; transition:all 0.1s; display:flex; align-items:center; gap:7px; }
+.dd-item:hover { background:#252530; color:#e0e0e0; }
+.dd-item.selected { color:#c084fc; background:rgba(168,85,247,0.08); }
+.dd-item.selected::after { content:'✓'; margin-left:auto; color:var(--accent); font-size:10px; }
+.dd-divider { height:1px; background:#252528; margin:3px 0; }
+.dd-check { width:13px; height:13px; border-radius:3px; border:1px solid #444; display:flex; align-items:center; justify-content:center; font-size:8px; flex-shrink:0; transition:all 0.1s; }
+.dd-item.selected .dd-check { background:var(--accent); border-color:var(--accent); color:#fff; }
+.multisel-val { display:flex; flex-wrap:wrap; gap:3px; flex:1; min-width:0; }
+.ms-tag { background:rgba(var(--accent-rgb),0.12); border:1px solid rgba(var(--accent-rgb),0.25); color:#c084fc; font-size:9.5px; padding:1px 6px; border-radius:4px; display:flex; align-items:center; gap:3px; white-space:nowrap; }
+.ms-x { cursor:pointer; opacity:0.6; font-size:9px; }
+.ms-x:hover { opacity:1; }
+
+/* ─── BUTTON ──────────────────────────────────────────────── */
+.btn { background:var(--accent-dim); border:1px solid var(--accent-border); color:#c084fc; font-size:11px; font-weight:600; padding:6px 14px; border-radius:6px; cursor:pointer; transition:all 0.15s; white-space:nowrap; font-family:inherit; }
+.btn:hover { background:rgba(var(--accent-rgb),0.25); border-color:var(--accent); color:#e9d5ff; transform:translateY(-1px); }
+.btn:active { transform:translateY(0); }
+.btn.danger  { background:rgba(239,68,68,0.1);  border-color:rgba(239,68,68,0.25);  color:#f87171; }
+.btn.danger:hover  { background:rgba(239,68,68,0.2);  border-color:#ef4444; transform:translateY(-1px); }
+.btn.success { background:rgba(34,197,94,0.1);  border-color:rgba(34,197,94,0.25);  color:#4ade80; }
+.btn.success:hover { background:rgba(34,197,94,0.2);  border-color:#22c55e; transform:translateY(-1px); }
+.btn.ghost   { background:transparent; border-color:#252528; color:#666; }
+.btn.ghost:hover   { border-color:#3a3a3e; color:#ccc; transform:translateY(-1px); }
+.btn.warn    { background:rgba(234,179,8,0.1);  border-color:rgba(234,179,8,0.25);  color:#eab308; }
+.btn.warn:hover    { background:rgba(234,179,8,0.2);  border-color:#eab308; transform:translateY(-1px); }
+.btn.sm { padding:4px 10px; font-size:10px; }
+.btn.lg { padding:9px 20px; font-size:13px; }
+.btn.full { width:100%; text-align:center; }
+
+/* ─── KEYBIND ─────────────────────────────────────────────── */
+.keybind { background:#0e0e10; border:1px solid #252528; border-radius:5px; padding:5px 10px; color:var(--accent); font-size:10px; font-weight:700; cursor:pointer; min-width:56px; text-align:center; letter-spacing:0.6px; transition:all 0.15s; font-family:inherit; }
+.keybind:hover { border-color:var(--accent); box-shadow:0 0 8px rgba(var(--accent-rgb),0.2); }
+.keybind.listening { border-color:var(--accent); color:#fff; animation:kbPulse 0.8s infinite; background:rgba(var(--accent-rgb),0.1); }
+
+/* ─── COLOR PICKER ────────────────────────────────────────── */
+.colorpicker-wrap { position:relative; display:inline-block; }
+.color-btn { width:30px; height:30px; border-radius:7px; cursor:pointer; border:2px solid #333; transition:all 0.15s; }
+.color-btn:hover { border-color:var(--accent); transform:scale(1.05); }
+.color-palette {
+  position:absolute; right:0; top:calc(100% + 6px);
+  background:#1c1c20; border:1px solid #2e2e36; border-radius:12px;
+  padding:12px; box-shadow:0 12px 40px rgba(0,0,0,0.6); z-index:999;
+  display:none; animation:dropIn 0.12s ease; width:220px;
+}
+.color-palette.open { display:block; }
+/* HSV canvas picker */
+.cp-canvas-wrap { position:relative; width:100%; height:120px; border-radius:7px; overflow:hidden; margin-bottom:8px; cursor:crosshair; }
+.cp-canvas { width:100%; height:100%; display:block; }
+.cp-cursor { position:absolute; width:12px; height:12px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 4px rgba(0,0,0,0.8); transform:translate(-50%,-50%); pointer-events:none; top:10%; left:90%; }
+/* hue bar */
+.cp-hue-wrap { position:relative; height:12px; border-radius:6px; margin-bottom:8px; cursor:pointer;
+  background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00); }
+.cp-hue-thumb { position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #fff; box-shadow:0 0 4px rgba(0,0,0,0.6); cursor:pointer; }
+/* alpha bar */
+.cp-alpha-wrap { position:relative; height:12px; border-radius:6px; margin-bottom:8px; cursor:pointer;
+  background:linear-gradient(to right,transparent,var(--accent));
+  background-image:linear-gradient(to right,transparent,var(--accent)),
+    repeating-conic-gradient(#555 0% 25%,#333 0% 50%);
+  background-size:100% 100%, 8px 8px; }
+.cp-alpha-thumb { position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #fff; box-shadow:0 0 4px rgba(0,0,0,0.6); cursor:pointer; right:0; left:100%; }
+/* hex row */
+.cp-hex-row { display:flex; gap:6px; align-items:center; margin-bottom:8px; }
+.cp-hex { flex:1; background:#111113; border:1px solid #2a2a2e; border-radius:5px; padding:5px 8px; color:#e0e0e0; font-size:10.5px; outline:none; font-family:monospace; text-transform:uppercase; }
+.cp-hex:focus { border-color:var(--accent); }
+/* preset swatches */
+.cp-presets { display:grid; grid-template-columns:repeat(8,1fr); gap:4px; }
+.cp-swatch { width:100%; aspect-ratio:1; border-radius:4px; cursor:pointer; border:2px solid transparent; transition:all 0.12s; }
+.cp-swatch:hover { transform:scale(1.2); border-color:rgba(255,255,255,0.3); }
+.cp-swatch.active { border-color:#fff; transform:scale(1.15); }
+/* preview strip */
+.cp-preview-row { display:flex; gap:6px; align-items:center; margin-bottom:8px; }
+.cp-preview { width:32px; height:32px; border-radius:7px; border:1px solid #333; flex-shrink:0; }
+.cp-preview-old { opacity:0.5; }
+.cp-values { flex:1; display:flex; flex-direction:column; gap:3px; }
+.cp-value-label { font-size:9px; color:#555; text-transform:uppercase; letter-spacing:0.5px; }
+.cp-value-hex { font-size:11px; color:#e0e0e0; font-family:monospace; font-weight:600; }
+
+/* ─── BADGE ───────────────────────────────────────────────── */
+.badge { padding:2px 8px; border-radius:4px; font-size:9.5px; font-weight:600; display:inline-flex; align-items:center; gap:4px; }
+.badge-purple { background:rgba(168,85,247,0.1); color:#A855F7; border:1px solid rgba(168,85,247,0.2); }
+.badge-green  { background:rgba(34,197,94,0.1);  color:#22c55e; border:1px solid rgba(34,197,94,0.2); }
+.badge-red    { background:rgba(239,68,68,0.1);  color:#ef4444; border:1px solid rgba(239,68,68,0.2); }
+.badge-yellow { background:rgba(234,179,8,0.1);  color:#eab308; border:1px solid rgba(234,179,8,0.2); }
+.badge-blue   { background:rgba(59,130,246,0.1); color:#60a5fa; border:1px solid rgba(59,130,246,0.2); }
+
+/* ─── PROGRESS BAR ────────────────────────────────────────── */
+.progress-wrap { width:100%; }
+.progress-bar  { height:5px; background:#1e1e22; border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--accent-dark),var(--accent)); box-shadow:0 0 8px var(--accent-glow); transition:width 0.3s ease; }
+.progress-labels { display:flex; justify-content:space-between; margin-top:4px; }
+.progress-labels span { font-size:9.5px; color:#555; }
+
+/* ─── INFO DISPLAY ────────────────────────────────────────── */
+.info-card { background:#0e0e10; border:1px solid #1e1e22; border-radius:8px; padding:10px 12px; }
+.info-card-title { font-size:10.5px; font-weight:700; color:var(--accent); margin-bottom:6px; }
+.info-row { display:flex; justify-content:space-between; align-items:center; padding:3.5px 0; border-bottom:1px solid #161618; }
+.info-row:last-child { border:none; }
+.info-key { font-size:10px; color:#555; }
+.info-val { font-size:10px; color:#ccc; font-weight:500; }
+
+/* ─── TEXT DISPLAY ────────────────────────────────────────── */
+.text-display { background:#0e0e10; border:1px solid #1e1e22; border-radius:8px; padding:10px 12px; font-size:11px; color:#666; line-height:1.7; }
+
+/* ─── CODE DISPLAY ────────────────────────────────────────── */
+.code-block { background:#0a0a0c; border:1px solid #1e1e22; border-radius:8px; padding:12px 14px; font-family:monospace; font-size:11px; color:#a8c4a2; line-height:1.7; overflow-x:auto; position:relative; }
+.code-block .kw  { color:#c084fc; }
+.code-block .str { color:#86efac; }
+.code-block .fn  { color:#93c5fd; }
+.code-block .cm  { color:#4b5563; }
+.code-copy { position:absolute; top:8px; right:8px; background:#1a1a1e; border:1px solid #252528; border-radius:5px; padding:3px 8px; font-size:9.5px; color:#666; cursor:pointer; font-family:inherit; transition:all 0.15s; }
+.code-copy:hover { border-color:var(--accent); color:#c084fc; }
+
+/* ─── DIVIDER ─────────────────────────────────────────────── */
+.divider { height:1px; background:#1e1e22; margin:2px 0; }
+.divider-label { display:flex; align-items:center; gap:8px; font-size:9.5px; color:#333; text-transform:uppercase; letter-spacing:0.8px; }
+.divider-label::before,.divider-label::after { content:''; flex:1; height:1px; background:#1e1e22; }
+
+/* ─── SPACE ───────────────────────────────────────────────── */
+.space-block { background:repeating-linear-gradient(45deg,#111113,#111113 4px,#0e0e10 4px,#0e0e10 8px); border:1px dashed #1e1e22; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#333; font-size:10px; letter-spacing:0.5px; }
+
+/* ─── ACCORDION ───────────────────────────────────────────── */
+.accordion { border:1px solid #1e1e22; border-radius:8px; overflow:hidden; }
+.accordion-item { border-bottom:1px solid #1e1e22; }
+.accordion-item:last-child { border-bottom:none; }
+.accordion-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 12px; background:#0e0e10; cursor:pointer;
+  font-size:11.5px; font-weight:500; color:#ccc;
+  user-select:none; transition:background 0.12s;
+}
+.accordion-header:hover { background:#141416; color:#e0e0e0; }
+.accordion-header.open { color:var(--accent); background:rgba(var(--accent-rgb),0.04); }
+.accordion-arrow { font-size:9px; color:#555; transition:transform 0.2s; }
+.accordion-header.open .accordion-arrow { transform:rotate(180deg); color:var(--accent); }
+.accordion-body {
+  background:#0a0a0c; padding:0 12px; max-height:0; overflow:hidden;
+  transition:max-height 0.22s ease, padding 0.22s ease;
+  font-size:11px; color:#888; line-height:1.6;
+}
+.accordion-body.open { padding:10px 12px; max-height:200px; }
+
+/* ─── DROPDOWN SEARCH ─────────────────────────────────────── */
+.dd-search-wrap { padding:6px 8px; border-bottom:1px solid #252528; }
+.dd-search {
+  width:100%; background:#0e0e10; border:1px solid #252528; border-radius:5px;
+  padding:5px 8px; color:#e0e0e0; font-size:11px; outline:none; font-family:inherit;
+  transition:border-color 0.15s;
+}
+.dd-search:focus { border-color:var(--accent); }
+.dd-search::placeholder { color:#333; }
+.dd-virtual-list { max-height:180px; overflow-y:auto; }
+.dd-count { padding:4px 12px 6px; font-size:9.5px; color:#444; }
+
+/* ─── IMAGE ───────────────────────────────────────────────── */
+.muva-image { border-radius:8px; border:1px solid #1e1e22; object-fit:cover; background:#111113; }
+.avatar-placeholder { border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; border:2px solid rgba(var(--accent-rgb),0.3); }
+.avatar-sm { width:26px; height:26px; font-size:10px; }
+.avatar-md { width:36px; height:36px; font-size:13px; }
+.avatar-lg { width:48px; height:48px; font-size:18px; }
+
+/* ─── TOOLTIP ─────────────────────────────────────────────── */
+.tooltip-wrap { position:relative; display:inline-flex; }
+.tooltip-wrap:hover .tooltip-box { opacity:1; transform:translate(-50%,0); pointer-events:auto; }
+.tooltip-box { position:absolute; bottom:calc(100% + 7px); left:50%; transform:translate(-50%,4px); background:#1c1c22; border:1px solid #2e2e36; border-radius:7px; padding:6px 10px; font-size:10px; color:#e0e0e0; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,0.5); pointer-events:none; opacity:0; transition:all 0.15s; z-index:1000; }
+.tooltip-box::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:#2e2e36; }
+
+/* ─── HSTACK / VSTACK ─────────────────────────────────────── */
+.hstack { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.vstack { display:flex; flex-direction:column; gap:6px; }
+.hstack-demo,.vstack-demo { background:#0e0e10; border:1px solid #1e1e22; border-radius:8px; padding:12px; }
+.stack-child { background:#1a1a1e; border:1px solid #252528; border-radius:6px; padding:8px 12px; font-size:11px; color:#888; text-align:center; }
+
+/* ─── TAG ─────────────────────────────────────────────────── */
+.tag { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:10.5px; font-weight:600; border:1px solid; }
+.tag-default { background:rgba(var(--accent-rgb),0.1); color:var(--accent); border-color:rgba(var(--accent-rgb),0.25); }
+.tag-close { cursor:pointer; opacity:0.6; font-size:9px; transition:opacity 0.12s; }
+.tag-close:hover { opacity:1; }
+
+/* ─── MODAL ───────────────────────────────────────────────── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:10000; backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity 0.2s; }
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal { background:#1a1a1e; border:1px solid #2e2e36; border-radius:12px; padding:20px; min-width:280px; max-width:360px; box-shadow:0 24px 80px rgba(0,0,0,0.7); transform:scale(0.95); transition:transform 0.2s; }
+.modal-overlay.open .modal { transform:scale(1); }
+.modal-title { font-size:14px; font-weight:700; color:#f0f0f0; margin-bottom:6px; }
+.modal-body  { font-size:11.5px; color:#777; line-height:1.6; margin-bottom:16px; }
+.modal-footer { display:flex; gap:8px; justify-content:flex-end; }
+
+/* ─── POPUP (inline) ──────────────────────────────────────── */
+.popup { background:#1a1a1e; border:1px solid #2e2e36; border-radius:10px; padding:14px 16px; max-width:280px; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
+.popup-title { font-size:12px; font-weight:700; color:#f0f0f0; margin-bottom:4px; }
+.popup-body  { font-size:11px; color:#666; line-height:1.6; margin-bottom:12px; }
+
+/* ─── NOTIFICATION TOAST ──────────────────────────────────── */
+#toast-container { position:fixed; top:20px; right:20px; display:flex; flex-direction:column; gap:8px; z-index:9999; pointer-events:none; }
+.toast { background:#1c1c20; border:1px solid #2a2a2e; border-radius:9px; padding:10px 13px; display:flex; gap:10px; align-items:flex-start; box-shadow:0 8px 32px rgba(0,0,0,0.5); min-width:240px; max-width:280px; pointer-events:all; animation:toastIn 0.2s ease; border-left:3px solid var(--accent); }
+.toast.t-success { border-left-color:#22c55e; }
+.toast.t-error   { border-left-color:#ef4444; }
+.toast.t-warn    { border-left-color:#eab308; }
+.toast-icon  { font-size:13px; margin-top:1px; }
+.toast-body  { flex:1; }
+.toast-title { font-size:11.5px; font-weight:600; color:#e0e0e0; }
+.toast-msg   { font-size:10px; color:#555; margin-top:2px; }
+.toast-close { font-size:11px; color:#444; cursor:pointer; transition:color 0.15s; }
+.toast-close:hover { color:#aaa; }
+
+/* ─── KEY SYSTEM ──────────────────────────────────────────── */
+.key-screen { background:#141416; border:1px solid #252528; border-radius:14px; overflow:hidden; width:320px; box-shadow:0 32px 80px rgba(0,0,0,0.7); }
+.ks-header { background:linear-gradient(135deg,rgba(var(--accent-rgb),0.12),rgba(124,58,237,0.06)); padding:24px 20px; text-align:center; border-bottom:1px solid #252528; }
+.ks-logo { font-size:26px; font-weight:900; color:#f0f0f0; letter-spacing:-1px; }
+.ks-logo span { color:var(--accent); }
+.ks-sub { font-size:11px; color:#555; margin-top:4px; }
+.ks-body { padding:20px; display:flex; flex-direction:column; gap:10px; }
+.ks-label { font-size:10px; font-weight:600; color:#555; text-transform:uppercase; letter-spacing:0.7px; }
+.ks-input-row { display:flex; gap:6px; }
+.ks-input { flex:1; background:#0e0e10; border:1px solid #252528; border-radius:7px; padding:8px 12px; color:#e0e0e0; font-size:11px; outline:none; font-family:monospace; letter-spacing:1px; transition:all 0.15s; }
+.ks-input:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(var(--accent-rgb),0.1); }
+.ks-input::placeholder { color:#333; letter-spacing:0; }
+.ks-submit { background:var(--accent); border:none; border-radius:7px; color:#fff; font-size:12px; font-weight:700; padding:8px 16px; cursor:pointer; transition:all 0.15s; font-family:inherit; box-shadow:0 4px 16px var(--accent-glow); }
+.ks-submit:hover { background:var(--accent-dark); transform:translateY(-1px); }
+.ks-links { display:flex; justify-content:space-between; }
+.ks-link { font-size:10.5px; color:#555; cursor:pointer; transition:color 0.12s; text-decoration:none; }
+.ks-link:hover { color:#c084fc; }
+.ks-error   { font-size:10.5px; color:#ef4444; text-align:center; display:none; }
+.ks-success { font-size:10.5px; color:#22c55e; text-align:center; display:none; }
+.ks-error.show,.ks-success.show { display:block; }
+
+/* ─── LOADING SCREEN ──────────────────────────────────────── */
+.loading-screen { background:#0e0e10; border:1px solid #1e1e22; border-radius:14px; width:300px; padding:32px 24px; display:flex; flex-direction:column; align-items:center; gap:16px; box-shadow:0 32px 80px rgba(0,0,0,0.7); }
+.ls-spinner { width:40px; height:40px; border-radius:50%; border:3px solid #1e1e22; border-top-color:var(--accent); animation:spin 0.8s linear infinite; }
+.ls-title { font-size:14px; font-weight:700; color:#f0f0f0; }
+.ls-msg   { font-size:11px; color:#555; text-align:center; }
+.ls-progress { width:100%; }
+
+/* ─── WEBHOOK ─────────────────────────────────────────────── */
+.webhook-wrap { background:#0e0e10; border:1px solid #1e1e22; border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+.webhook-label { font-size:10px; font-weight:600; color:#555; text-transform:uppercase; letter-spacing:0.7px; }
+.webhook-input { flex:1; background:#141416; border:1px solid #252528; border-radius:6px; padding:6px 10px; color:#e0e0e0; font-size:11px; outline:none; font-family:monospace; transition:all 0.15s; }
+.webhook-input:focus { border-color:var(--accent); }
+.webhook-input::placeholder { color:#333; }
+.webhook-status { font-size:10px; display:flex; align-items:center; gap:5px; }
+.ws-dot { width:6px; height:6px; border-radius:50%; background:#333; flex-shrink:0; }
+.ws-dot.ok  { background:#22c55e; box-shadow:0 0 6px rgba(34,197,94,0.5); }
+.ws-dot.err { background:#ef4444; }
+.ws-dot.testing { animation:wsDot 0.8s infinite; }
+
+/* ─── TABLE ───────────────────────────────────────────────── */
+.muva-table { width:100%; border-collapse:collapse; font-size:11px; }
+.muva-table thead tr { background:#0e0e10; border-bottom:1px solid rgba(var(--accent-rgb),0.2); }
+.muva-table thead th { padding:7px 10px; text-align:left; font-size:9.5px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.7px; white-space:nowrap; }
+.muva-table thead th.sortable { cursor:pointer; user-select:none; }
+.muva-table thead th.sortable:hover { color:#e9d5ff; }
+.muva-table thead th .sort-arrow { margin-left:4px; opacity:0.4; font-size:8px; }
+.muva-table thead th.sort-asc .sort-arrow::after { content:'▲'; opacity:1; color:var(--accent); }
+.muva-table thead th.sort-desc .sort-arrow::after { content:'▼'; opacity:1; color:var(--accent); }
+.muva-table tbody tr { border-bottom:1px solid #161618; transition:background 0.1s; }
+.muva-table tbody tr:last-child { border-bottom:none; }
+.muva-table tbody tr:hover { background:#141416; }
+.muva-table tbody td { padding:7px 10px; color:#aaa; vertical-align:middle; }
+.muva-table tbody td.td-name { color:#e0e0e0; font-weight:500; }
+.table-wrap { background:#0a0a0c; border:1px solid #1e1e22; border-radius:8px; overflow:hidden; }
+.table-toolbar { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-bottom:1px solid #1e1e22; gap:8px; }
+.table-search { background:#141416; border:1px solid #252528; border-radius:5px; padding:5px 9px; color:#e0e0e0; font-size:11px; outline:none; font-family:inherit; width:160px; transition:border-color 0.15s; }
+.table-search:focus { border-color:var(--accent); }
+.table-search::placeholder { color:#333; }
+.table-count { font-size:10px; color:#444; white-space:nowrap; }
+
+/* ─── SECTION SEPARATOR ───────────────────────────────────── */
+.section-sep { display:flex; align-items:center; gap:7px; margin:10px 0 6px; }
+.section-sep-label { font-size:9.5px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.9px; white-space:nowrap; }
+.section-sep-line { flex:1; height:1px; background:#1e1e22; }
+.section-sep-accent { height:1px; width:24px; background:var(--accent); border-radius:1px; flex-shrink:0; }
+
+/* ─── WINDOW PREVIEW NAV ──────────────────────────────────── */
+.nav-item { display:flex; align-items:center; gap:8px; padding:7px 10px 7px 12px; cursor:pointer; border-left:2.5px solid transparent; transition:background 0.12s, border-color 0.2s; user-select:none; }
+.nav-item:hover { background:#191920; }
+.nav-item.active { background:rgba(var(--accent-rgb),0.08); border-left-color:var(--accent); }
+.nav-item .nav-icon  { font-size:13px; width:16px; text-align:center; opacity:0.6; }
+.nav-item .nav-label { font-size:11.5px; color:#666; font-weight:500; }
+.nav-item.active .nav-icon  { opacity:1; }
+.nav-item.active .nav-label { color:#d4b3fa; font-weight:600; }
+
+/* page title & section in preview window */
+.page-title { font-size:15px; font-weight:700; color:#f0f0f0; padding-bottom:9px; border-bottom:1px solid #1e1e22; display:flex; align-items:center; gap:7px; margin-bottom:9px; }
+.page-title::before { content:''; width:3px; height:17px; background:var(--accent); border-radius:2px; display:block; flex-shrink:0; }
+.section-header { font-size:9.5px; font-weight:700; color:var(--accent-dark); text-transform:uppercase; letter-spacing:0.9px; display:flex; align-items:center; gap:6px; padding:3px 0 1px; }
+.section-header::after { content:''; flex:1; height:1px; background:rgba(var(--accent-rgb),0.15); }
+
+/* ─── CONFIGS ─────────────────────────────────────────────── */
+.config-slot { background:#0e0e10; border:1px solid #1e1e22; border-radius:8px; padding:10px 12px; display:flex; align-items:center; gap:10px; transition:border-color 0.15s; cursor:pointer; }
+.config-slot:hover { border-color:#2a2a2e; }
+.config-slot.active { border-color:var(--accent); background:rgba(var(--accent-rgb),0.05); }
+.config-icon { width:32px; height:32px; border-radius:6px; background:#1a1a1e; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.config-name { font-size:11.5px; color:#ddd; font-weight:500; }
+.config-meta { font-size:10px; color:#444; margin-top:1px; }
+.config-actions { margin-left:auto; display:flex; gap:4px; }
+
+/* ─── ANIMATIONS ──────────────────────────────────────────── */
+@keyframes dropIn  { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes toastOut{ from{opacity:1;transform:translateX(0);max-height:80px} to{opacity:0;transform:translateX(20px);max-height:0;padding:0;margin:0} }
+@keyframes kbPulse { 0%,100%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),0.4)} 50%{box-shadow:0 0 0 4px rgba(var(--accent-rgb),0.1)} }
+@keyframes spin    { to{transform:rotate(360deg)} }
+@keyframes wsDot   { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ─── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar              { width:4px; height:4px; }
+::-webkit-scrollbar-track        { background:transparent; }
+::-webkit-scrollbar-thumb        { background:#2a2a2e; border-radius:4px; }
+::-webkit-scrollbar-thumb:hover  { background:var(--accent); }
+::-webkit-scrollbar-corner       { background:transparent; }
+
+/* ─── UTILITY ─────────────────────────────────────────────── */
+.flex-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.flex-col  { display:flex; flex-direction:column; gap:6px; }
+
+/* ─── FEEDBACK / EMPTY STATES ─────────────────────────────── */
+.state-box {
+  background:#0e0e10; border:1px solid #1e1e22; border-radius:10px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:28px 20px; text-align:center; gap:8px; min-height:140px;
+  position:relative; overflow:hidden;
+}
+.state-icon {
+  font-size:28px; line-height:1; margin-bottom:2px;
+  filter:grayscale(0.3);
+}
+.state-title { font-size:12px; font-weight:700; color:#ccc; }
+.state-sub   { font-size:10.5px; color:#444; max-width:200px; line-height:1.5; }
+.state-action { margin-top:4px; }
+
+/* variant tints */
+.state-empty  { border-color:#1e1e22; }
+.state-error  { border-color:rgba(239,68,68,0.2); background:rgba(239,68,68,0.03); }
+.state-error .state-title { color:#f87171; }
+.state-warn   { border-color:rgba(234,179,8,0.2); background:rgba(234,179,8,0.03); }
+.state-warn .state-title  { color:#fbbf24; }
+.state-locked { border-color:rgba(168,85,247,0.2); background:rgba(168,85,247,0.03); }
+.state-locked .state-title { color:#c084fc; }
+.state-loading { border-color:#1e1e22; }
+.state-noresult { border-color:#1e1e22; }
+
+/* loading spinner */
+@keyframes spin { to { transform:rotate(360deg); } }
+.state-spinner {
+  width:28px; height:28px; border-radius:50%;
+  border:2.5px solid #1e1e22;
+  border-top-color:var(--accent);
+  animation:spin 0.75s linear infinite;
+  margin-bottom:2px;
+}
+
+/* inline tab empty — used inside window preview tabs */
+.tab-empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  height:100%; min-height:120px; gap:6px; text-align:center; padding:20px;
+}
+.tab-empty-icon  { font-size:22px; opacity:0.3; }
+.tab-empty-title { font-size:11px; font-weight:600; color:#555; }
+.tab-empty-sub   { font-size:10px; color:#333; max-width:180px; line-height:1.5; }
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Confirm Action</div>
+    <div class="modal-body"  id="modal-body">Are you sure?</div>
+    <div class="modal-footer">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn danger" onclick="closeModal();showToast('Done','Action confirmed','success')">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="audit-layout">
+  <!-- LEFT NAV -->
+  <nav class="audit-nav">
+    <div class="audit-nav-title">MuvaUI Audit</div>
+    <a href="#sec-input">Input</a>
+    <a href="#sec-display">Display</a>
+    <a href="#sec-layout">Layout</a>
+    <a href="#sec-overlay">Overlay</a>
+    <a href="#sec-system">System</a>
+    <a href="#sec-feedback">Feedback States</a>
+    <div class="audit-nav-sep"></div>
+    <a href="#sec-window">Window Preview</a>
+  </nav>
+
+  <main class="audit-main">
+    <div class="audit-header">
+      <h1>MuvaUI — Component Audit</h1>
+      <p>Review tiap komponen. Accent color berubah global saat kamu pilih warna di ColorPicker.</p>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- SEC 1: INPUT                                  -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="comp-group" id="sec-input">
+      <div class="comp-group-title">Input Components <span>10 komponen</span></div>
+      <div class="comp-group-desc">Semua komponen yang menerima input dari user.</div>
+      <div class="comp-grid">
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">1 · Toggle</div><div class="comp-desc">ON/OFF switch dengan callback boolean.</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">2 · Checkbox</div><div class="comp-desc">Kotak centang. Cocok untuk multi-option list.</div></div>
+          <div class="flex-row">
+            <div class="checkbox checked" onclick="this.classList.toggle('checked')">✓</div>
+            <div class="checkbox" onclick="this.classList.toggle('checked')">✓</div>
+            <div class="checkbox" onclick="this.classList.toggle('checked')">✓</div>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">3 · Slider</div><div class="comp-desc">Range nilai dengan min/max/step/default.</div></div>
+          <div class="slider-group">
+            <input type="range" min="0" max="100" value="60" oninput="this.nextElementSibling.textContent=this.value">
+            <span class="slider-val">60</span>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">4 · NumberInput</div><div class="comp-desc">Angka dengan tombol +/−. Bisa ketik langsung.</div></div>
+          <div class="number-input">
+            <button class="ni-btn" onclick="niStep(this,-1)">−</button>
+            <input class="ni-val" type="number" value="5" min="0" max="99">
+            <button class="ni-btn" onclick="niStep(this,1)">+</button>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">5 · TextInput</div><div class="comp-desc">Single-line text dengan placeholder & callback.</div></div>
+          <input type="text" class="textinput" style="width:140px" placeholder="Enter text...">
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">6 · Textarea</div><div class="comp-desc">Multi-line text input. Bisa resize.</div></div>
+          <div style="flex:1;max-width:320px">
+            <textarea class="textarea" placeholder="Enter longer text..."></textarea>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">7 · Dropdown (Single)</div><div class="comp-desc">Pilih satu opsi. Mendukung ribuan item via search filter + virtual scroll — hanya render item yang terlihat.</div></div>
+          <div class="flex-row" style="gap:16px;align-items:flex-start;flex-wrap:wrap">
+            <!-- Normal dropdown (few items) -->
+            <div>
+              <div style="font-size:9.5px;color:#444;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.7px">Normal (few items)</div>
+              <div class="dropdown-wrap">
+                <div class="dropdown-trigger" onclick="toggleDropdown(this)">
+                  <span class="dt-val">Option 1</span><span class="dt-arrow">▾</span>
+                </div>
+                <div class="dropdown-menu">
+                  <div class="dd-item selected" onclick="selectOption(this,'Option 1')">Option 1</div>
+                  <div class="dd-item" onclick="selectOption(this,'Option 2')">Option 2</div>
+                  <div class="dd-item" onclick="selectOption(this,'Option 3')">Option 3</div>
+                  <div class="dd-divider"></div>
+                  <div class="dd-item" onclick="selectOption(this,'None')">None</div>
+                </div>
+              </div>
+            </div>
+            <!-- Searchable large dropdown -->
+            <div>
+              <div style="font-size:9.5px;color:#444;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.7px">Large list (1000 items) + search</div>
+              <div class="dropdown-wrap">
+                <div class="dropdown-trigger" id="large-dd-trigger" onclick="toggleLargeDropdown()">
+                  <span class="dt-val" id="large-dd-val">Select item...</span><span class="dt-arrow">▾</span>
+                </div>
+                <div class="dropdown-menu" id="large-dd-menu" style="min-width:220px">
+                  <div class="dd-search-wrap">
+                    <input class="dd-search" id="large-dd-search" placeholder="Search 1000 items..." oninput="filterLargeDropdown(this.value)">
+                  </div>
+                  <div class="dd-count" id="large-dd-count">Showing 20 / 1000</div>
+                  <div class="dd-virtual-list" id="large-dd-list"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">8 · Dropdown (Multi)</div><div class="comp-desc">Beberapa opsi sekaligus. Tags bisa di-remove.</div></div>
+          <div class="dropdown-wrap">
+            <div class="dropdown-trigger" onclick="toggleMultiDropdown(this)" style="min-width:150px">
+              <div class="multisel-val" id="ms1-val">
+                <span class="ms-tag">Auto Fish <span class="ms-x" onclick="removeTag(event,this,'af','ms1-val')">✕</span></span>
+              </div>
+              <span class="dt-arrow">▾</span>
+            </div>
+            <div class="dropdown-menu" id="ms1-menu">
+              <div class="dd-item selected" data-key="af" data-target="ms1-val" onclick="toggleMultiItem(this)"><span class="dd-check">✓</span>Auto Fish</div>
+              <div class="dd-item" data-key="ac" data-target="ms1-val" onclick="toggleMultiItem(this)"><span class="dd-check"></span>Auto Cast</div>
+              <div class="dd-item" data-key="as" data-target="ms1-val" onclick="toggleMultiItem(this)"><span class="dd-check"></span>Auto Shake</div>
+              <div class="dd-item" data-key="ib" data-target="ms1-val" onclick="toggleMultiItem(this)"><span class="dd-check"></span>Instant Bobber</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">9 · Keybind</div><div class="comp-desc">Klik lalu tekan key untuk rebind.</div></div>
+          <div class="flex-row">
+            <button class="keybind" onclick="listenKeybind(this)">F5</button>
+            <button class="keybind" onclick="listenKeybind(this)">LSHIFT</button>
+          </div>
+        </div>
+
+        <!-- COLOR PICKER — FULL HSV -->
+        <div class="comp full-width">
+          <div class="comp-info">
+            <div class="comp-name">10 · ColorPicker</div>
+            <div class="comp-desc">HSV canvas + hue bar + alpha + hex input. Memilih warna akan mengubah accent color seluruh UI secara global.</div>
+          </div>
+          <div class="flex-row" style="gap:12px;align-items:flex-start">
+            <div class="colorpicker-wrap">
+              <div class="color-btn" id="main-color-btn" style="background:#A855F7;width:36px;height:36px;border-radius:8px" onclick="toggleColorPicker(this)"></div>
+              <div class="color-palette" id="main-palette">
+                <div class="cp-preview-row">
+                  <div class="cp-preview cp-preview-old" id="cp-old" style="background:#A855F7"></div>
+                  <div class="cp-preview" id="cp-new" style="background:#A855F7"></div>
+                  <div class="cp-values">
+                    <div class="cp-value-label">Selected</div>
+                    <div class="cp-value-hex" id="cp-hex-display">#A855F7</div>
+                  </div>
+                </div>
+                <div class="cp-canvas-wrap" id="cp-canvas-wrap">
+                  <canvas class="cp-canvas" id="cp-canvas" width="196" height="120"></canvas>
+                  <div class="cp-cursor" id="cp-cursor"></div>
+                </div>
+                <div class="cp-hue-wrap" id="cp-hue-wrap">
+                  <div class="cp-hue-thumb" id="cp-hue-thumb" style="left:75%"></div>
+                </div>
+                <div class="cp-hex-row">
+                  <input type="text" class="cp-hex" id="cp-hex-input" value="#A855F7" oninput="cpHexInput(this.value)">
+                  <button class="btn sm" onclick="applyAccentFromPicker()">Apply</button>
+                </div>
+                <div class="cp-presets" id="cp-presets"></div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:#555;max-width:200px;line-height:1.6">
+              Klik swatch warna, drag canvas HSV, drag hue bar, atau ketik hex. Klik <strong style="color:#c084fc">Apply</strong> untuk terapkan ke seluruh UI.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- SEC 2: DISPLAY                               -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="comp-group" id="sec-display">
+      <div class="comp-group-title">Display Components <span>12 komponen</span></div>
+      <div class="comp-group-desc">Komponen yang menampilkan informasi atau status.</div>
+      <div class="comp-grid">
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">11 · Button</div><div class="comp-desc">Default / Success / Danger / Ghost / Warn. Size: sm, default, lg.</div></div>
+          <div class="flex-row">
+            <button class="btn" onclick="showToast('Clicked','Default button','info')">Default</button>
+            <button class="btn success">Success</button>
+            <button class="btn danger">Danger</button>
+            <button class="btn ghost">Ghost</button>
+            <button class="btn warn">Warn</button>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">12 · Badge / Label</div><div class="comp-desc">Status tag inline. 5 warna variant.</div></div>
+          <div class="flex-row">
+            <span class="badge badge-purple">Purple</span>
+            <span class="badge badge-green">Active</span>
+            <span class="badge badge-red">Error</span>
+            <span class="badge badge-yellow">Warn</span>
+            <span class="badge badge-blue">Info</span>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">13 · Tag</div><div class="comp-desc">Label yang bisa di-dismiss/remove oleh user.</div></div>
+          <div class="flex-row" id="tag-demo">
+            <span class="tag tag-default">Script Hub <span class="tag-close" onclick="this.closest('.tag').remove()">✕</span></span>
+            <span class="tag tag-default">Roblox <span class="tag-close" onclick="this.closest('.tag').remove()">✕</span></span>
+            <span class="tag tag-default">v1.0 <span class="tag-close" onclick="this.closest('.tag').remove()">✕</span></span>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">14 · Progress Bar</div><div class="comp-desc">Visual indikator 0–100%.</div></div>
+          <div style="flex:1;max-width:200px">
+            <div class="progress-wrap">
+              <div class="progress-bar"><div class="progress-fill" id="pb1" style="width:68%"></div></div>
+              <div class="progress-labels"><span>0%</span><span id="pb1-lbl">68%</span><span>100%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">15 · Info Display</div><div class="comp-desc">Key-value rows. Status panel, stats, debug info.</div></div>
+          <div style="flex:1;max-width:280px">
+            <div class="info-card">
+              <div class="info-card-title">Player Stats</div>
+              <div class="info-row"><span class="info-key">Name</span><span class="info-val">Ric***</span></div>
+              <div class="info-row"><span class="info-key">Level</span><span class="info-val"><span class="badge badge-purple">42</span></span></div>
+              <div class="info-row"><span class="info-key">Status</span><span class="info-val"><span class="badge badge-green">Online</span></span></div>
+              <div class="info-row"><span class="info-key">Gold</span><span class="info-val">12,430</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">16 · Paragraph / Text</div><div class="comp-desc">Read-only text block. Patch notes, deskripsi, info.</div></div>
+          <div style="flex:1;max-width:340px">
+            <div class="text-display">
+              Ini adalah paragraph display component. Gunakan untuk patch notes, deskripsi fitur, atau informasi read-only di dalam section.
+            </div>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">17 · Code Block</div><div class="comp-desc">Tampilkan cuplikan kode dengan syntax highlight. Ada tombol Copy.</div></div>
+          <div style="flex:1;max-width:380px">
+            <div class="code-block">
+              <button class="code-copy" onclick="copyCode(this)">Copy</button>
+<span class="kw">local</span> Window = Library:<span class="fn">CreateWindow</span>({<br>
+&nbsp;&nbsp;<span class="str">Title</span> = <span class="str">"MuvaUI"</span>,<br>
+&nbsp;&nbsp;<span class="str">Theme</span> = <span class="str">"Dark"</span>,<br>
+})<br>
+<span class="kw">local</span> Tab = Window:<span class="fn">AddTab</span>(<span class="str">"Main"</span>)<br>
+<span class="cm">-- add components here</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">18 · Divider</div><div class="comp-desc">Pemisah visual. Bisa plain atau dengan label.</div></div>
+          <div style="flex:1;max-width:320px;display:flex;flex-direction:column;gap:8px">
+            <div class="divider"></div>
+            <div class="divider-label">Section Break</div>
+            <div class="divider"></div>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">19 · Tooltip</div><div class="comp-desc">Hover untuk keterangan tambahan.</div></div>
+          <div class="flex-row">
+            <div class="tooltip-wrap">
+              <button class="btn">Hover Me</button>
+              <div class="tooltip-box">Penjelasan tombol ini</div>
+            </div>
+            <div class="tooltip-wrap">
+              <span class="badge badge-purple" style="cursor:default">?</span>
+              <div class="tooltip-box">Info tambahan</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp">
+          <div class="comp-info"><div class="comp-name">20 · Avatar / Image</div><div class="comp-desc">Avatar player atau thumbnail item. 3 ukuran.</div></div>
+          <div class="flex-row">
+            <div class="avatar-placeholder avatar-sm">R</div>
+            <div class="avatar-placeholder avatar-md">R</div>
+            <div class="avatar-placeholder avatar-lg">R</div>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="comp full-width" style="flex-direction:column;align-items:stretch;gap:10px">
+          <div class="comp-info">
+            <div class="comp-name">21 · Table</div>
+            <div class="comp-desc">Grid data dengan header, sortable column, search filter, dan row hover. Cocok untuk player list, item list, log history.</div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-toolbar">
+              <input class="table-search" placeholder="Search players..." oninput="filterTable(this.value)" id="tbl-search">
+              <span class="table-count" id="tbl-count">6 players</span>
+            </div>
+            <table class="muva-table" id="main-table">
+              <thead>
+                <tr>
+                  <th class="sortable" onclick="sortTable(0,this)">Player <span class="sort-arrow"></span></th>
+                  <th class="sortable" onclick="sortTable(1,this)">Level <span class="sort-arrow"></span></th>
+                  <th class="sortable" onclick="sortTable(2,this)">Distance <span class="sort-arrow"></span></th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-body">
+                <tr><td class="td-name">Ric***</td><td>42</td><td>12m</td><td><span class="badge badge-green">Online</span></td><td><button class="btn sm" onclick="showToast('Teleport','Moved to Ric***','success')">TP</button></td></tr>
+                <tr><td class="td-name">Dar***</td><td>87</td><td>34m</td><td><span class="badge badge-green">Online</span></td><td><button class="btn sm" onclick="showToast('Teleport','Moved to Dar***','success')">TP</button></td></tr>
+                <tr><td class="td-name">Mxy***</td><td>15</td><td>5m</td><td><span class="badge badge-yellow">AFK</span></td><td><button class="btn sm" onclick="showToast('Teleport','Moved to Mxy***','success')">TP</button></td></tr>
+                <tr><td class="td-name">Zul***</td><td>63</td><td>88m</td><td><span class="badge badge-green">Online</span></td><td><button class="btn sm" onclick="showToast('Teleport','Moved to Zul***','success')">TP</button></td></tr>
+                <tr><td class="td-name">Pro***</td><td>99</td><td>210m</td><td><span class="badge badge-red">Away</span></td><td><button class="btn sm" onclick="showToast('Teleport','Moved to Pro***','success')">TP</button></td></tr>
+                <tr><td class="td-name">Nob***</td><td>7</td><td>3m</td><td><span class="badge badge-green">Online</span></td><td><button class="btn sm" onclick="showToast('Teleport','Moved to Nob***','success')">TP</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION SEPARATOR -->
+        <div class="comp full-width" style="flex-direction:column;align-items:stretch;gap:8px">
+          <div class="comp-info">
+            <div class="comp-name">22 · Section Separator</div>
+            <div class="comp-desc">Pemisah visual antar grup komponen dalam satu tab. Bisa plain atau dengan label. Aksen kecil di kiri untuk tanda grup aktif.</div>
+          </div>
+          <div style="background:#0e0e10;border:1px solid #1e1e22;border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
+            <!-- with label + accent -->
+            <div class="section-sep">
+              <div class="section-sep-accent"></div>
+              <div class="section-sep-label">Automation</div>
+              <div class="section-sep-line"></div>
+            </div>
+            <div style="height:28px;background:#141416;border-radius:5px;border:1px solid #1e1e22;margin-bottom:6px"></div>
+            <!-- with label, no accent -->
+            <div class="section-sep">
+              <div class="section-sep-label">Configuration</div>
+              <div class="section-sep-line"></div>
+            </div>
+            <div style="height:28px;background:#141416;border-radius:5px;border:1px solid #1e1e22;margin-bottom:6px"></div>
+            <!-- plain line only -->
+            <div class="section-sep">
+              <div class="section-sep-line"></div>
+            </div>
+            <div style="height:28px;background:#141416;border-radius:5px;border:1px solid #1e1e22"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- SEC 3: LAYOUT                                -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="comp-group" id="sec-layout">
+      <div class="comp-group-title">Layout Components <span>4 komponen</span></div>
+      <div class="comp-group-desc">Komponen untuk mengatur tata letak elemen di dalam section.</div>
+      <div class="comp-grid">
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">23 · HStack</div><div class="comp-desc">Susun komponen secara horizontal dalam satu baris.</div></div>
+          <div style="flex:1;max-width:380px">
+            <div class="hstack-demo">
+              <div class="hstack">
+                <div class="stack-child" style="flex:1">Item A</div>
+                <div class="stack-child" style="flex:1">Item B</div>
+                <div class="stack-child" style="flex:1">Item C</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">24 · VStack</div><div class="comp-desc">Susun komponen secara vertikal dalam satu kolom.</div></div>
+          <div style="flex:1;max-width:380px">
+            <div class="vstack-demo">
+              <div class="vstack">
+                <div class="stack-child">Item A</div>
+                <div class="stack-child">Item B</div>
+                <div class="stack-child">Item C</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">25 · Space</div><div class="comp-desc">Blok kosong untuk padding/gap manual antar komponen.</div></div>
+          <div style="flex:1;max-width:380px">
+            <div class="space-block" style="height:32px">space (h: 32px)</div>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">26 · Accordion / Collapsible</div><div class="comp-desc">Section yang bisa dibuka/tutup. Cocok untuk sub-setting, FAQ, atau kategori komponen yang panjang.</div></div>
+          <div style="flex:1;max-width:420px">
+            <div class="accordion">
+              <div class="accordion-item">
+                <div class="accordion-header open" onclick="toggleAccordion(this)">
+                  <span>⚙ General Settings</span><span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body open">
+                  Enable notifications, set hotkeys, and configure auto-start behavior for the script.
+                </div>
+              </div>
+              <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                  <span>◈ Combat Options</span><span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                  Auto-attack range, target priority, and skill rotation settings.
+                </div>
+              </div>
+              <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                  <span>⬡ Teleport Zones</span><span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                  Saved teleport coordinates and quick-travel zone list.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- SEC 4: OVERLAY                               -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="comp-group" id="sec-overlay">
+      <div class="comp-group-title">Overlay Components <span>3 komponen</span></div>
+      <div class="comp-group-desc">Komponen yang muncul di atas konten utama.</div>
+      <div class="comp-grid">
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">27 · Dialog / Modal</div><div class="comp-desc">Popup konfirmasi dengan title, body, dan tombol aksi.</div></div>
+          <div class="flex-row">
+            <button class="btn danger" onclick="openModal('Stop All Scripts?','Semua script yang berjalan akan dihentikan.')">Open Dialog</button>
+            <button class="btn" onclick="openModal('Save Config','Config akan disimpan. Lanjutkan?')">Confirm</button>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">28 · Popup (inline)</div><div class="comp-desc">Pesan kecil inline tanpa blokir background. Lebih ringan dari Dialog.</div></div>
+          <div style="flex:1;max-width:280px">
+            <div class="popup">
+              <div class="popup-title">⚠ Rate limit reached</div>
+              <div class="popup-body">Kamu telah mencapai batas request. Tunggu 30 detik sebelum mencoba lagi.</div>
+              <div class="flex-row"><button class="btn sm" onclick="this.closest('.popup').style.display='none'">Dismiss</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp full-width">
+          <div class="comp-info"><div class="comp-name">29 · Notification Toast</div><div class="comp-desc">4 tipe: info, success, error, warn. Auto-dismiss 3.5 detik.</div></div>
+          <div class="flex-row">
+            <button class="btn"         onclick="showToast('Info','Library berhasil diload','info')">Info</button>
+            <button class="btn success" onclick="showToast('Success','Config tersimpan','success')">Success</button>
+            <button class="btn danger"  onclick="showToast('Error','Koneksi gagal','error')">Error</button>
+            <button class="btn warn"    onclick="showToast('Warning','Hati-hati','warn')">Warn</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- SEC 5: SYSTEM                                -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="comp-group" id="sec-system">
+      <div class="comp-group-title">System / Core <span>5 komponen</span></div>
+      <div class="comp-group-desc">Komponen level sistem. Dijalankan sebelum atau di luar window utama.</div>
+      <div class="comp-grid comp-grid-wide">
+
+        <!-- KEY SYSTEM -->
+        <div class="comp full-width" style="flex-direction:column;align-items:flex-start;gap:12px">
+          <div class="comp-info">
+            <div class="comp-name">30 · Key System</div>
+            <div class="comp-desc">Layar validasi key sebelum window muncul. Coba: <code style="color:#c084fc;font-family:monospace">MUVA-1234-5678-9012</code></div>
+          </div>
+          <div class="key-screen">
+            <div class="ks-header">
+              <div class="ks-logo">Muva<span>UI</span></div>
+              <div class="ks-sub">Enter your key to continue</div>
+            </div>
+            <div class="ks-body">
+              <div class="ks-label">License Key</div>
+              <div class="ks-input-row">
+                <input class="ks-input" id="ks1" type="text" placeholder="MUVA-XXXX-XXXX-XXXX">
+                <button class="ks-submit" onclick="validateKey('ks1','ks1e','ks1o')">→</button>
+              </div>
+              <div class="ks-error" id="ks1e">❌ Invalid key. Try again.</div>
+              <div class="ks-success" id="ks1o">✓ Key valid! Loading...</div>
+              <div class="ks-links">
+                <a class="ks-link" href="#">Get Key</a>
+                <a class="ks-link" href="#">Discord</a>
+                <a class="ks-link" href="#">Support</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOADING SCREEN -->
+        <div class="comp full-width" style="flex-direction:column;align-items:flex-start;gap:12px">
+          <div class="comp-info">
+            <div class="comp-name">31 · Loading Screen</div>
+            <div class="comp-desc">Animasi loading saat library diinisialisasi. Klik Simulate.</div>
+          </div>
+          <div class="loading-screen">
+            <div class="ls-spinner"></div>
+            <div class="ls-title">MuvaUI</div>
+            <div class="ls-msg" id="ls-msg">Initializing library...</div>
+            <div class="ls-progress">
+              <div class="progress-bar"><div class="progress-fill" id="ls-bar" style="width:20%"></div></div>
+            </div>
+            <button class="btn ghost sm" onclick="animateLoading()">Simulate</button>
+          </div>
+        </div>
+
+        <!-- WEBHOOK -->
+        <div class="comp full-width" style="flex-direction:column;align-items:flex-start;gap:12px">
+          <div class="comp-info">
+            <div class="comp-name">32 · Webhook Input</div>
+            <div class="comp-desc">Input Discord webhook URL dengan tombol Test koneksi.</div>
+          </div>
+          <div style="width:100%;max-width:480px">
+            <div class="webhook-wrap">
+              <div class="webhook-label">Discord Webhook</div>
+              <div style="display:flex;gap:6px">
+                <input class="webhook-input" type="text" id="wh-input" placeholder="https://discord.com/api/webhooks/...">
+                <button class="btn sm" onclick="testWebhook()">Test</button>
+                <button class="btn success sm" onclick="saveWebhook()">Save</button>
+              </div>
+              <div class="webhook-status">
+                <div class="ws-dot" id="wh-dot"></div>
+                <span id="wh-status" style="font-size:10px;color:#444">Not configured</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONFIGS -->
+        <div class="comp full-width" style="flex-direction:column;align-items:flex-start;gap:12px">
+          <div class="comp-info">
+            <div class="comp-name">33 · Config System</div>
+            <div class="comp-desc">Simpan dan load preset konfigurasi. User bisa punya beberapa slot config berbeda.</div>
+          </div>
+          <div style="width:100%;max-width:480px;display:flex;flex-direction:column;gap:6px">
+            <div class="config-slot active" onclick="selectConfig(this)">
+              <div class="config-icon">⭐</div>
+              <div><div class="config-name">Default Config</div><div class="config-meta">Last saved: 2 hours ago</div></div>
+              <div class="config-actions">
+                <button class="btn sm" onclick="event.stopPropagation();showToast('Loaded','Default Config loaded','success')">Load</button>
+                <button class="btn ghost sm" onclick="event.stopPropagation();showToast('Saved','Config saved','success')">Save</button>
+              </div>
+            </div>
+            <div class="config-slot" onclick="selectConfig(this)">
+              <div class="config-icon">🎣</div>
+              <div><div class="config-name">Fishing Preset</div><div class="config-meta">Last saved: yesterday</div></div>
+              <div class="config-actions">
+                <button class="btn sm" onclick="event.stopPropagation();showToast('Loaded','Fishing Preset loaded','success')">Load</button>
+                <button class="btn ghost sm" onclick="event.stopPropagation()">Save</button>
+              </div>
+            </div>
+            <div class="config-slot" onclick="selectConfig(this)">
+              <div class="config-icon">⚔️</div>
+              <div><div class="config-name">PvP Config</div><div class="config-meta">Last saved: 3 days ago</div></div>
+              <div class="config-actions">
+                <button class="btn sm" onclick="event.stopPropagation();showToast('Loaded','PvP Config loaded','success')">Load</button>
+                <button class="btn ghost sm" onclick="event.stopPropagation()">Save</button>
+              </div>
+            </div>
+            <button class="btn ghost full" style="margin-top:2px" onclick="showToast('Created','New config slot added','info')">+ New Config</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- SEC 6: FEEDBACK STATES                        -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="comp-group" id="sec-feedback">
+      <div class="comp-group-title">Feedback States <span>6 variant</span></div>
+      <div class="comp-group-desc">Ditampilkan saat tab/section kosong, gagal load, tidak ada hasil, atau fitur terkunci. Selalu ada icon + judul + keterangan + optional aksi.</div>
+      <div class="comp-grid">
+
+        <!-- EMPTY -->
+        <div class="comp" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden">
+          <div style="padding:8px 12px;border-bottom:1px solid #1e1e22"><div class="comp-name">34 · Empty State</div><div class="comp-desc">Tab belum punya konten.</div></div>
+          <div class="state-box state-empty" style="border:none;border-radius:0">
+            <div class="state-icon">📭</div>
+            <div class="state-title">Nothing Here Yet</div>
+            <div class="state-sub">Tab ini belum dikonfigurasi. Tambahkan item untuk memulai.</div>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <div class="comp" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden">
+          <div style="padding:8px 12px;border-bottom:1px solid #1e1e22"><div class="comp-name">35 · Error State</div><div class="comp-desc">Gagal load module atau fetch data.</div></div>
+          <div class="state-box state-error" style="border:none;border-radius:0">
+            <div class="state-icon">⚠</div>
+            <div class="state-title">Failed to Load</div>
+            <div class="state-sub">Module tidak dapat diakses. Pastikan koneksi aktif dan coba lagi.</div>
+            <div class="state-action"><button class="btn danger sm" onclick="showToast('Retrying...','Fetching module','info')">Retry</button></div>
+          </div>
+        </div>
+
+        <!-- NO RESULTS -->
+        <div class="comp" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden">
+          <div style="padding:8px 12px;border-bottom:1px solid #1e1e22"><div class="comp-name">36 · No Results</div><div class="comp-desc">Search atau filter tidak menemukan apapun.</div></div>
+          <div class="state-box state-noresult" style="border:none;border-radius:0">
+            <div class="state-icon">🔍</div>
+            <div class="state-title">No Results Found</div>
+            <div class="state-sub">Tidak ada item yang cocok dengan pencarian "<span style="color:#c084fc">xyzabc</span>".</div>
+            <div class="state-action"><button class="btn ghost sm" onclick="showToast('Cleared','Search reset','info')">Clear Search</button></div>
+          </div>
+        </div>
+
+        <!-- LOADING -->
+        <div class="comp" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden">
+          <div style="padding:8px 12px;border-bottom:1px solid #1e1e22"><div class="comp-name">37 · Loading State</div><div class="comp-desc">Sedang fetch data atau inisialisasi modul.</div></div>
+          <div class="state-box state-loading" style="border:none;border-radius:0">
+            <div class="state-spinner"></div>
+            <div class="state-title">Loading Module...</div>
+            <div class="state-sub">Sedang mengambil data dari server. Harap tunggu.</div>
+          </div>
+        </div>
+
+        <!-- LOCKED -->
+        <div class="comp" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden">
+          <div style="padding:8px 12px;border-bottom:1px solid #1e1e22"><div class="comp-name">38 · Locked State</div><div class="comp-desc">Fitur butuh key atau permission khusus.</div></div>
+          <div class="state-box state-locked" style="border:none;border-radius:0">
+            <div class="state-icon">🔒</div>
+            <div class="state-title">Premium Feature</div>
+            <div class="state-sub">Fitur ini memerlukan key premium. Masukkan key valid untuk membuka akses.</div>
+            <div class="state-action"><button class="btn sm" onclick="showToast('Key Required','Enter a valid key','warn')">Enter Key</button></div>
+          </div>
+        </div>
+
+        <!-- WARNING / DEGRADED -->
+        <div class="comp" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden">
+          <div style="padding:8px 12px;border-bottom:1px solid #1e1e22"><div class="comp-name">39 · Warning State</div><div class="comp-desc">Tab bisa dibuka tapi ada isu yang perlu perhatian.</div></div>
+          <div class="state-box state-warn" style="border:none;border-radius:0">
+            <div class="state-icon">⚡</div>
+            <div class="state-title">Webhook Not Configured</div>
+            <div class="state-sub">Fitur berjalan tapi log tidak dikirim. Isi URL webhook untuk mengaktifkan notifikasi.</div>
+            <div class="state-action"><button class="btn warn sm" onclick="showToast('Go to Settings','Configure webhook first','warn')">Configure</button></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- INLINE DEMO: bagaimana state ini terlihat di dalam tab window -->
+      <div style="margin-top:20px">
+        <div class="divider-text">Inline demo — inside a window tab</div>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+
+          <!-- Tab Empty inline -->
+          <div style="background:#141416;border:1px solid #1e1e22;border-radius:10px;width:220px;overflow:hidden;flex-shrink:0">
+            <div style="padding:8px 12px;border-bottom:1px solid #1e1e22;font-size:10.5px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">
+              <span>⬡</span> Webhook
+            </div>
+            <div class="tab-empty">
+              <div class="tab-empty-icon">📭</div>
+              <div class="tab-empty-title">Tab Empty</div>
+              <div class="tab-empty-sub">Belum ada konten di tab ini.</div>
+            </div>
+          </div>
+
+          <!-- Tab Error inline -->
+          <div style="background:#141416;border:1px solid #1e1e22;border-radius:10px;width:220px;overflow:hidden;flex-shrink:0">
+            <div style="padding:8px 12px;border-bottom:1px solid #1e1e22;font-size:10.5px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">
+              <span>◈</span> Main Module
+            </div>
+            <div class="tab-empty">
+              <div class="tab-empty-icon" style="opacity:1;color:#f87171">⚠</div>
+              <div class="tab-empty-title" style="color:#f87171">Load Failed</div>
+              <div class="tab-empty-sub">Gagal memuat modul. Cek koneksi.</div>
+              <button class="btn danger sm" style="margin-top:6px" onclick="showToast('Retrying','Fetching module...','info')">Retry</button>
+            </div>
+          </div>
+
+          <!-- Tab Locked inline -->
+          <div style="background:#141416;border:1px solid #1e1e22;border-radius:10px;width:220px;overflow:hidden;flex-shrink:0">
+            <div style="padding:8px 12px;border-bottom:1px solid #1e1e22;font-size:10.5px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">
+              <span>⚔</span> PvP Tools
+            </div>
+            <div class="tab-empty">
+              <div class="tab-empty-icon" style="opacity:1;color:#c084fc">🔒</div>
+              <div class="tab-empty-title" style="color:#c084fc">Premium Only</div>
+              <div class="tab-empty-sub">Fitur ini memerlukan key premium.</div>
+              <button class="btn sm" style="margin-top:6px" onclick="showToast('Key Required','Enter a valid premium key','warn')">Enter Key</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- SEC 7: WINDOW PREVIEW                       -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="comp-group" id="sec-window">
+      <div class="comp-group-title">Window Preview <span>full simulation</span></div>
+      <div class="comp-group-desc">Simulasi window lengkap. Drag titlebar untuk pindah. Drag sudut kanan-bawah untuk resize. Klik ─ untuk minimize ke floating icon, klik □ untuk maximize, klik ✕ untuk close.</div>
+
+      <!-- SANDBOX AREA — window bebas bergerak di sini -->
+      <div id="win-sandbox" style="position:relative;height:620px;background:#0e0e10;border:1px solid #1a1a1e;border-radius:10px;overflow:hidden;margin-top:8px">
+
+        <!-- FLOATING MINIMIZED ICON -->
+        <div id="win-mini-icon" style="display:none;position:absolute;bottom:16px;left:16px;z-index:20;
+          width:44px;height:44px;border-radius:12px;
+          background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+          align-items:center;justify-content:center;
+          font-size:18px;font-weight:900;color:#fff;cursor:pointer;
+          box-shadow:0 4px 20px var(--accent-glow);
+          border:2px solid rgba(255,255,255,0.15);
+          transition:transform 0.15s,box-shadow 0.15s;
+          user-select:none;"
+          onclick="restoreWindow()"
+          onmouseenter="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 28px var(--accent-glow)'"
+          onmouseleave="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px var(--accent-glow)'">
+          M
+          <div style="position:absolute;top:-4px;right:-4px;width:8px;height:8px;border-radius:50%;background:#22c55e;border:2px solid #0e0e10"></div>
+        </div>
+
+        <!-- THE WINDOW (draggable + resizable) -->
+        <div id="muva-window" style="
+          position:absolute; top:16px; left:30px;
+          width:560px; min-width:400px;
+          background:#141416; border-radius:12px;
+          border:1px solid #252528;
+          box-shadow:0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(var(--accent-rgb),0.06);
+          overflow:visible; z-index:10;
+          transition: box-shadow 0.2s;
+          display:flex; flex-direction:column;">
+
+          <!-- TITLEBAR (drag handle) -->
+          <div id="win-titlebar" style="background:#1a1a1e;padding:10px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #252528;border-radius:12px 12px 0 0;cursor:grab;flex-shrink:0;user-select:none;">
+            <div style="display:flex;align-items:center;gap:9px">
+              <div id="win-logo" style="width:26px;height:26px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;box-shadow:0 0 10px var(--accent-glow)">M</div>
+              <span style="font-size:13px;font-weight:700;color:#f0f0f0">MuvaUI</span>
+              <span style="font-size:10px;color:#555">by you</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span id="win-badge" style="background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px">v1.0.0</span>
+              <div style="display:flex;gap:5px">
+                <!-- MINIMIZE -->
+                <button id="btn-minimize" title="Minimize"
+                  style="width:22px;height:22px;border-radius:6px;background:#2a2a2e;color:#aaa;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all 0.12s"
+                  onmouseenter="this.style.background='#3a3a3e';this.style.color='#fff'"
+                  onmouseleave="this.style.background='#2a2a2e';this.style.color='#aaa'"
+                  onclick="minimizeWindow()">─</button>
+                <!-- MAXIMIZE -->
+                <button id="btn-maximize" title="Maximize / Restore"
+                  style="width:22px;height:22px;border-radius:6px;background:#2a2a2e;color:#aaa;border:none;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all 0.12s"
+                  onmouseenter="this.style.background='#3a3a3e';this.style.color='#fff'"
+                  onmouseleave="this.style.background='#2a2a2e';this.style.color='#aaa'"
+                  onclick="toggleMaximize()">□</button>
+                <!-- CLOSE -->
+                <button id="btn-close" title="Close"
+                  style="width:22px;height:22px;border-radius:6px;background:rgba(239,68,68,0.12);color:#ef4444;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all 0.12s"
+                  onmouseenter="this.style.background='rgba(239,68,68,0.25)'"
+                  onmouseleave="this.style.background='rgba(239,68,68,0.12)'"
+                  onclick="closeWindow()">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- BODY -->
+          <div style="display:flex;height:500px;overflow:hidden;border-radius:0 0 12px 12px">
+            <!-- SIDEBAR -->
+            <div style="width:155px;background:#111113;border-right:1px solid #1e1e22;display:flex;flex-direction:column;padding:8px 0;flex-shrink:0">
+              <div style="margin:0 8px 6px;background:#1a1a1e;border:1px solid #252528;border-radius:7px;display:flex;align-items:center;padding:5px 8px;gap:5px">
+                <span style="color:#444;font-size:11px">⌕</span>
+                <input type="text" placeholder="Search..." style="background:none;border:none;outline:none;color:#aaa;font-size:11px;width:100%;font-family:inherit" oninput="filterNav2(this.value)">
+              </div>
+              <div class="nav-item active" onclick="switchWin('w-main',this)"><span class="nav-icon">◈</span><span class="nav-label">Main</span></div>
+              <div class="nav-item" onclick="switchWin('w-tp',this)"><span class="nav-icon">⬡</span><span class="nav-label">Teleport</span></div>
+              <div class="nav-item" onclick="switchWin('w-inv',this)"><span class="nav-icon">⊞</span><span class="nav-label">Inventory</span></div>
+              <div class="nav-item" onclick="switchWin('w-wh',this)"><span class="nav-icon">🔗</span><span class="nav-label">Webhook</span></div>
+              <div class="nav-item" onclick="switchWin('w-set',this)"><span class="nav-icon">⚙</span><span class="nav-label">Settings</span></div>
+              <div style="margin-top:auto;border-top:1px solid #1e1e22;padding:8px 10px;display:flex;align-items:center;gap:8px">
+                <div class="avatar-placeholder avatar-sm">R</div>
+                <div><div style="font-size:11px;color:#ccc;font-weight:600">Ric***</div><div style="font-size:10px;color:#444">User</div></div>
+              </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div style="flex:1;overflow-y:auto;overflow-x:visible;padding:12px 13px;display:flex;flex-direction:column;gap:9px">
+
+              <div id="w-main">
+                <div class="page-title">Main</div>
+                <div class="section" style="gap:5px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Automation</div><div class="section-sep-line"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Auto Farm</div><div class="comp-desc">Farms resources automatically</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Auto Collect</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Farm Speed</div><div class="comp-desc">Min: 1 — Max: 100</div></div><div class="slider-group"><input type="range" min="1" max="100" value="45" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">45</span></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Boat Distance</div></div><div class="number-input"><button class="ni-btn" onclick="niStep(this,-1)">−</button><input class="ni-val" type="number" value="5" min="0" max="99"><button class="ni-btn" onclick="niStep(this,1)">+</button></div></div>
+                </div>
+                <div class="section" style="gap:5px;margin-top:8px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Configuration</div><div class="section-sep-line"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Select Event</div></div><div class="dropdown-wrap"><div class="dropdown-trigger" onclick="toggleDropdown(this)"><span class="dt-val">Farming Event</span><span class="dt-arrow">▾</span></div><div class="dropdown-menu"><div class="dd-item selected" onclick="selectOption(this,'Farming Event')">Farming Event</div><div class="dd-item" onclick="selectOption(this,'Fishing Event')">Fishing Event</div><div class="dd-item" onclick="selectOption(this,'PvP Event')">PvP Event</div></div></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Toggle Key</div><div class="comp-desc">Click to rebind</div></div><button class="keybind" onclick="listenKeybind(this)">F5</button></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Player Name</div></div><input type="text" class="textinput" style="width:130px" placeholder="Enter name..."></div>
+                </div>
+                <div class="section" style="gap:5px;margin-top:8px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Status</div><div class="section-sep-line"></div></div>
+                  <div class="info-card"><div class="info-card-title">Fishing Status</div><div class="info-row"><span class="info-key">Total</span><span class="info-val">349,623 C$</span></div><div class="info-row"><span class="info-key">Rarity</span><span class="info-val"><span class="badge badge-purple">Rare</span></span></div><div class="info-row"><span class="info-key">Status</span><span class="info-val"><span class="badge badge-green">Active</span></span></div></div>
+                </div>
+                <div class="section" style="gap:5px;margin-top:8px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Actions</div><div class="section-sep-line"></div></div>
+                  <div class="flex-row">
+                    <button class="btn" onclick="showToast('Executed','Script running','success')">Execute</button>
+                    <button class="btn danger" onclick="showToast('Stopped','All stopped','error')">Stop All</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="w-tp" style="display:none">
+                <div class="page-title">Teleport</div>
+                <div class="section" style="gap:5px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Locations</div><div class="section-sep-line"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Spawn</div></div><button class="btn" onclick="showToast('Teleported','Moved to Spawn','success')">Go</button></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Farm Zone</div></div><button class="btn" onclick="showToast('Teleported','Moved to Farm Zone','success')">Go</button></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Safe Zone</div></div><button class="btn" onclick="showToast('Teleported','Moved to Safe Zone','success')">Go</button></div>
+                </div>
+              </div>
+
+              <div id="w-inv" style="display:none">
+                <div class="page-title">Inventory</div>
+                <div class="section" style="gap:5px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Player List</div><div class="section-sep-line"></div></div>
+                  <div class="table-wrap" style="font-size:10.5px">
+                    <table class="muva-table">
+                      <thead><tr>
+                        <th>Player</th><th>Level</th><th>Dist</th><th>Status</th>
+                      </tr></thead>
+                      <tbody>
+                        <tr><td class="td-name">Ric***</td><td>42</td><td>12m</td><td><span class="badge badge-green" style="font-size:9px">Online</span></td></tr>
+                        <tr><td class="td-name">Dar***</td><td>87</td><td>34m</td><td><span class="badge badge-green" style="font-size:9px">Online</span></td></tr>
+                        <tr><td class="td-name">Mxy***</td><td>15</td><td>5m</td><td><span class="badge badge-yellow" style="font-size:9px">AFK</span></td></tr>
+                        <tr><td class="td-name">Zul***</td><td>63</td><td>88m</td><td><span class="badge badge-red" style="font-size:9px">Away</span></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="section" style="gap:5px;margin-top:8px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Quick Actions</div><div class="section-sep-line"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Auto Equip Best</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Auto Sell Junk</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+                </div>
+              </div>
+
+              <div id="w-wh" style="display:none">
+                <div class="page-title">Webhook</div>
+                <div class="section" style="gap:5px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Discord Integration</div><div class="section-sep-line"></div></div>
+                  <div class="comp" style="flex-direction:column;align-items:flex-start;gap:8px">
+                    <div style="display:flex;gap:6px;width:100%">
+                      <input type="text" class="textinput" style="flex:1" id="wh2-input" placeholder="https://discord.com/api/webhooks/...">
+                      <button class="btn sm" onclick="testWebhook2()">Test</button>
+                    </div>
+                    <div class="webhook-status"><div class="ws-dot" id="wh2-dot"></div><span id="wh2-status" style="font-size:10px;color:#444">Not configured</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="w-set" style="display:none">
+                <div class="page-title">Settings</div>
+                <div class="section" style="gap:5px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Appearance</div><div class="section-sep-line"></div></div>
+                  <div class="comp">
+                    <div class="comp-info"><div class="comp-name">Accent Color</div><div class="comp-desc">Klik untuk ubah warna UI secara global</div></div>
+                    <div class="colorpicker-wrap">
+                      <div class="color-btn" id="settings-color-btn" style="background:#A855F7" onclick="toggleColorPicker(this)"></div>
+                      <div class="color-palette">
+                        <div class="cp-preview-row">
+                          <div class="cp-preview cp-preview-old" id="sp-old" style="background:#A855F7"></div>
+                          <div class="cp-preview" id="sp-new" style="background:#A855F7"></div>
+                          <div class="cp-values"><div class="cp-value-label">Selected</div><div class="cp-value-hex" id="sp-hex-display">#A855F7</div></div>
+                        </div>
+                        <div class="cp-canvas-wrap" id="sp-canvas-wrap">
+                          <canvas class="cp-canvas" id="sp-canvas" width="196" height="120"></canvas>
+                          <div class="cp-cursor" id="sp-cursor"></div>
+                        </div>
+                        <div class="cp-hue-wrap" id="sp-hue-wrap">
+                          <div class="cp-hue-thumb" id="sp-hue-thumb" style="left:75%"></div>
+                        </div>
+                        <div class="cp-hex-row">
+                          <input type="text" class="cp-hex" id="sp-hex-input" value="#A855F7" oninput="cpHexInputSettings(this.value)">
+                          <button class="btn sm" onclick="applyAccentFromSettings()">Apply</button>
+                        </div>
+                        <div class="cp-presets" id="sp-presets"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">UI Scale</div></div><div class="slider-group"><input type="range" min="80" max="120" value="100" oninput="this.nextElementSibling.textContent=this.value+'%'"><span class="slider-val">100%</span></div></div>
+                </div>
+                <div class="section" style="gap:5px;margin-top:8px">
+                  <div class="section-sep"><div class="section-sep-accent"></div><div class="section-sep-label">Preferences</div><div class="section-sep-line"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Notifications</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                  <div class="comp"><div class="comp-info"><div class="comp-name">Sound Effects</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- RESIZE HANDLE (bottom-right corner) -->
+          <div id="win-resize-handle" style="
+            position:absolute; bottom:0; right:0;
+            width:18px; height:18px; cursor:se-resize; z-index:20;
+            display:flex; align-items:flex-end; justify-content:flex-end;
+            padding:3px;">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path d="M9 1L1 9M9 5L5 9M9 9L9 9" stroke="#444" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+        </div><!-- /#muva-window -->
+
+        <!-- HINT LABEL -->
+        <div id="win-hint" style="position:absolute;bottom:10px;right:12px;font-size:9.5px;color:#333;pointer-events:none">
+          Drag titlebar · Resize corner · ─ minimize · □ maximize · ✕ close
+        </div>
+
+        <!-- CLOSED STATE MESSAGE -->
+        <div id="win-closed-msg" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:10px">
+          <div style="font-size:13px;color:#444">Window is closed</div>
+          <button class="btn" onclick="reopenWindow()">Reopen Window</button>
+        </div>
+
+      </div><!-- /#win-sandbox -->
+    </div>
+
+
+  </main>
+</div>
+
+<script>
+// ─── ACCENT COLOR SYSTEM ──────────────────────────────────
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+function rgbToHex(r,g,b) {
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+function hexToHsl(hex) {
+  let {r,g,b} = hexToRgb(hex);
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){h=s=0;}else{
+    const d=max-min; s=l>0.5?d/(2-max-min):d/(max+min);
+    switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;}
+    h/=6;
+  }
+  return {h:h*360,s:s*100,l:l*100};
+}
+function hslToHex(h,s,l) {
+  h/=360; s/=100; l/=100;
+  let r,g,b;
+  if(s===0){r=g=b=l;}else{
+    const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
+    const q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
+    r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
+  }
+  return rgbToHex(Math.round(r*255),Math.round(g*255),Math.round(b*255));
+}
+
+let currentAccent = '#A855F7';
+
+function applyAccent(hex) {
+  if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+  currentAccent = hex.toUpperCase();
+  const {r,g,b} = hexToRgb(hex);
+  const dark = hslToHex(...(()=>{ const hsl=hexToHsl(hex); return [hsl.h, hsl.s, Math.max(hsl.l-15,0)]; })());
+  const glow = `rgba(${r},${g},${b},0.35)`;
+  const dim  = `rgba(${r},${g},${b},0.15)`;
+  const brd  = `rgba(${r},${g},${b},0.3)`;
+  document.documentElement.style.setProperty('--accent', hex);
+  document.documentElement.style.setProperty('--accent-rgb', `${r},${g},${b}`);
+  document.documentElement.style.setProperty('--accent-dark', dark);
+  document.documentElement.style.setProperty('--accent-glow', glow);
+  document.documentElement.style.setProperty('--accent-dim', dim);
+  document.documentElement.style.setProperty('--accent-border', brd);
+  // update all color buttons that track accent
+  document.querySelectorAll('#main-color-btn,#settings-color-btn').forEach(b => b.style.background = hex);
+  // update win logo and badge
+  const logo = document.getElementById('win-logo');
+  if (logo) logo.style.background = `linear-gradient(135deg,${hex},${dark})`;
+  const badge = document.getElementById('win-badge');
+  if (badge) { badge.style.background=dim; badge.style.border=`1px solid ${brd}`; badge.style.color=hex; }
+  // redraw canvases
+  drawHsvCanvas('cp-canvas', cpState.hue);
+  drawHsvCanvas('sp-canvas', spState.hue);
+  showToast('Accent Updated', `Color changed to ${hex}`, 'info');
+}
+
+// ─── HSV COLOR PICKER ─────────────────────────────────────
+const PRESETS = ['#A855F7','#3b82f6','#22c55e','#ef4444','#f97316','#eab308','#ec4899','#06b6d4','#8b5cf6','#14b8a6','#f43f5e','#6366f1','#ffffff','#a1a1aa','#52525b','#27272a'];
+
+function initPresets(containerId, applyFn) {
+  const grid = document.getElementById(containerId);
+  if (!grid) return;
+  PRESETS.forEach(hex => {
+    const sw = document.createElement('div');
+    sw.className = 'cp-swatch'; sw.style.background = hex;
+    sw.onclick = () => { grid.querySelectorAll('.cp-swatch').forEach(s=>s.classList.remove('active')); sw.classList.add('active'); applyFn(hex); };
+    grid.appendChild(sw);
+  });
+}
+
+// HSV state for main picker
+const cpState = { hue:270, sat:68, val:97, hex:'#A855F7' };
+// HSV state for settings picker
+const spState = { hue:270, sat:68, val:97, hex:'#A855F7' };
+
+function hsvToRgb(h,s,v) {
+  s/=100; v/=100;
+  const i=Math.floor(h/60)%6, f=h/60-Math.floor(h/60), p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s);
+  let r,g,b;
+  switch(i){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;default:r=v;g=p;b=q;}
+  return {r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
+}
+
+function hsvToHex(h,s,v) {
+  const {r,g,b}=hsvToRgb(h,s,v); return rgbToHex(r,g,b);
+}
+
+function drawHsvCanvas(id, hue) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  // saturation gradient (white to hue color)
+  const gradS = ctx.createLinearGradient(0,0,W,0);
+  gradS.addColorStop(0, '#fff');
+  const hueColor = `hsl(${hue},100%,50%)`;
+  gradS.addColorStop(1, hueColor);
+  ctx.fillStyle = gradS; ctx.fillRect(0,0,W,H);
+  // value gradient (transparent to black)
+  const gradV = ctx.createLinearGradient(0,0,0,H);
+  gradV.addColorStop(0,'rgba(0,0,0,0)');
+  gradV.addColorStop(1,'rgba(0,0,0,1)');
+  ctx.fillStyle = gradV; ctx.fillRect(0,0,W,H);
+}
+
+function initPicker(canvasId, hueWrapperId, hueThumbId, hexInputId, previewNewId, hexDisplayId, state, applyFn) {
+  const canvas   = document.getElementById(canvasId);
+  const hueWrap  = document.getElementById(hueWrapperId);
+  const hueThumb = document.getElementById(hueThumbId);
+  const hexInput = document.getElementById(hexInputId);
+  const previewNew = document.getElementById(previewNewId);
+  const hexDisplay = document.getElementById(hexDisplayId);
+  if (!canvas) return;
+
+  drawHsvCanvas(canvasId, state.hue);
+
+  function updateFromHsv() {
+    state.hex = hsvToHex(state.hue, state.sat, state.val);
+    if (previewNew) previewNew.style.background = state.hex;
+    if (hexInput) hexInput.value = state.hex;
+    if (hexDisplay) hexDisplay.textContent = state.hex;
+  }
+
+  // canvas drag
+  function onCanvasClick(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.max(0,Math.min(e.clientX-rect.left, rect.width));
+    const y = Math.max(0,Math.min(e.clientY-rect.top, rect.height));
+    state.sat = (x/rect.width)*100;
+    state.val = (1 - y/rect.height)*100;
+    const cursor = canvas.parentElement.querySelector('.cp-cursor');
+    if (cursor) { cursor.style.left=(x/rect.width*100)+'%'; cursor.style.top=(y/rect.height*100)+'%'; }
+    updateFromHsv();
+  }
+  let draggingCanvas = false;
+  canvas.addEventListener('mousedown', e=>{ draggingCanvas=true; onCanvasClick(e); });
+  document.addEventListener('mousemove', e=>{ if(draggingCanvas) onCanvasClick(e); });
+  document.addEventListener('mouseup', ()=>{ draggingCanvas=false; });
+
+  // hue drag
+  function onHueClick(e) {
+    const rect = hueWrap.getBoundingClientRect();
+    const x = Math.max(0,Math.min(e.clientX-rect.left, rect.width));
+    state.hue = (x/rect.width)*360;
+    if (hueThumb) hueThumb.style.left = (x/rect.width*100)+'%';
+    drawHsvCanvas(canvasId, state.hue);
+    updateFromHsv();
+  }
+  let draggingHue = false;
+  hueWrap.addEventListener('mousedown', e=>{ draggingHue=true; onHueClick(e); });
+  document.addEventListener('mousemove', e=>{ if(draggingHue) onHueClick(e); });
+  document.addEventListener('mouseup', ()=>{ draggingHue=false; });
+
+  updateFromHsv();
+}
+
+function cpHexInput(val) {
+  if (!/^#[0-9A-Fa-f]{6}$/.test(val)) return;
+  cpState.hex = val.toUpperCase();
+  document.getElementById('cp-new').style.background = val;
+  document.getElementById('cp-hex-display').textContent = val.toUpperCase();
+}
+function applyAccentFromPicker() {
+  applyAccent(cpState.hex);
+  document.getElementById('cp-old').style.background = cpState.hex;
+  closeAll();
+}
+
+function cpHexInputSettings(val) {
+  if (!/^#[0-9A-Fa-f]{6}$/.test(val)) return;
+  spState.hex = val.toUpperCase();
+  document.getElementById('sp-new').style.background = val;
+  document.getElementById('sp-hex-display').textContent = val.toUpperCase();
+}
+function applyAccentFromSettings() {
+  applyAccent(spState.hex);
+  document.getElementById('sp-old').style.background = spState.hex;
+  closeAll();
+}
+
+// ─── COLOR PICKER TOGGLE ──────────────────────────────────
+function toggleColorPicker(btn) {
+  const pal = btn.nextElementSibling;
+  const open = pal.classList.contains('open');
+  closeAll();
+  if (!open) pal.classList.add('open');
+}
+
+// ─── DROPDOWN ─────────────────────────────────────────────
+function toggleDropdown(t) {
+  const m = t.nextElementSibling, open = m.classList.contains('open');
+  closeAll(); if (!open) { m.classList.add('open'); t.classList.add('open'); }
+}
+function selectOption(item, label) {
+  const menu = item.closest('.dropdown-menu');
+  menu.querySelectorAll('.dd-item').forEach(i => i.classList.remove('selected'));
+  item.classList.add('selected');
+  menu.previousElementSibling.querySelector('.dt-val').textContent = label;
+  closeAll();
+}
+function toggleMultiDropdown(t) {
+  const m = t.nextElementSibling, open = m.classList.contains('open');
+  closeAll(); if (!open) { m.classList.add('open'); t.classList.add('open'); }
+}
+function toggleMultiItem(item) {
+  item.classList.toggle('selected');
+  const key=item.dataset.key, tid=item.dataset.target;
+  const label=item.textContent.trim();
+  const cont=document.getElementById(tid);
+  const check=item.querySelector('.dd-check');
+  if (item.classList.contains('selected')) {
+    check.textContent='✓';
+    const tag=document.createElement('span'); tag.className='ms-tag'; tag.dataset.key=key;
+    tag.innerHTML=label+' <span class="ms-x" onclick="removeTag(event,this,\''+key+'\',\''+tid+'\')">✕</span>';
+    cont.appendChild(tag);
+    const ph=cont.querySelector('.ms-placeholder'); if(ph)ph.remove();
+  } else {
+    check.textContent='';
+    const ex=cont.querySelector('[data-key="'+key+'"]'); if(ex)ex.remove();
+    if(!cont.querySelectorAll('.ms-tag').length){const ph=document.createElement('span');ph.className='ms-placeholder';ph.style.cssText='font-size:11px;color:#333';ph.textContent='Select...';cont.appendChild(ph);}
+  }
+}
+function removeTag(e,x,key,tid) {
+  e.stopPropagation(); x.closest('.ms-tag').remove();
+  document.querySelectorAll('[data-key="'+key+'"]').forEach(i=>{i.classList.remove('selected');const c=i.querySelector('.dd-check');if(c)c.textContent='';});
+  const cont=document.getElementById(tid);
+  if(cont&&!cont.querySelectorAll('.ms-tag').length){const ph=document.createElement('span');ph.className='ms-placeholder';ph.style.cssText='font-size:11px;color:#333';ph.textContent='Select...';cont.appendChild(ph);}
+}
+
+// ─── CLOSE ALL ────────────────────────────────────────────
+function closeAll() {
+  document.querySelectorAll('.dropdown-menu.open').forEach(m=>{m.classList.remove('open');if(m.previousElementSibling)m.previousElementSibling.classList.remove('open');});
+  document.querySelectorAll('.color-palette.open').forEach(p=>p.classList.remove('open'));
+  // close large dropdown
+  const ldm=document.getElementById('large-dd-menu'), ldt=document.getElementById('large-dd-trigger');
+  if(ldm){ldm.classList.remove('open');} if(ldt)ldt.classList.remove('open');
+}
+document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown-wrap')&&!e.target.closest('.colorpicker-wrap'))closeAll(); });
+
+// ─── ACCORDION ────────────────────────────────────────────
+function toggleAccordion(header) {
+  const body = header.nextElementSibling;
+  const isOpen = header.classList.contains('open');
+  // close siblings in same accordion
+  const accordion = header.closest('.accordion');
+  accordion.querySelectorAll('.accordion-header.open').forEach(h => {
+    h.classList.remove('open');
+    h.nextElementSibling.classList.remove('open');
+  });
+  if (!isOpen) { header.classList.add('open'); body.classList.add('open'); }
+}
+
+// ─── LARGE DROPDOWN (search + virtual scroll) ─────────────
+const LARGE_DD_ITEMS = Array.from({length:1000}, (_,i) => `Item ${String(i+1).padStart(4,'0')}`);
+const LARGE_DD_PAGE = 20;
+
+function buildLargeDropdownItems(items) {
+  const list = document.getElementById('large-dd-list');
+  const count = document.getElementById('large-dd-count');
+  if (!list) return;
+  list.innerHTML = '';
+  const visible = items.slice(0, LARGE_DD_PAGE);
+  count.textContent = items.length <= LARGE_DD_PAGE
+    ? `Showing ${items.length} item${items.length!==1?'s':''}`
+    : `Showing ${LARGE_DD_PAGE} / ${items.length}`;
+  visible.forEach(label => {
+    const el = document.createElement('div');
+    el.className = 'dd-item';
+    el.textContent = label;
+    el.onclick = () => {
+      document.getElementById('large-dd-val').textContent = label;
+      list.querySelectorAll('.dd-item').forEach(i=>i.classList.remove('selected'));
+      el.classList.add('selected');
+      closeAll();
+    };
+    list.appendChild(el);
+  });
+  // "load more" if needed
+  if (items.length > LARGE_DD_PAGE) {
+    const more = document.createElement('div');
+    more.style.cssText = 'padding:6px 12px;font-size:10px;color:#444;text-align:center;cursor:pointer';
+    more.textContent = `+ ${items.length - LARGE_DD_PAGE} more — refine search`;
+    list.appendChild(more);
+  }
+}
+
+function filterLargeDropdown(q) {
+  const filtered = q.trim()
+    ? LARGE_DD_ITEMS.filter(s => s.toLowerCase().includes(q.toLowerCase()))
+    : LARGE_DD_ITEMS;
+  buildLargeDropdownItems(filtered);
+}
+
+function toggleLargeDropdown() {
+  const menu = document.getElementById('large-dd-menu');
+  const trigger = document.getElementById('large-dd-trigger');
+  const isOpen = menu.classList.contains('open');
+  closeAll();
+  if (!isOpen) {
+    menu.classList.add('open'); trigger.classList.add('open');
+    buildLargeDropdownItems(LARGE_DD_ITEMS);
+    setTimeout(() => { const s=document.getElementById('large-dd-search'); if(s){s.value='';s.focus();} }, 50);
+  }
+}
+
+// ─── WINDOW NAV ───────────────────────────────────────────
+function switchWin(id, navEl) {
+  document.querySelectorAll('#sec-window .nav-item').forEach(n=>n.classList.remove('active'));
+  navEl.classList.add('active');
+  ['w-main','w-tp','w-inv','w-wh','w-set'].forEach(t=>{const el=document.getElementById(t);if(el)el.style.display='none';});
+  const el=document.getElementById(id); if(el)el.style.display='block';
+}
+function filterNav2(q) {
+  document.querySelectorAll('#sec-window .nav-item').forEach(item=>{
+    const lbl=item.querySelector('.nav-label');
+    if(!lbl)return;
+    item.style.display=lbl.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
+  });
+}
+
+
+// ─── AUDIT NAV HIGHLIGHT ──────────────────────────────────
+const auditLinks = document.querySelectorAll('.audit-nav a');
+window.addEventListener('scroll', ()=>{
+  let cur='';
+  document.querySelectorAll('.comp-group').forEach(sec=>{ if(window.scrollY>=sec.offsetTop-80)cur=sec.id; });
+  auditLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+});
+
+// ─── KEYBIND ──────────────────────────────────────────────
+let activeKb=null;
+function listenKeybind(btn) {
+  if(activeKb){activeKb.classList.remove('listening');activeKb.textContent=activeKb._p||activeKb.textContent;}
+  if(activeKb===btn){activeKb=null;return;}
+  activeKb=btn; btn._p=btn.textContent; btn.classList.add('listening'); btn.textContent='...';
+}
+document.addEventListener('keydown', e=>{
+  if(!activeKb)return; e.preventDefault();
+  const key=e.key===' '?'Space':e.key.length===1?e.key.toUpperCase():e.key;
+  activeKb.textContent=key; activeKb.classList.remove('listening'); activeKb=null;
+});
+
+// ─── NUMBER INPUT ──────────────────────────────────────────
+function niStep(btn,dir) {
+  const inp=btn.parentElement.querySelector('.ni-val');
+  const min=parseFloat(inp.min||'-Infinity'),max=parseFloat(inp.max||'Infinity');
+  inp.value=Math.min(max,Math.max(min,parseFloat(inp.value||0)+dir));
+}
+
+// ─── MODAL ────────────────────────────────────────────────
+function openModal(title,body) {
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').textContent=body;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+// ─── TOAST ────────────────────────────────────────────────
+function showToast(title,msg,type='info') {
+  const icons={info:'🔔',success:'✓',error:'✕',warn:'⚠'};
+  const cls={info:'',success:'t-success',error:'t-error',warn:'t-warn'};
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div'); t.className='toast '+(cls[type]||'');
+  t.innerHTML=`<span class="toast-icon">${icons[type]||'🔔'}</span><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div><span class="toast-close" onclick="dismissToast(this.closest('.toast'))">✕</span>`;
+  c.appendChild(t); setTimeout(()=>dismissToast(t),3500);
+}
+function dismissToast(t) { t.style.animation='toastOut 0.2s ease forwards'; setTimeout(()=>t.remove(),200); }
+
+// ─── KEY SYSTEM ───────────────────────────────────────────
+function validateKey(inputId,errId,okId) {
+  const val=document.getElementById(inputId).value.trim();
+  const err=document.getElementById(errId),ok=document.getElementById(okId);
+  err.classList.remove('show'); ok.classList.remove('show');
+  if(val==='MUVA-1234-5678-9012'){ok.classList.add('show');showToast('Key Valid','Loading MuvaUI...','success');}
+  else{err.classList.add('show');}
+}
+
+// ─── LOADING ──────────────────────────────────────────────
+const lsMsgs=['Initializing library...','Loading components...','Setting up theme...','Almost ready...','Done!'];
+function animateLoading() {
+  const bar=document.getElementById('ls-bar'),msg=document.getElementById('ls-msg');
+  let p=0; bar.style.width='0%';
+  const iv=setInterval(()=>{
+    p+=3; bar.style.width=p+'%';
+    msg.textContent=lsMsgs[Math.min(Math.floor((p/100)*(lsMsgs.length)),lsMsgs.length-1)];
+    if(p>=100){clearInterval(iv);showToast('MuvaUI Ready','Initialized successfully','success');}
+  },50);
+}
+
+// ─── WEBHOOK ──────────────────────────────────────────────
+function testWebhook() {
+  const dot=document.getElementById('wh-dot'),status=document.getElementById('wh-status');
+  const val=document.getElementById('wh-input').value.trim();
+  if(!val){status.textContent='Enter a URL first';status.style.color='#ef4444';return;}
+  dot.className='ws-dot testing'; status.textContent='Testing...'; status.style.color='#aaa';
+  setTimeout(()=>{
+    if(val.includes('discord.com/api/webhooks')){dot.className='ws-dot ok';status.textContent='Connected';status.style.color='#22c55e';showToast('Webhook OK','','success');}
+    else{dot.className='ws-dot err';status.textContent='Invalid URL';status.style.color='#ef4444';showToast('Webhook Error','Invalid URL','error');}
+  },1200);
+}
+function saveWebhook(){const val=document.getElementById('wh-input').value.trim();if(!val)return;showToast('Saved','Webhook saved','success');}
+function testWebhook2() {
+  const dot=document.getElementById('wh2-dot'),status=document.getElementById('wh2-status');
+  const val=document.getElementById('wh2-input').value.trim();
+  if(!val){status.textContent='Enter a URL first';status.style.color='#ef4444';return;}
+  dot.className='ws-dot testing'; status.textContent='Testing...'; status.style.color='#aaa';
+  setTimeout(()=>{
+    if(val.includes('discord.com/api/webhooks')){dot.className='ws-dot ok';status.textContent='Connected';status.style.color='#22c55e';showToast('Webhook OK','','success');}
+    else{dot.className='ws-dot err';status.textContent='Invalid URL';status.style.color='#ef4444';showToast('Error','Invalid URL','error');}
+  },1200);
+}
+
+// ─── TABLE ────────────────────────────────────────────────
+function filterTable(q) {
+  const rows = document.querySelectorAll('#tbl-body tr');
+  let visible = 0;
+  rows.forEach(r => {
+    const match = r.textContent.toLowerCase().includes(q.toLowerCase());
+    r.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  const countEl = document.getElementById('tbl-count');
+  if (countEl) countEl.textContent = q ? visible+' of '+rows.length+' players' : rows.length+' players';
+}
+
+let _sortCol=-1, _sortAsc=true;
+function sortTable(colIdx, th) {
+  const tbody = document.getElementById('tbl-body');
+  if (!tbody) return;
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  _sortAsc = (_sortCol===colIdx) ? !_sortAsc : true;
+  _sortCol = colIdx;
+  document.querySelectorAll('#main-table thead th').forEach((h,i) => {
+    h.classList.remove('sort-asc','sort-desc');
+    if (i===colIdx) h.classList.add(_sortAsc?'sort-asc':'sort-desc');
+  });
+  rows.sort((a,b) => {
+    const av=a.cells[colIdx]?.textContent.trim()||'', bv=b.cells[colIdx]?.textContent.trim()||'';
+    const an=parseFloat(av), bn=parseFloat(bv);
+    const cmp=(!isNaN(an)&&!isNaN(bn))?an-bn:av.localeCompare(bv);
+    return _sortAsc?cmp:-cmp;
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+}
+
+// ─── CONFIG ───────────────────────────────────────────────
+function selectConfig(el) { document.querySelectorAll('.config-slot').forEach(s=>s.classList.remove('active')); el.classList.add('active'); }
+
+// ─── CODE COPY ────────────────────────────────────────────
+function copyCode(btn) { btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1500); }
+
+// ─── WINDOW DRAG ─────────────────────────────────────────
+(function() {
+  const win     = document.getElementById('muva-window');
+  const titlebar= document.getElementById('win-titlebar');
+  const sandbox = document.getElementById('win-sandbox');
+  const resizeH = document.getElementById('win-resize-handle');
+
+  // saved state for maximize restore
+  let savedState = null;
+  let isMaximized = false;
+
+  // ── DRAG ──
+  let dragging=false, dragOffX=0, dragOffY=0;
+  titlebar.addEventListener('mousedown', e => {
+    if (e.target.tagName==='BUTTON') return; // don't drag when clicking buttons
+    dragging = true;
+    dragOffX = e.clientX - win.getBoundingClientRect().left;
+    dragOffY = e.clientY - win.getBoundingClientRect().top;
+    titlebar.style.cursor = 'grabbing';
+    win.style.transition = 'none';
+    win.style.boxShadow = '0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(var(--accent-rgb),0.15)';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const sbRect = sandbox.getBoundingClientRect();
+    let x = e.clientX - sbRect.left - dragOffX;
+    let y = e.clientY - sbRect.top  - dragOffY;
+    // clamp inside sandbox
+    x = Math.max(0, Math.min(x, sbRect.width  - win.offsetWidth));
+    y = Math.max(0, Math.min(y, sbRect.height - win.offsetHeight));
+    win.style.left = x + 'px';
+    win.style.top  = y + 'px';
+    if (isMaximized) { isMaximized=false; document.getElementById('btn-maximize').textContent='□'; }
+  });
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    titlebar.style.cursor = 'grab';
+    win.style.transition = 'box-shadow 0.2s';
+    win.style.boxShadow = '0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(var(--accent-rgb),0.06)';
+  });
+
+  // ── RESIZE ──
+  let resizing=false, resizeStartX=0, resizeStartY=0, resizeStartW=0, resizeStartH=0;
+  resizeH.addEventListener('mousedown', e => {
+    resizing = true;
+    resizeStartX = e.clientX;
+    resizeStartY = e.clientY;
+    resizeStartW = win.offsetWidth;
+    resizeStartH = win.offsetHeight;
+    win.style.transition = 'none';
+    e.stopPropagation();
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!resizing) return;
+    const sbRect = sandbox.getBoundingClientRect();
+    const newW = Math.max(400, Math.min(resizeStartW + e.clientX - resizeStartX, sbRect.width - win.offsetLeft));
+    const newH = Math.max(260, Math.min(resizeStartH + e.clientY - resizeStartY, sbRect.height - win.offsetTop));
+    win.style.width  = newW + 'px';
+    win.style.height = newH + 'px';
+    if (isMaximized) { isMaximized=false; document.getElementById('btn-maximize').textContent='□'; }
+  });
+  document.addEventListener('mouseup', () => { resizing=false; });
+
+  // expose functions globally
+  window.minimizeWindow = function() {
+    win.style.display = 'none';
+    const icon = document.getElementById('win-mini-icon');
+    icon.style.display = 'flex';
+    document.getElementById('win-hint').style.display = 'none';
+  };
+
+  window.restoreWindow = function() {
+    win.style.display = 'flex';
+    const icon = document.getElementById('win-mini-icon');
+    icon.style.display = 'none';
+    document.getElementById('win-hint').style.display = 'block';
+    // bounce animation
+    win.style.transform = 'scale(0.92)';
+    win.style.transition = 'transform 0.15s ease';
+    setTimeout(()=>{ win.style.transform='scale(1)'; }, 10);
+    setTimeout(()=>{ win.style.transition='box-shadow 0.2s'; }, 160);
+  };
+
+  window.toggleMaximize = function() {
+    const sbRect = sandbox.getBoundingClientRect();
+    const btn = document.getElementById('btn-maximize');
+    if (!isMaximized) {
+      savedState = { left:win.style.left, top:win.style.top, width:win.style.width, height:win.style.height };
+      win.style.transition = 'all 0.2s ease';
+      win.style.left   = '0px';
+      win.style.top    = '0px';
+      win.style.width  = sbRect.width  + 'px';
+      win.style.height = sbRect.height + 'px';
+      win.style.borderRadius = '0';
+      isMaximized = true;
+      btn.textContent = '❐';
+      btn.title = 'Restore';
+    } else {
+      win.style.transition = 'all 0.2s ease';
+      win.style.left   = savedState.left   || '30px';
+      win.style.top    = savedState.top    || '16px';
+      win.style.width  = savedState.width  || '560px';
+      win.style.height = savedState.height || '';
+      win.style.borderRadius = '12px';
+      isMaximized = false;
+      btn.textContent = '□';
+      btn.title = 'Maximize';
+      setTimeout(()=>{ win.style.transition='box-shadow 0.2s'; }, 210);
+    }
+  };
+
+  window.closeWindow = function() {
+    win.style.transition = 'all 0.15s ease';
+    win.style.opacity = '0';
+    win.style.transform = 'scale(0.95)';
+    document.getElementById('win-hint').style.display = 'none';
+    document.getElementById('win-mini-icon').style.display = 'none';
+    setTimeout(() => {
+      win.style.display = 'none';
+      const msg = document.getElementById('win-closed-msg');
+      msg.style.display = 'flex';
+    }, 150);
+  };
+
+  window.reopenWindow = function() {
+    const msg = document.getElementById('win-closed-msg');
+    msg.style.display = 'none';
+    win.style.display = 'flex';
+    win.style.opacity = '0';
+    win.style.transform = 'scale(0.95)';
+    win.style.transition = 'all 0.15s ease';
+    setTimeout(()=>{ win.style.opacity='1'; win.style.transform='scale(1)'; },10);
+    setTimeout(()=>{ win.style.transition='box-shadow 0.2s'; win.style.left='30px'; win.style.top='16px'; win.style.width='560px'; win.style.height=''; win.style.borderRadius='12px'; isMaximized=false; document.getElementById('btn-maximize').textContent='□'; document.getElementById('win-hint').style.display='block'; }, 160);
+  };
+})();
+
+// ─── INIT ─────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  initPresets('cp-presets', hex => { cpState.hex=hex; document.getElementById('cp-new').style.background=hex; document.getElementById('cp-hex-input').value=hex; document.getElementById('cp-hex-display').textContent=hex; });
+  initPresets('sp-presets', hex => { spState.hex=hex; document.getElementById('sp-new').style.background=hex; document.getElementById('sp-hex-input').value=hex; document.getElementById('sp-hex-display').textContent=hex; });
+  initPicker('cp-canvas','cp-hue-wrap','cp-hue-thumb','cp-hex-input','cp-new','cp-hex-display', cpState, hex=>{cpState.hex=hex;});
+  initPicker('sp-canvas','sp-hue-wrap','sp-hue-thumb','sp-hex-input','sp-new','sp-hex-display', spState, hex=>{spState.hex=hex;});
+});
+</script>
+</body>
+</html>
