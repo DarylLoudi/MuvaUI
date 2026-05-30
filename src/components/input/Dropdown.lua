@@ -287,7 +287,7 @@ Section.AddDropdown = function(self, opts)
         sg.ResetOnSpawn   = false
         sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
         sg.DisplayOrder   = 1100
-        sg.IgnoreGuiInset = false
+        sg.IgnoreGuiInset = true
         pcall(function() sg.Parent = CoreGui end)
         _dropSG = sg
         return sg
@@ -328,7 +328,7 @@ Section.AddDropdown = function(self, opts)
         -- Untuk kompensasi: tambah inset.Y agar actual position = yang diinginkan.
         -- actual = set - inset.Y, jadi set = wanted + inset.Y
         local menuX = absPosBefore.X
-        local menuY = absPosBefore.Y + absSize.Y + 4 + inset.Y
+        local menuY = absPosBefore.Y + absSize.Y + 4
         menu.Position = UDim2.fromOffset(menuX, menuY)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
 
