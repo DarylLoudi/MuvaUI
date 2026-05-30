@@ -291,20 +291,23 @@ function Window.new(opts, screenGui, flags)
     navLayout.SortOrder     = Enum.SortOrder.LayoutOrder
     navLayout.Parent        = navScroll
 
-    -- User divider line: at y=(100%-43px)
+    -- User divider + profile: parented to BODY with fixed pixel position from bottom
+    -- This avoids any sidebar height calculation issues
     local userDivider = Instance.new("Frame")
     userDivider.BackgroundColor3 = Color.fromHex("#1e1e22")
     userDivider.BorderSizePixel  = 0
-    userDivider.Size     = UDim2.new(1, 0, 0, 1)
-    userDivider.Position = UDim2.new(0, 0, 1, -43)
-    userDivider.Parent   = sidebar
+    userDivider.Size             = UDim2.new(0, 155, 0, 1)
+    userDivider.Position         = UDim2.new(0, 0, 1, -43)
+    userDivider.ZIndex           = 2
+    userDivider.Parent           = body
 
-    -- User profile: bottom 42px, absolute
     local userFrame = Instance.new("Frame")
-    userFrame.BackgroundTransparency = 1
-    userFrame.Size     = UDim2.new(1, 0, 0, 42)
-    userFrame.Position = UDim2.new(0, 0, 1, -42)
-    userFrame.Parent   = sidebar
+    userFrame.BackgroundColor3   = Color.fromHex("#111113")
+    userFrame.BorderSizePixel    = 0
+    userFrame.Size               = UDim2.new(0, 155, 0, 42)
+    userFrame.Position           = UDim2.new(0, 0, 1, -42)
+    userFrame.ZIndex             = 2
+    userFrame.Parent             = body
 
     local userPad = Instance.new("UIPadding")
     userPad.PaddingLeft   = UDim.new(0, 10)
