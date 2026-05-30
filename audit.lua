@@ -307,14 +307,19 @@ secWebhook:AddWebhook({
 local secTable = tabSystem:AddSection({ Title = "Table" })
 
 secTable:AddTable({
-    Columns = { "Player", "Level", "Distance", "Status" },
+    Columns = {
+        { Key = "player",   Label = "Player"   },
+        { Key = "level",    Label = "Level"    },
+        { Key = "distance", Label = "Distance" },
+        { Key = "status",   Label = "Status"   },
+    },
     Rows = {
-        { "Ric***", "42",  "12m",  "Online" },
-        { "Dar***", "87",  "34m",  "Online" },
-        { "Mxy***", "15",  "5m",   "AFK"    },
-        { "Zul***", "63",  "88m",  "Online" },
-        { "Pro***", "99",  "210m", "Away"   },
-        { "Nob***", "7",   "3m",   "Online" },
+        { player = "Ric***", level = "42", distance = "12m",  status = "Online" },
+        { player = "Dar***", level = "87", distance = "34m",  status = "Online" },
+        { player = "Mxy***", level = "15", distance = "5m",   status = "AFK"    },
+        { player = "Zul***", level = "63", distance = "88m",  status = "Online" },
+        { player = "Pro***", level = "99", distance = "210m", status = "Away"   },
+        { player = "Nob***", level = "7",  distance = "3m",   status = "Online" },
     },
     Searchable = true,
 })
