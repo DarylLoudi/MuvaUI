@@ -91,7 +91,9 @@ Section.AddButton = function(self, opts)
     local btn = Instance.new("TextButton")
     btn.BackgroundColor3 = style.bg()
     btn.BorderSizePixel  = 0
-    btn.Size             = opts.Desc and UDim2.fromOffset(80, 26) or UDim2.new(1, 0, 1, 0)
+    btn.Size             = opts.Width and UDim2.fromOffset(opts.Width, 32)
+                          or opts.Desc and UDim2.fromOffset(80, 26)
+                          or UDim2.new(1, 0, 1, 0)
     btn.Text             = opts.Title or "Button"
     btn.Font             = Enum.Font.GothamBold
     btn.TextSize         = 11

@@ -15,50 +15,19 @@ local tabMain = win:AddTab({ Title = "Main" })
 
 -- Section: Automation
 local secAuto = tabMain:AddSection({ Title = "Automation" })
-
-secAuto:AddToggle({
-    ID = "AutoFarm", Title = "Auto Farm", Desc = "Farms resources automatically",
-    Default = true,
-    Callback = function(v) print("Auto Farm:", v) end,
-})
-secAuto:AddToggle({
-    ID = "AutoCollect", Title = "Auto Collect",
-    Default = false,
-    Callback = function(v) print("Auto Collect:", v) end,
-})
-secAuto:AddSlider({
-    ID = "FarmSpeed", Title = "Farm Speed",
-    Min = 1, Max = 100, Step = 1, Default = 45, Suffix = "",
-    Callback = function(v) print("Farm Speed:", v) end,
-})
-secAuto:AddNumberInput({
-    ID = "BoatDistance", Title = "Boat Distance",
-    Min = 0, Max = 99, Step = 1, Default = 5,
-    Callback = function(v) print("Boat Distance:", v) end,
-})
+secAuto:AddToggle({ ID = "AutoFarm",    Title = "Auto Farm",    Desc = "Farms resources automatically", Default = true,  Callback = function(v) end })
+secAuto:AddToggle({ ID = "AutoCollect", Title = "Auto Collect", Default = false, Callback = function(v) end })
+secAuto:AddSlider({ ID = "FarmSpeed",   Title = "Farm Speed",   Min = 1, Max = 100, Step = 1, Default = 45, Callback = function(v) end })
+secAuto:AddNumberInput({ ID = "BoatDist", Title = "Boat Distance", Min = 0, Max = 99, Step = 1, Default = 5, Callback = function(v) end })
 
 -- Section: Configuration
 local secConfig = tabMain:AddSection({ Title = "Configuration" })
-
-secConfig:AddDropdown({
-    ID = "SelectEvent", Title = "Select Event",
-    Options = { "Farming Event", "Fishing Event", "PvP Event" },
-    Default = "Farming Event",
-    Callback = function(v) print("Event:", v) end,
-})
-secConfig:AddKeybind({
-    ID = "ToggleKey", Title = "Toggle Key", Desc = "Click to rebind",
-    Default = Enum.KeyCode.F5,
-    Callback = function(k) print("Keybind:", k) end,
-})
-secConfig:AddTextInput({
-    ID = "PlayerName", Title = "Player Name", Placeholder = "Enter name...",
-    Callback = function(v) print("Player:", v) end,
-})
+secConfig:AddDropdown({ ID = "SelectEvent", Title = "Select Event", Options = { "Farming Event", "Fishing Event", "PvP Event" }, Default = "Farming Event", Callback = function(v) end })
+secConfig:AddKeybind({ ID = "ToggleKey", Title = "Toggle Key", Desc = "Click to rebind", Default = Enum.KeyCode.F5, Callback = function(k) end })
+secConfig:AddTextInput({ ID = "PlayerName", Title = "Player Name", Placeholder = "Enter name...", Callback = function(v) end })
 
 -- Section: Status
 local secStatus = tabMain:AddSection({ Title = "Status" })
-
 secStatus:AddInfoDisplay({
     Title = "Fishing Status",
     Rows = {
@@ -68,21 +37,11 @@ secStatus:AddInfoDisplay({
     },
 })
 
--- Section: Actions
+-- Section: Actions — Execute + Stop All side by side
 local secActions = tabMain:AddSection({ Title = "Actions" })
-
-secActions:AddButton({
-    Title = "Execute", Style = "Default",
-    Callback = function()
-        MuvaUI:Notify({ Title = "Executed", Body = "Script running", Type = "success", Duration = 3 })
-    end,
-})
-secActions:AddButton({
-    Title = "Stop All", Style = "Danger",
-    Callback = function()
-        MuvaUI:Notify({ Title = "Stopped", Body = "All scripts stopped", Type = "error", Duration = 3 })
-    end,
-})
+local hstack = secActions:AddHStack({})
+hstack:AddButton({ Title = "Execute",  Style = "Default", Width = 90, Callback = function() MuvaUI:Notify({ Title = "Executed", Body = "Script running",      Type = "success", Duration = 3 }) end })
+hstack:AddButton({ Title = "Stop All", Style = "Danger",  Width = 90, Callback = function() MuvaUI:Notify({ Title = "Stopped",  Body = "All scripts stopped", Type = "error",   Duration = 3 }) end })
 
 -- ════════════════════════════════════════════
 -- TAB 2: TELEPORT
