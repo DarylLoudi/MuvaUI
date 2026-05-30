@@ -335,11 +335,9 @@ Section.AddColorPicker = function(self, opts)
         open = true
         pvStroke.Color = Theme:Accent()
 
-        -- Baca posisi SEBELUM reparent
         local absPos  = previewBtn.AbsolutePosition
         local absSize = previewBtn.AbsoluteSize
 
-        -- Parent ke ScreenGui baru dengan DisplayOrder tinggi
         local CoreGui = game:GetService("CoreGui")
         for _, v in ipairs(CoreGui:GetChildren()) do
             if v.Name == "MuvaUI_ColorPicker" then
@@ -354,29 +352,45 @@ Section.AddColorPicker = function(self, opts)
         sg.IgnoreGuiInset = false
         pcall(function() sg.Parent = CoreGui end)
         _palSG = sg
+
+        -- Blocker full-screen untuk close on outside click
+        local blocker = Instance.new("TextButton")
+        blocker.BackgroundTransparency = 1
+        blocker.BorderSizePixel        = 0
+        blocker.Size                   = UDim2.new(1, 0, 1, 0)
+        blocker.Text                   = ""
+        blocker.AutoButtonColor        = false
+        blocker.ZIndex                 = 998
+        blocker.Parent                 = sg
+        blocker.MouseButton1Click:Connect(function() closePalette() end)
+
         palette.Parent = sg
 
-        -- Hitung posisi: palette 220px lebar, muncul di kiri previewBtn
-        local palW = 220
-        local palH = 300  -- estimasi
+        local palW    = 220
         local screenW = workspace.CurrentCamera.ViewportSize.X
+        local posX    = absPos.X - palW - 6
+        if posX < 0 then posX = absPos.X + absSize.X + 6 end
+        if posX + palW > screenW then posX = absPos.X end
 
-        -- Default: di kiri previewBtn
-        local posX = absPos.X - palW - 6
-        -- Kalau tidak muat ke kiri, taruh ke kanan
-        if posX < 0 then
-            posX = absPos.X + absSize.X + 6
-        end
-        -- Kalau ke kanan juga tidak muat, align ke kiri button
-        if posX + palW > screenW then
-            posX = absPos.X
-        end
-
-        local posY = absPos.Y
-
-        palette.Position = UDim2.fromOffset(posX, posY)
+        palette.Position = UDim2.fromOffset(posX, absPos.Y)
         palette.Visible  = true
     end
+
+    -- Auto-close saat tab berganti — cek parent ScrollingFrame visibility
+    local function isCardVisible()
+        local p = card.Parent
+        while p do
+            if not p.Visible then return false end
+            p = p.Parent
+        end
+        return true
+    end
+
+    game:GetService("RunService").Heartbeat:Connect(function()
+        if open and not isCardVisible() then
+            closePalette()
+        end
+    end)
 
     previewBtn.MouseButton1Click:Connect(function()
         if open then closePalette() else openPalette() end
