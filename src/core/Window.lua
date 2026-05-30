@@ -1,240 +1,462 @@
--- Window: top-level UI window
--- Berisi sidebar nav, content area, titlebar, drag/resize
+-- Window: matches mockup.html design exactly
 Window = {}
 Window.__index = Window
 
 local UserInputService = game:GetService("UserInputService")
+local Players          = game:GetService("Players")
 
 function Window.new(opts, screenGui, flags)
-    local self      = setmetatable({}, Window)
-    self._flags     = flags
-    self._tabs      = {}
-    self._activeTab = nil
-    self._opts      = opts
+    local self = setmetatable({}, Window)
+    self._flags = flags; self._tabs = {}; self._activeTab = nil; self._opts = opts
 
-    local accent    = opts.Accent or Theme:Accent()
+    local accent = opts.Accent or Theme:Accent()
     Theme:SetAccent(accent)
 
-    -- ── MAIN WINDOW FRAME ───────────────────────────────────
+    -- ROOT WINDOW
     local win = Instance.new("Frame")
-    win.Name                = "MuvaWindow"
-    win.BackgroundColor3    = Theme:BG(1)
-    win.BorderSizePixel     = 0
-    win.Size                = UDim2.fromOffset(
-        opts.Size and opts.Size.X or 560,
-        opts.Size and opts.Size.Y or 500
-    )
-    win.Position            = UDim2.fromOffset(80, 80)
-    win.ClipsDescendants    = false
-    win.Parent              = screenGui
-    self._win               = win
+    win.Name = "MuvaWindow"
+    win.BackgroundColor3 = Color.fromHex("#141416")
+    win.BorderSizePixel  = 0
+    win.Size     = UDim2.fromOffset(opts.Size and opts.Size.X or 560, opts.Size and opts.Size.Y or 540)
+    win.Position = UDim2.fromOffset(80, 80)
+    win.ClipsDescendants = false
+    win.Parent   = screenGui
+    self._win    = win
 
     local winCorner = Instance.new("UICorner")
-    winCorner.CornerRadius = UDim.new(0, 10)
-    winCorner.Parent       = win
+    winCorner.CornerRadius = UDim.new(0, 12)
+    winCorner.Parent = win
 
     local winStroke = Instance.new("UIStroke")
-    winStroke.Color     = Theme:Border(0)
+    winStroke.Color = Color.fromHex("#252528")
     winStroke.Thickness = 1
-    winStroke.Parent    = win
+    winStroke.Parent = win
 
-    -- ── TITLEBAR ────────────────────────────────────────────
+    -- TITLEBAR
     local titlebar = Instance.new("Frame")
-    titlebar.Name               = "Titlebar"
-    titlebar.BackgroundColor3   = Theme:BG(1)
-    titlebar.BorderSizePixel    = 0
-    titlebar.Size               = UDim2.new(1, 0, 0, 38)
-    titlebar.Parent             = win
-    self._titlebar              = titlebar
+    titlebar.Name = "Titlebar"
+    titlebar.BackgroundColor3 = Color.fromHex("#1a1a1e")
+    titlebar.BorderSizePixel  = 0
+    titlebar.Size = UDim2.new(1, 0, 0, 46)
+    titlebar.Parent = win
+    self._titlebar = titlebar
 
     local tbCorner = Instance.new("UICorner")
-    tbCorner.CornerRadius = UDim.new(0, 10)
-    tbCorner.Parent       = titlebar
+    tbCorner.CornerRadius = UDim.new(0, 12)
+    tbCorner.Parent = titlebar
 
-    -- Bottom square corners on titlebar
-    local tbFill = Instance.new("Frame")
-    tbFill.BackgroundColor3 = Theme:BG(1)
-    tbFill.BorderSizePixel  = 0
-    tbFill.Size             = UDim2.new(1, 0, 0.5, 0)
-    tbFill.Position         = UDim2.new(0, 0, 0.5, 0)
-    tbFill.Parent           = titlebar
+    local tbSquare = Instance.new("Frame")
+    tbSquare.BackgroundColor3 = Color.fromHex("#1a1a1e")
+    tbSquare.BorderSizePixel  = 0
+    tbSquare.Size = UDim2.new(1, 0, 0.5, 0)
+    tbSquare.Position = UDim2.new(0, 0, 0.5, 0)
+    tbSquare.Parent = titlebar
 
-    -- Logo
+    local tbDivider = Instance.new("Frame")
+    tbDivider.BackgroundColor3 = Color.fromHex("#252528")
+    tbDivider.BorderSizePixel  = 0
+    tbDivider.Size = UDim2.new(1, 0, 0, 1)
+    tbDivider.Position = UDim2.new(0, 0, 1, -1)
+    tbDivider.Parent = titlebar
+
+    -- LEFT: Logo + Title + SubTitle
+    local tbLeft = Instance.new("Frame")
+    tbLeft.BackgroundTransparency = 1
+    tbLeft.Size = UDim2.new(0.6, 0, 1, 0)
+    tbLeft.Position = UDim2.new(0, 13, 0, 0)
+    tbLeft.Parent = titlebar
+
+    local tbLeftLayout = Instance.new("UIListLayout")
+    tbLeftLayout.FillDirection     = Enum.FillDirection.Horizontal
+    tbLeftLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    tbLeftLayout.Padding = UDim.new(0, 9)
+    tbLeftLayout.Parent  = tbLeft
+
     local logo = Instance.new("Frame")
-    logo.Name               = "Logo"
-    logo.Size               = UDim2.fromOffset(22, 22)
-    logo.Position           = UDim2.new(0, 10, 0.5, -11)
-    logo.BackgroundColor3   = accent
-    logo.BorderSizePixel    = 0
-    logo.Parent             = titlebar
-    local logoCorner = Instance.new("UICorner")
-    logoCorner.CornerRadius = UDim.new(0, 5)
-    logoCorner.Parent       = logo
-    local logoLabel = Instance.new("TextLabel")
-    logoLabel.BackgroundTransparency = 1
-    logoLabel.Size          = UDim2.new(1, 0, 1, 0)
-    logoLabel.Text          = "M"
-    logoLabel.Font          = Enum.Font.GothamBold
-    logoLabel.TextSize      = 11
-    logoLabel.TextColor3    = Color3.new(1, 1, 1)
-    logoLabel.Parent        = logo
-    self._logo              = logo
+    logo.Size = UDim2.fromOffset(26, 26)
+    logo.BackgroundColor3 = accent
+    logo.BorderSizePixel  = 0
+    logo.Parent = tbLeft
+    self._logo  = logo
 
-    -- Title text
-    local titleLbl = Instance.new("TextLabel")
-    titleLbl.BackgroundTransparency = 1
-    titleLbl.Position       = UDim2.new(0, 38, 0, 0)
-    titleLbl.Size           = UDim2.new(1, -120, 1, 0)
-    titleLbl.Text           = opts.Title or "MuvaUI"
-    titleLbl.Font           = Enum.Font.GothamBold
-    titleLbl.TextSize       = 12
-    titleLbl.TextColor3     = Theme:Text(0)
-    titleLbl.TextXAlignment = Enum.TextXAlignment.Left
-    titleLbl.Parent         = titlebar
+    local logoCorner = Instance.new("UICorner")
+    logoCorner.CornerRadius = UDim.new(0, 6)
+    logoCorner.Parent = logo
+
+    local logoText = Instance.new("TextLabel")
+    logoText.BackgroundTransparency = 1
+    logoText.Size = UDim2.new(1, 0, 1, 0)
+    logoText.Text = "M"
+    logoText.Font = Enum.Font.GothamBold
+    logoText.TextSize   = 12
+    logoText.TextColor3 = Color3.new(1, 1, 1)
+    logoText.Parent = logo
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Size = UDim2.fromOffset(0, 46)
+    titleLabel.AutomaticSize = Enum.AutomaticSize.X
+    titleLabel.Text = opts.Title or "MuvaUI"
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize   = 13
+    titleLabel.TextColor3 = Color.fromHex("#f0f0f0")
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = tbLeft
 
     if opts.SubTitle then
-        titleLbl.Size     = UDim2.new(0, 0, 0, 14)
-        titleLbl.AutomaticSize = Enum.AutomaticSize.X
-        titleLbl.Position = UDim2.new(0, 38, 0, 6)
-        local subLbl = Instance.new("TextLabel")
-        subLbl.BackgroundTransparency = 1
-        subLbl.Position       = UDim2.new(0, 38, 0, 22)
-        subLbl.Size           = UDim2.new(1, -120, 0, 12)
-        subLbl.Text           = opts.SubTitle
-        subLbl.Font           = Enum.Font.Gotham
-        subLbl.TextSize       = 9
-        subLbl.TextColor3     = Theme:Text(3)
-        subLbl.TextXAlignment = Enum.TextXAlignment.Left
-        subLbl.Parent         = titlebar
+        local subLabel = Instance.new("TextLabel")
+        subLabel.BackgroundTransparency = 1
+        subLabel.Size = UDim2.fromOffset(0, 46)
+        subLabel.AutomaticSize = Enum.AutomaticSize.X
+        subLabel.Text = opts.SubTitle
+        subLabel.Font = Enum.Font.Gotham
+        subLabel.TextSize   = 10
+        subLabel.TextColor3 = Color.fromHex("#555555")
+        subLabel.TextXAlignment = Enum.TextXAlignment.Left
+        subLabel.Parent = tbLeft
     end
 
-    -- Window controls (minimize, maximize, close)
-    self:_buildControls(titlebar)
+    -- RIGHT: Badge + Controls
+    local tbRight = Instance.new("Frame")
+    tbRight.BackgroundTransparency = 1
+    tbRight.Size = UDim2.fromOffset(0, 46)
+    tbRight.AutomaticSize = Enum.AutomaticSize.X
+    tbRight.Position  = UDim2.new(1, -13, 0, 0)
+    tbRight.AnchorPoint = Vector2.new(1, 0)
+    tbRight.Parent = titlebar
 
-    -- ── BODY (sidebar + content) ────────────────────────────
+    local tbRightLayout = Instance.new("UIListLayout")
+    tbRightLayout.FillDirection       = Enum.FillDirection.Horizontal
+    tbRightLayout.VerticalAlignment   = Enum.VerticalAlignment.Center
+    tbRightLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+    tbRightLayout.Padding = UDim.new(0, 8)
+    tbRightLayout.Parent  = tbRight
+
+    -- Version badge
+    local badgeFrame = Instance.new("Frame")
+    badgeFrame.BackgroundColor3 = Color.fromHex("#1e1220")
+    badgeFrame.BorderSizePixel  = 0
+    badgeFrame.Size = UDim2.fromOffset(0, 22)
+    badgeFrame.AutomaticSize = Enum.AutomaticSize.X
+    badgeFrame.Parent = tbRight
+
+    local badgeCorner = Instance.new("UICorner")
+    badgeCorner.CornerRadius = UDim.new(1, 0)
+    badgeCorner.Parent = badgeFrame
+
+    local badgeStroke = Instance.new("UIStroke")
+    badgeStroke.Color     = Color.fromHex("#3d1f5a")
+    badgeStroke.Thickness = 1
+    badgeStroke.Parent    = badgeFrame
+
+    local badgePad = Instance.new("UIPadding")
+    badgePad.PaddingLeft  = UDim.new(0, 8)
+    badgePad.PaddingRight = UDim.new(0, 8)
+    badgePad.Parent = badgeFrame
+
+    local badgeLbl = Instance.new("TextLabel")
+    badgeLbl.BackgroundTransparency = 1
+    badgeLbl.Size = UDim2.new(1, 0, 1, 0)
+    badgeLbl.Text = opts.Version or "v1.0.0"
+    badgeLbl.Font = Enum.Font.GothamBold
+    badgeLbl.TextSize   = 10
+    badgeLbl.TextColor3 = accent
+    badgeLbl.Parent = badgeFrame
+    self._badgeLbl = badgeLbl
+
+    -- Control buttons container
+    local ctrlFrame = Instance.new("Frame")
+    ctrlFrame.BackgroundTransparency = 1
+    ctrlFrame.Size = UDim2.fromOffset(0, 46)
+    ctrlFrame.AutomaticSize = Enum.AutomaticSize.X
+    ctrlFrame.Parent = tbRight
+
+    local ctrlLayout = Instance.new("UIListLayout")
+    ctrlLayout.FillDirection     = Enum.FillDirection.Horizontal
+    ctrlLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    ctrlLayout.Padding = UDim.new(0, 5)
+    ctrlLayout.Parent  = ctrlFrame
+
+    local btnMin   = self:_makeCtrlBtn(ctrlFrame, "-",  Color.fromHex("#2a2a2e"), Color.fromHex("#aaaaaa"))
+    local btnMax   = self:_makeCtrlBtn(ctrlFrame, "[]", Color.fromHex("#2a2a2e"), Color.fromHex("#aaaaaa"))
+    local btnClose = self:_makeCtrlBtn(ctrlFrame, "x",  Color.fromHex("#3d1010"), Color.fromHex("#ef4444"))
+    self._btnMax = btnMax
+
+    btnMin.MouseButton1Click:Connect(function()   self:_minimize() end)
+    btnMax.MouseButton1Click:Connect(function()   self:_toggleMaximize() end)
+    btnClose.MouseButton1Click:Connect(function() self:_close() end)
+
+    -- BODY (sidebar + content)
     local body = Instance.new("Frame")
-    body.Name               = "Body"
-    body.BackgroundTransparency = 1
-    body.Position           = UDim2.new(0, 0, 0, 38)
-    body.Size               = UDim2.new(1, 0, 1, -38)
-    body.Parent             = win
-    self._body              = body
+    body.BackgroundColor3 = Color.fromHex("#141416")
+    body.BorderSizePixel  = 0
+    body.Position = UDim2.new(0, 0, 0, 46)
+    body.Size     = UDim2.new(1, 0, 1, -46)
+    body.ClipsDescendants = true
+    body.Parent = win
 
-    -- Sidebar
-    local sidebar = Instance.new("ScrollingFrame")
-    sidebar.Name                   = "Sidebar"
-    sidebar.BackgroundColor3       = Theme:BG(1)
-    sidebar.BorderSizePixel        = 0
-    sidebar.Size                   = UDim2.new(0, 148, 1, 0)
-    sidebar.CanvasSize             = UDim2.new(0, 0, 0, 0)
-    sidebar.AutomaticCanvasSize    = Enum.AutomaticSize.Y
-    sidebar.ScrollBarThickness     = 2
-    sidebar.ScrollBarImageColor3   = Theme:BG(4)
-    sidebar.Parent                 = body
-    self._sidebar                  = sidebar
+    -- SIDEBAR
+    local sidebar = Instance.new("Frame")
+    sidebar.Name = "Sidebar"
+    sidebar.BackgroundColor3 = Color.fromHex("#111113")
+    sidebar.BorderSizePixel  = 0
+    sidebar.Size = UDim2.new(0, 155, 1, 0)
+    sidebar.ClipsDescendants = false
+    sidebar.Parent = body
+    self._sidebar = sidebar
 
-    local sbLayout = Instance.new("UIListLayout")
-    sbLayout.FillDirection = Enum.FillDirection.Vertical
-    sbLayout.SortOrder     = Enum.SortOrder.LayoutOrder
-    sbLayout.Padding       = UDim.new(0, 1)
-    sbLayout.Parent        = sidebar
-
+    -- Sidebar right divider — parent to body to avoid UIListLayout conflict
     local sbDivider = Instance.new("Frame")
-    sbDivider.BackgroundColor3 = Theme:Border(0)
+    sbDivider.BackgroundColor3 = Color.fromHex("#1e1e22")
     sbDivider.BorderSizePixel  = 0
-    sbDivider.Size             = UDim2.new(0, 1, 1, 0)
-    sbDivider.Position         = UDim2.new(1, -1, 0, 0)
-    sbDivider.ZIndex           = 5
-    sbDivider.Parent           = body
+    sbDivider.Size     = UDim2.new(0, 1, 1, 0)
+    sbDivider.Position = UDim2.new(0, 155, 0, 0)
+    sbDivider.ZIndex   = 2
+    sbDivider.Parent   = body
 
-    -- Content area
+    local sbMainLayout = Instance.new("UIListLayout")
+    sbMainLayout.FillDirection = Enum.FillDirection.Vertical
+    sbMainLayout.SortOrder     = Enum.SortOrder.LayoutOrder
+    sbMainLayout.Parent = sidebar
+
+    -- Search bar
+    local searchOuter = Instance.new("Frame")
+    searchOuter.BackgroundTransparency = 1
+    searchOuter.Size = UDim2.new(1, 0, 0, 36)
+    searchOuter.LayoutOrder = 1
+    searchOuter.Parent = sidebar
+
+    local searchOuterPad = Instance.new("UIPadding")
+    searchOuterPad.PaddingLeft   = UDim.new(0, 8)
+    searchOuterPad.PaddingRight  = UDim.new(0, 8)
+    searchOuterPad.PaddingTop    = UDim.new(0, 6)
+    searchOuterPad.PaddingBottom = UDim.new(0, 4)
+    searchOuterPad.Parent = searchOuter
+
+    local searchWrap = Instance.new("Frame")
+    searchWrap.BackgroundColor3 = Color.fromHex("#1a1a1e")
+    searchWrap.BorderSizePixel  = 0
+    searchWrap.Size   = UDim2.new(1, 0, 1, 0)
+    searchWrap.Parent = searchOuter
+
+    local searchCorner = Instance.new("UICorner")
+    searchCorner.CornerRadius = UDim.new(0, 7)
+    searchCorner.Parent = searchWrap
+
+    local searchStroke = Instance.new("UIStroke")
+    searchStroke.Color     = Color.fromHex("#252528")
+    searchStroke.Thickness = 1
+    searchStroke.Parent    = searchWrap
+
+    local searchRowLayout = Instance.new("UIListLayout")
+    searchRowLayout.FillDirection     = Enum.FillDirection.Horizontal
+    searchRowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    searchRowLayout.Padding = UDim.new(0, 5)
+    searchRowLayout.Parent  = searchWrap
+
+    local searchPad = Instance.new("UIPadding")
+    searchPad.PaddingLeft  = UDim.new(0, 7)
+    searchPad.PaddingRight = UDim.new(0, 7)
+    searchPad.Parent = searchWrap
+
+    local searchIcon = Instance.new("TextLabel")
+    searchIcon.BackgroundTransparency = 1
+    searchIcon.Size = UDim2.fromOffset(11, 24)
+    searchIcon.Text = "*"
+    searchIcon.Font = Enum.Font.Gotham
+    searchIcon.TextSize   = 11
+    searchIcon.TextColor3 = Color.fromHex("#444444")
+    searchIcon.Parent = searchWrap
+
+    local searchBox = Instance.new("TextBox")
+    searchBox.BackgroundTransparency = 1
+    searchBox.BorderSizePixel   = 0
+    searchBox.Size = UDim2.new(1, -18, 1, 0)
+    searchBox.PlaceholderText   = "Search..."
+    searchBox.PlaceholderColor3 = Color.fromHex("#444444")
+    searchBox.Text = ""
+    searchBox.Font = Enum.Font.Gotham
+    searchBox.TextSize   = 11
+    searchBox.TextColor3 = Color.fromHex("#aaaaaa")
+    searchBox.ClearTextOnFocus = false
+    searchBox.Parent = searchWrap
+
+    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        self:_filterTabs(searchBox.Text)
+    end)
+
+    -- Nav items scrollframe
+    local navScroll = Instance.new("ScrollingFrame")
+    navScroll.BackgroundTransparency = 1
+    navScroll.BorderSizePixel        = 0
+    navScroll.Size = UDim2.new(1, 0, 1, -78)
+    navScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    navScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    navScroll.ScrollBarThickness  = 2
+    navScroll.ScrollBarImageColor3 = Color.fromHex("#252528")
+    navScroll.LayoutOrder = 2
+    navScroll.Parent = sidebar
+    self._navScroll  = navScroll
+
+    local navLayout = Instance.new("UIListLayout")
+    navLayout.FillDirection = Enum.FillDirection.Vertical
+    navLayout.SortOrder     = Enum.SortOrder.LayoutOrder
+    navLayout.Parent = navScroll
+
+    -- User profile (bottom)
+    local userFrame = Instance.new("Frame")
+    userFrame.BackgroundTransparency = 1
+    userFrame.Size = UDim2.new(1, 0, 0, 42)
+    userFrame.LayoutOrder = 3
+    userFrame.Parent = sidebar
+
+    local userDivider = Instance.new("Frame")
+    userDivider.BackgroundColor3 = Color.fromHex("#1e1e22")
+    userDivider.BorderSizePixel  = 0
+    userDivider.Size = UDim2.new(1, 0, 0, 1)
+    userDivider.Parent = userFrame
+
+    local userPad = Instance.new("UIPadding")
+    userPad.PaddingLeft   = UDim.new(0, 10)
+    userPad.PaddingRight  = UDim.new(0, 10)
+    userPad.PaddingTop    = UDim.new(0, 8)
+    userPad.PaddingBottom = UDim.new(0, 6)
+    userPad.Parent = userFrame
+
+    local userRowLayout = Instance.new("UIListLayout")
+    userRowLayout.FillDirection     = Enum.FillDirection.Horizontal
+    userRowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    userRowLayout.Padding = UDim.new(0, 8)
+    userRowLayout.Parent  = userFrame
+
+    local avatarFrame = Instance.new("Frame")
+    avatarFrame.BackgroundColor3 = accent
+    avatarFrame.BorderSizePixel  = 0
+    avatarFrame.Size   = UDim2.fromOffset(26, 26)
+    avatarFrame.Parent = userFrame
+
+    local avatarCorner = Instance.new("UICorner")
+    avatarCorner.CornerRadius = UDim.new(1, 0)
+    avatarCorner.Parent = avatarFrame
+
+    local avatarLabel = Instance.new("TextLabel")
+    avatarLabel.BackgroundTransparency = 1
+    avatarLabel.Size = UDim2.new(1, 0, 1, 0)
+    avatarLabel.Text = "?"
+    avatarLabel.Font = Enum.Font.GothamBold
+    avatarLabel.TextSize   = 11
+    avatarLabel.TextColor3 = Color3.new(1, 1, 1)
+    avatarLabel.Parent = avatarFrame
+
+    local nameColumn = Instance.new("Frame")
+    nameColumn.BackgroundTransparency = 1
+    nameColumn.Size   = UDim2.new(1, -34, 1, 0)
+    nameColumn.Parent = userFrame
+
+    local nameColumnLayout = Instance.new("UIListLayout")
+    nameColumnLayout.FillDirection     = Enum.FillDirection.Vertical
+    nameColumnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    nameColumnLayout.Parent = nameColumn
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Size = UDim2.new(1, 0, 0, 14)
+    nameLabel.Text = "User"
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextSize   = 11
+    nameLabel.TextColor3 = Color.fromHex("#cccccc")
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = nameColumn
+
+    local roleLabel = Instance.new("TextLabel")
+    roleLabel.BackgroundTransparency = 1
+    roleLabel.Size = UDim2.new(1, 0, 0, 12)
+    roleLabel.Text = "Player"
+    roleLabel.Font = Enum.Font.Gotham
+    roleLabel.TextSize   = 10
+    roleLabel.TextColor3 = Color.fromHex("#444444")
+    roleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    roleLabel.Parent = nameColumn
+
+    task.spawn(function()
+        local ok, player = pcall(function() return Players.LocalPlayer end)
+        if ok and player then
+            avatarLabel.Text = player.Name:sub(1, 1):upper()
+            nameLabel.Text   = player.Name:sub(1, 3) .. "***"
+        end
+    end)
+
+    Theme:OnAccentChanged(function(a)
+        avatarFrame.BackgroundColor3 = a
+        badgeLbl.TextColor3          = a
+        logo.BackgroundColor3        = a
+    end)
+
+    -- CONTENT AREA
     local content = Instance.new("Frame")
-    content.Name               = "Content"
+    content.Name = "Content"
     content.BackgroundTransparency = 1
-    content.Position           = UDim2.new(0, 148, 0, 0)
-    content.Size               = UDim2.new(1, -148, 1, 0)
-    content.ClipsDescendants   = true
-    content.Parent             = body
-    self._content              = content
+    content.Position = UDim2.new(0, 155, 0, 0)
+    content.Size     = UDim2.new(1, -155, 1, 0)
+    content.ClipsDescendants = true
+    content.Parent   = body
+    self._content    = content
 
-    -- ── RESIZE HANDLE ───────────────────────────────────────
-    if opts.Resizable ~= false then
-        self:_buildResizeHandle(win)
-    end
+    if opts.Draggable ~= false then self:_buildDrag(titlebar, win, screenGui) end
+    if opts.Resizable ~= false then self:_buildResizeHandle(win) end
 
-    -- ── DRAG ────────────────────────────────────────────────
-    if opts.Draggable ~= false then
-        self:_buildDrag(titlebar, win, screenGui)
-    end
-
-    -- ── MINIMIZED ICON ──────────────────────────────────────
+    -- MINIMIZED FLOATING ICON
     local miniIcon = Instance.new("TextButton")
-    miniIcon.Name               = "MiniIcon"
-    miniIcon.Size               = UDim2.fromOffset(44, 44)
-    miniIcon.Position           = UDim2.new(0, 16, 1, -60)
-    miniIcon.BackgroundColor3   = accent
-    miniIcon.BorderSizePixel    = 0
-    miniIcon.Text               = "M"
-    miniIcon.Font               = Enum.Font.GothamBold
-    miniIcon.TextSize           = 18
-    miniIcon.TextColor3         = Color3.new(1, 1, 1)
-    miniIcon.AutoButtonColor    = false
-    miniIcon.Visible            = false
-    miniIcon.ZIndex             = 20
-    miniIcon.Parent             = screenGui
-    self._miniIcon              = miniIcon
-    local miCorner = Instance.new("UICorner")
-    miCorner.CornerRadius = UDim.new(0, 10)
-    miCorner.Parent       = miniIcon
+    miniIcon.Name = "MiniIcon"
+    miniIcon.Size = UDim2.fromOffset(44, 44)
+    miniIcon.Position = UDim2.new(0, 16, 1, -60)
+    miniIcon.BackgroundColor3 = accent
+    miniIcon.BorderSizePixel  = 0
+    miniIcon.Text = "M"
+    miniIcon.Font = Enum.Font.GothamBold
+    miniIcon.TextSize   = 18
+    miniIcon.TextColor3 = Color3.new(1, 1, 1)
+    miniIcon.AutoButtonColor = false
+    miniIcon.Visible = false
+    miniIcon.ZIndex  = 20
+    miniIcon.Parent  = screenGui
+    self._miniIcon   = miniIcon
 
-    miniIcon.MouseButton1Click:Connect(function()
-        self:_restore()
-    end)
+    local miniCorner = Instance.new("UICorner")
+    miniCorner.CornerRadius = UDim.new(0, 12)
+    miniCorner.Parent = miniIcon
 
-    -- Theme accent update
-    Theme:OnAccentChanged(function(newAccent)
-        logo.BackgroundColor3  = newAccent
-        miniIcon.BackgroundColor3 = newAccent
-    end)
+    miniIcon.MouseButton1Click:Connect(function() self:_restore() end)
+    Theme:OnAccentChanged(function(a) miniIcon.BackgroundColor3 = a end)
 
     return self
 end
 
-function Window:_buildControls(titlebar)
-    local btnClose = self:_makeWinBtn(titlebar, "✕", Color.fromHex("#ef4444"), 3)
-    local btnMax   = self:_makeWinBtn(titlebar, "□", Theme:BG(3), 2)
-    local btnMin   = self:_makeWinBtn(titlebar, "─", Theme:BG(3), 1)
+-- ── HELPERS ─────────────────────────────────────────────────
 
-    btnClose.MouseButton1Click:Connect(function() self:_close() end)
-    btnMax.MouseButton1Click:Connect(function()   self:_toggleMaximize() end)
-    btnMin.MouseButton1Click:Connect(function()   self:_minimize() end)
-
-    self._btnMax = btnMax
-end
-
-function Window:_makeWinBtn(parent, symbol, bgColor, order)
+function Window:_makeCtrlBtn(parent, symbol, bgColor, textColor)
     local btn = Instance.new("TextButton")
-    btn.Size                = UDim2.fromOffset(20, 20)
-    btn.Position            = UDim2.new(1, -(order * 26), 0.5, -10)
-    btn.BackgroundColor3    = Theme:BG(3)
-    btn.BorderSizePixel     = 0
-    btn.Text                = symbol
-    btn.Font                = Enum.Font.Gotham
-    btn.TextSize            = 10
-    btn.TextColor3          = Theme:Text(3)
-    btn.AutoButtonColor     = false
-    btn.ZIndex              = 5
-    btn.Parent              = parent
-    local c = Instance.new("UICorner")
-    c.CornerRadius = UDim.new(0, 4)
-    c.Parent = btn
+    btn.BackgroundColor3 = bgColor
+    btn.BorderSizePixel  = 0
+    btn.Size = UDim2.fromOffset(22, 22)
+    btn.Text = symbol
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize   = 9
+    btn.TextColor3 = textColor
+    btn.AutoButtonColor = false
+    btn.Parent = parent
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 5)
+    corner.Parent = btn
+
     btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = bgColor
+        Tween.fast(btn, { BackgroundColor3 = Color.lighten(bgColor, 0.1) })
         btn.TextColor3 = Color3.new(1, 1, 1)
     end)
     btn.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = Theme:BG(3)
-        btn.TextColor3 = Theme:Text(3)
+        Tween.fast(btn, { BackgroundColor3 = bgColor })
+        btn.TextColor3 = textColor
     end)
     return btn
 end
@@ -266,28 +488,28 @@ end
 
 function Window:_buildResizeHandle(win)
     local handle = Instance.new("TextButton")
-    handle.Name             = "ResizeHandle"
-    handle.Size             = UDim2.fromOffset(18, 18)
-    handle.Position         = UDim2.new(1, -18, 1, -18)
+    handle.Size = UDim2.fromOffset(18, 18)
+    handle.Position = UDim2.new(1, -18, 1, -18)
     handle.BackgroundTransparency = 1
-    handle.Text             = ""
-    handle.ZIndex           = 10
-    handle.Parent           = win
+    handle.Text = ""
+    handle.ZIndex = 10
+    handle.Parent = win
 
     local resizing, resizeStart, startSize = false, nil, nil
     handle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            resizing    = true
-            resizeStart = input.Position
-            startSize   = win.Size
+            resizing     = true
+            resizeStart  = input.Position
+            startSize    = win.Size
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
         if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - resizeStart
-            local newW  = math.max(400, startSize.X.Offset + delta.X)
-            local newH  = math.max(280, startSize.Y.Offset + delta.Y)
-            win.Size    = UDim2.fromOffset(newW, newH)
+            win.Size = UDim2.fromOffset(
+                math.max(420, startSize.X.Offset + delta.X),
+                math.max(300, startSize.Y.Offset + delta.Y)
+            )
         end
     end)
     UserInputService.InputEnded:Connect(function(input)
@@ -305,22 +527,10 @@ end
 function Window:_restore()
     self._miniIcon.Visible = false
     self._win.Visible      = true
-    Tween.spring(self._win, { Size = self._win.Size })
-end
-
-function Window:_close()
-    Tween.play(self._win, { Size = UDim2.fromOffset(
-        self._win.AbsoluteSize.X * 0.95,
-        self._win.AbsoluteSize.Y * 0.95
-    )})
-    task.delay(0.15, function()
-        self._win.Visible = false
-    end)
 end
 
 local _maximized, _savedSize, _savedPos = false, nil, nil
 function Window:_toggleMaximize()
-    local sg = self._win.Parent
     if not _maximized then
         _savedSize = self._win.Size
         _savedPos  = self._win.Position
@@ -328,12 +538,26 @@ function Window:_toggleMaximize()
             Size     = UDim2.new(1, 0, 1, 0),
             Position = UDim2.new(0, 0, 0, 0),
         })
-        self._btnMax.Text = "❐"
         _maximized = true
     else
         Tween.slow(self._win, { Size = _savedSize, Position = _savedPos })
-        self._btnMax.Text = "□"
         _maximized = false
+    end
+end
+
+function Window:_close()
+    self._win.Visible = false
+end
+
+function Window:_filterTabs(query)
+    query = query:lower()
+    for _, child in ipairs(self._navScroll:GetChildren()) do
+        if child:IsA("TextButton") then
+            local lbl = child:FindFirstChild("Label")
+            if lbl then
+                child.Visible = query == "" or lbl.Text:lower():find(query, 1, true) ~= nil
+            end
+        end
     end
 end
 
@@ -343,62 +567,72 @@ function Window:AddTab(opts)
     local tab    = Tab.new(opts, self._content, self._flags)
     local navBtn = self:_makeNavButton(opts, #self._tabs + 1, tab)
     table.insert(self._tabs, tab)
-
-    -- Auto-select first tab
-    if #self._tabs == 1 then
-        self:_selectTab(tab, navBtn)
-    end
-
+    if #self._tabs == 1 then self:_selectTab(tab, navBtn) end
     return tab
 end
 
 function Window:_makeNavButton(opts, order, tab)
     local btn = Instance.new("TextButton")
-    btn.Name                = "NavBtn_" .. (opts.Title or "Tab")
+    btn.Name = "NavBtn_" .. (opts.Title or "Tab")
     btn.BackgroundTransparency = 1
-    btn.Size                = UDim2.new(1, 0, 0, 32)
-    btn.LayoutOrder         = order
-    btn.BorderSizePixel     = 0
-    btn.Text                = ""
-    btn.AutoButtonColor     = false
-    btn.Parent              = self._sidebar
+    btn.Size        = UDim2.new(1, 0, 0, 32)
+    btn.LayoutOrder = order
+    btn.BorderSizePixel = 0
+    btn.Text = ""
+    btn.AutoButtonColor = false
+    btn.Parent = self._navScroll
 
-    -- Left accent bar
-    local bar = Instance.new("Frame")
-    bar.Name               = "AccentBar"
-    bar.Size               = UDim2.fromOffset(2, 0)
-    bar.Size               = UDim2.new(0, 2, 1, 0)
-    bar.BackgroundColor3   = Theme:Accent()
-    bar.BackgroundTransparency = 1
-    bar.BorderSizePixel    = 0
-    bar.Parent             = btn
+    -- Left accent bar (shows when active)
+    local accentBar = Instance.new("Frame")
+    accentBar.Name = "AccentBar"
+    accentBar.Size = UDim2.new(0, 2.5, 1, 0)
+    accentBar.BackgroundColor3       = Theme:Accent()
+    accentBar.BackgroundTransparency = 1
+    accentBar.BorderSizePixel = 0
+    accentBar.Parent = btn
 
     -- Icon
     if opts.Icon then
         local icon = Instance.new("TextLabel")
         icon.BackgroundTransparency = 1
-        icon.Size           = UDim2.fromOffset(16, 32)
-        icon.Position       = UDim2.new(0, 10, 0, 0)
-        icon.Text           = opts.Icon
-        icon.TextSize       = 13
-        icon.Font           = Enum.Font.Gotham
-        icon.TextColor3     = Theme:Text(3)
-        icon.Name           = "Icon"
-        icon.Parent         = btn
+        icon.Size     = UDim2.fromOffset(16, 32)
+        icon.Position = UDim2.new(0, 12, 0, 0)
+        icon.Text     = opts.Icon
+        icon.TextSize = 13
+        icon.Font     = Enum.Font.Gotham
+        icon.TextColor3       = Color.fromHex("#555555")
+        icon.TextXAlignment   = Enum.TextXAlignment.Center
+        icon.Name   = "Icon"
+        icon.Parent = btn
     end
 
     -- Label
-    local lbl = Instance.new("TextLabel")
-    lbl.BackgroundTransparency = 1
-    lbl.Size           = UDim2.new(1, -36, 1, 0)
-    lbl.Position       = UDim2.new(0, 30, 0, 0)
-    lbl.Text           = opts.Title or "Tab"
-    lbl.Font           = Enum.Font.Gotham
-    lbl.TextSize       = 11
-    lbl.TextColor3     = Theme:Text(3)
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.Name           = "Label"
-    lbl.Parent         = btn
+    local label = Instance.new("TextLabel")
+    label.BackgroundTransparency = 1
+    label.Size     = UDim2.new(1, -36, 1, 0)
+    label.Position = UDim2.new(0, 32, 0, 0)
+    label.Text     = opts.Title or "Tab"
+    label.Font     = Enum.Font.Gotham
+    label.TextSize = 11.5
+    label.TextColor3     = Color.fromHex("#666666")
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Name   = "Label"
+    label.Parent = btn
+
+    -- Hover effect
+    btn.MouseEnter:Connect(function()
+        local bar = btn:FindFirstChild("AccentBar")
+        if bar and bar.BackgroundTransparency == 1 then
+            Tween.fast(btn, { BackgroundColor3 = Color.fromHex("#191920") })
+            btn.BackgroundTransparency = 0
+        end
+    end)
+    btn.MouseLeave:Connect(function()
+        local bar = btn:FindFirstChild("AccentBar")
+        if bar and bar.BackgroundTransparency == 1 then
+            btn.BackgroundTransparency = 1
+        end
+    end)
 
     btn.MouseButton1Click:Connect(function()
         self:_selectTab(tab, btn)
@@ -408,41 +642,38 @@ function Window:_makeNavButton(opts, order, tab)
 end
 
 function Window:_selectTab(tab, navBtn)
-    -- Deactivate all
+    -- Deactivate all tabs
     for _, t in ipairs(self._tabs) do t:Hide() end
-    for _, child in ipairs(self._sidebar:GetChildren()) do
+    for _, child in ipairs(self._navScroll:GetChildren()) do
         if child:IsA("TextButton") then
             child.BackgroundTransparency = 1
-            local cBar   = child:FindFirstChild("AccentBar")
-            local cLabel = child:FindFirstChild("Label")
-            local cIcon  = child:FindFirstChild("Icon")
-            if cBar   then cBar.BackgroundTransparency = 1 end
-            if cLabel then cLabel.TextColor3 = Theme:Text(3); cLabel.Font = Enum.Font.Gotham end
-            if cIcon  then cIcon.TextColor3  = Theme:Text(3) end
+            local bar   = child:FindFirstChild("AccentBar")
+            local lbl   = child:FindFirstChild("Label")
+            local icon  = child:FindFirstChild("Icon")
+            if bar  then bar.BackgroundTransparency = 1 end
+            if lbl  then lbl.TextColor3 = Color.fromHex("#666666"); lbl.Font = Enum.Font.Gotham end
+            if icon then icon.TextColor3 = Color.fromHex("#555555") end
         end
     end
+
     -- Activate selected
     tab:Show()
-    navBtn.BackgroundColor3       = Theme:Accent()
-    navBtn.BackgroundTransparency = 0.92
-    local nBar   = navBtn:FindFirstChild("AccentBar")
-    local nLabel = navBtn:FindFirstChild("Label")
-    local nIcon  = navBtn:FindFirstChild("Icon")
-    if nBar   then nBar.BackgroundTransparency = 0 end
-    if nLabel then nLabel.TextColor3 = Color.fromHex("#d4b3fa"); nLabel.Font = Enum.Font.GothamBold end
-    if nIcon  then nIcon.TextColor3  = Theme:Accent() end
+    Tween.fast(navBtn, { BackgroundColor3 = Color.fromHex("#191920") })
+    navBtn.BackgroundTransparency = 0
+
+    local bar  = navBtn:FindFirstChild("AccentBar")
+    local lbl  = navBtn:FindFirstChild("Label")
+    local icon = navBtn:FindFirstChild("Icon")
+
+    if bar  then bar.BackgroundTransparency = 0; bar.BackgroundColor3 = Theme:Accent() end
+    if lbl  then lbl.TextColor3 = Color.fromHex("#d4b3fa"); lbl.Font = Enum.Font.GothamBold end
+    if icon then icon.TextColor3 = Theme:Accent() end
+
     self._activeTab = tab
 end
 
-function Window:Dialog(opts)
-    -- Forward to overlay/Dialog component
-    Dialog.show(opts, self._win.Parent)
-end
-
-function Window:Popup(opts)
-    Popup.show(opts, self._win)
-end
-
+function Window:Dialog(opts)  Dialog.show(opts, self._win.Parent) end
+function Window:Popup(opts)   Popup.show(opts, self._win) end
 function Window:OnClose(fn)    self._onClose    = fn end
 function Window:OnMinimize(fn) self._onMinimize = fn end
 function Window:OnRestore(fn)  self._onRestore  = fn end
