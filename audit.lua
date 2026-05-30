@@ -11,7 +11,7 @@ local win = MuvaUI:CreateWindow({
 -- ════════════════════════════════════════════
 -- TAB 1: INPUT
 -- ════════════════════════════════════════════
-local tabInput = win:AddTab({ Title = "Input", Icon = "◈" })
+local tabInput = win:AddTab({ Title = "Input" })
 
 local secToggles = tabInput:AddSection({ Title = "Toggle & Checkbox" })
 
@@ -95,7 +95,7 @@ secOther:AddColorPicker({
 -- ════════════════════════════════════════════
 -- TAB 2: DISPLAY
 -- ════════════════════════════════════════════
-local tabDisplay = win:AddTab({ Title = "Display", Icon = "⬡" })
+local tabDisplay = win:AddTab({ Title = "Display" })
 
 local secButtons = tabDisplay:AddSection({ Title = "Button" })
 
@@ -169,7 +169,7 @@ secAvatars:AddAvatar({ Size = "lg" })
 -- ════════════════════════════════════════════
 -- TAB 3: LAYOUT
 -- ════════════════════════════════════════════
-local tabLayout = win:AddTab({ Title = "Layout", Icon = "⚙" })
+local tabLayout = win:AddTab({ Title = "Layout" })
 
 local secStacks = tabLayout:AddSection({ Title = "HStack & VStack" })
 
@@ -212,7 +212,7 @@ secAccordion:AddAccordion({
 -- ════════════════════════════════════════════
 -- TAB 4: OVERLAY
 -- ════════════════════════════════════════════
-local tabOverlay = win:AddTab({ Title = "Overlay", Icon = "◇" })
+local tabOverlay = win:AddTab({ Title = "Overlay" })
 
 local secOverlay = tabOverlay:AddSection({ Title = "Toast / Notify" })
 
@@ -249,7 +249,7 @@ secDialog:AddButton({ Title = "Open Confirm Dialog", Style = "Danger",
 -- ════════════════════════════════════════════
 -- TAB 5: SYSTEM
 -- ════════════════════════════════════════════
-local tabSystem = win:AddTab({ Title = "System", Icon = "⚡" })
+local tabSystem = win:AddTab({ Title = "System" })
 
 local secWebhook = tabSystem:AddSection({ Title = "Webhook" })
 
