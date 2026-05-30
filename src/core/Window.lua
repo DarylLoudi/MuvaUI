@@ -12,12 +12,13 @@ function Window.new(opts, screenGui, flags)
     local accent = opts.Accent or Theme:Accent()
     Theme:SetAccent(accent)
 
-    -- ROOT WINDOW
-    -- win background = titlebar color (#1a1a1e) so top corners look correct
-    -- body background = #141416 with UICorner covers bottom half
+    -- ROOT WINDOW — single UICorner, single background color, ClipsDescendants=true
+    -- This is the ONLY frame with UICorner. All children are clipped to this boundary.
+    -- Note: Roblox ClipsDescendants clips to rectangular bounds, but UICorner visually
+    -- masks the corners. Children that go to the edge will be hidden behind win's bg color.
     local win = Instance.new("Frame")
     win.Name = "MuvaWindow"
-    win.BackgroundColor3 = Color.fromHex("#1a1a1e")  -- same as titlebar
+    win.BackgroundColor3 = Color.fromHex("#1a1a1e")
     win.BorderSizePixel  = 0
     win.Size     = UDim2.fromOffset(opts.Size and opts.Size.X or 560, opts.Size and opts.Size.Y or 540)
     win.Position = UDim2.fromOffset(80, 80)
@@ -35,7 +36,7 @@ function Window.new(opts, screenGui, flags)
     winStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     winStroke.Parent          = win
 
-    -- TITLEBAR — no UICorner, win background handles top corners
+    -- TITLEBAR — same bg as win top area, NO UICorner
     local titlebar = Instance.new("Frame")
     titlebar.Name = "Titlebar"
     titlebar.BackgroundColor3 = Color.fromHex("#1a1a1e")
@@ -179,26 +180,18 @@ function Window.new(opts, screenGui, flags)
     btnClose.MouseButton1Click:Connect(function() self:_close() end)
 
     -- BODY — covers full win, UICorner 12 gives rounded bottom corners
-    -- Background #141416 blends with win at bottom, different from titlebar at top
+    -- BODY — UICorner matches win so bottom corners are rounded
     local body = Instance.new("Frame")
     body.BackgroundColor3 = Color.fromHex("#141416")
     body.BorderSizePixel  = 0
-    body.Position         = UDim2.new(0, 0, 0, 0)
-    body.Size             = UDim2.new(1, 0, 1, 0)
+    body.Position         = UDim2.new(0, 0, 0, 46)
+    body.Size             = UDim2.new(1, 0, 1, -46)
     body.ClipsDescendants = true
     body.Parent           = win
 
     local bodyCorner = Instance.new("UICorner")
     bodyCorner.CornerRadius = UDim.new(0, 12)
     bodyCorner.Parent       = body
-
-    -- Titlebar background patch: covers top of body so titlebar color shows
-    local tbBg = Instance.new("Frame")
-    tbBg.BackgroundColor3 = Color.fromHex("#1a1a1e")
-    tbBg.BorderSizePixel  = 0
-    tbBg.Size             = UDim2.new(1, 0, 0, 46)
-    tbBg.Position         = UDim2.new(0, 0, 0, 0)
-    tbBg.Parent           = body
 
     local bodyInner = body
 
@@ -207,8 +200,8 @@ function Window.new(opts, screenGui, flags)
     sidebar.Name = "Sidebar"
     sidebar.BackgroundColor3 = Color.fromHex("#111113")
     sidebar.BorderSizePixel  = 0
-    sidebar.Position         = UDim2.new(0, 0, 0, 46)
-    sidebar.Size             = UDim2.new(0, 155, 1, -46)
+    sidebar.Position         = UDim2.new(0, 0, 0, 0)
+    sidebar.Size             = UDim2.new(0, 155, 1, 0)
     sidebar.ClipsDescendants = false
     sidebar.Parent           = body
     self._sidebar            = sidebar
@@ -217,8 +210,8 @@ function Window.new(opts, screenGui, flags)
     local sbDivider = Instance.new("Frame")
     sbDivider.BackgroundColor3 = Color.fromHex("#1e1e22")
     sbDivider.BorderSizePixel  = 0
-    sbDivider.Size     = UDim2.new(0, 1, 1, -46)
-    sbDivider.Position = UDim2.new(0, 155, 0, 46)
+    sbDivider.Size     = UDim2.new(0, 1, 1, 0)
+    sbDivider.Position = UDim2.new(0, 155, 0, 0)
     sbDivider.ZIndex   = 2
     sbDivider.Parent   = body
 
@@ -402,8 +395,8 @@ function Window.new(opts, screenGui, flags)
     local content = Instance.new("Frame")
     content.Name = "Content"
     content.BackgroundTransparency = 1
-    content.Position = UDim2.new(0, 155, 0, 46)
-    content.Size     = UDim2.new(1, -155, 1, -46)
+    content.Position = UDim2.new(0, 155, 0, 0)
+    content.Size     = UDim2.new(1, -155, 1, 0)
     content.ClipsDescendants = true
     content.Parent   = body
     self._content    = content
