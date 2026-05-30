@@ -297,11 +297,13 @@ Section.AddMultiDropdown = function(self, opts)
             Tween.fast(arrow, { Rotation = 0 })
         else
             open = true
-            local sg = getScreenGui(trigger)
-            if sg then menu.Parent = sg end
+            -- Baca posisi SEBELUM pindah parent
             local absPos  = trigger.AbsolutePosition
             local absSize = trigger.AbsoluteSize
+            local sg = getScreenGui(trigger)
+            if sg then menu.Parent = sg end
             menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
+            menu.Size     = UDim2.fromOffset(absSize.X, menu.AbsoluteSize.Y)
             buildMenu()
             menu.Visible     = true
             arrow.TextColor3 = Theme:Accent()

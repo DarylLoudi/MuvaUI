@@ -258,17 +258,17 @@ Section.AddDropdown = function(self, opts)
     local function openMenu()
         open = true
 
-        -- Pindah parent ke ScreenGui agar tidak ter-clip
-        local sg = getScreenGui(trigger)
-        if sg then
-            menu.Parent = sg
-        end
-
-        -- Hitung posisi absolut di bawah trigger
-        -- IgnoreGuiInset = true di ScreenGui window, jadi tidak perlu kurangi inset
+        -- Baca posisi SEBELUM pindah parent (koordinat masih valid di layout saat ini)
         local absPos  = trigger.AbsolutePosition
         local absSize = trigger.AbsoluteSize
+
+        -- Pindah parent ke ScreenGui agar tidak ter-clip ScrollingFrame
+        local sg = getScreenGui(trigger)
+        if sg then menu.Parent = sg end
+
+        -- Set posisi tepat di bawah trigger
         menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
+        menu.Size     = UDim2.fromOffset(absSize.X, 0)
 
         buildItems(nil)
         menu.Visible = true
