@@ -272,13 +272,21 @@ Section.AddDropdown = function(self, opts)
     -- ScreenGui khusus dropdown dengan DisplayOrder lebih tinggi dari window (999)
     local _dropSG = nil
     local function getDropSG()
-        if _dropSG and _dropSG.Parent then return _dropSG end
+        -- Destroy stale instance agar property baru ter-apply
+        if _dropSG then
+            pcall(function() _dropSG:Destroy() end)
+            _dropSG = nil
+        end
         local CoreGui = game:GetService("CoreGui")
+        -- Juga destroy any existing MuvaUI_Dropdown dari run sebelumnya
+        for _, v in ipairs(CoreGui:GetChildren()) do
+            if v.Name == "MuvaUI_Dropdown" then v:Destroy() end
+        end
         local sg = Instance.new("ScreenGui")
         sg.Name           = "MuvaUI_Dropdown"
         sg.ResetOnSpawn   = false
         sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        sg.DisplayOrder   = 1100  -- lebih tinggi dari window (999)
+        sg.DisplayOrder   = 1100
         sg.IgnoreGuiInset = false
         pcall(function() sg.Parent = CoreGui end)
         _dropSG = sg
