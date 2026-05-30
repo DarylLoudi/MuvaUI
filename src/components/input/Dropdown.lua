@@ -287,7 +287,7 @@ Section.AddDropdown = function(self, opts)
         sg.ResetOnSpawn   = false
         sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
         sg.DisplayOrder   = 1100
-        sg.IgnoreGuiInset = true
+        sg.IgnoreGuiInset = false
         pcall(function() sg.Parent = CoreGui end)
         _dropSG = sg
         return sg
