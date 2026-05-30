@@ -34,7 +34,7 @@ function Section:_buildSeparator(label)
     local row = Instance.new("Frame")
     row.Name                    = "Separator"
     row.BackgroundTransparency  = 1
-    row.Size                    = UDim2.new(1, 0, 0, 16)
+    row.Size                    = UDim2.new(1, 0, 0, 18)
     row.LayoutOrder             = 0
     row.Parent                  = self._frame
 
@@ -90,7 +90,7 @@ function Section:_makeCard(layoutOrder)
     card.Name                   = "Card"
     card.BackgroundColor3       = Theme:BG(2)
     card.BorderSizePixel        = 0
-    card.Size                   = UDim2.new(1, 0, 0, 50)  -- was 38, +30%
+    card.Size                   = UDim2.new(1, 0, 0, 40)
     card.LayoutOrder            = layoutOrder or #self._components + 10
     card.Parent                 = self._frame
 
@@ -107,8 +107,8 @@ function Section:_makeCard(layoutOrder)
     local pad = Instance.new("UIPadding")
     pad.PaddingLeft   = UDim.new(0, 12)
     pad.PaddingRight  = UDim.new(0, 12)
-    pad.PaddingTop    = UDim.new(0, 10)
-    pad.PaddingBottom = UDim.new(0, 10)
+    pad.PaddingTop    = UDim.new(0, 8)
+    pad.PaddingBottom = UDim.new(0, 8)
     pad.Parent        = card
 
     return card, stroke
