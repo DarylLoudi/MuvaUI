@@ -29,19 +29,18 @@ local function getContainer(screenGui)
         end
     end
 
-    -- Container anchor ke bawah-kanan
+    -- Container: full height, anchor kanan-bawah layar
+    -- AutomaticSize TIDAK dipakai — butuh tinggi tetap agar VerticalAlignment.Bottom bekerja
     local c = Instance.new("Frame")
     c.Name                   = "ToastContainer"
     c.BackgroundTransparency = 1
     c.AnchorPoint            = Vector2.new(1, 1)
-    c.Size                   = UDim2.fromOffset(280, 0)
-    c.AutomaticSize          = Enum.AutomaticSize.Y
-    -- Posisi: 16px dari kanan, 24px dari bawah
+    c.Size                   = UDim2.new(0, 280, 1, -24)  -- full height dikurangi margin bawah
     c.Position               = UDim2.new(1, -16, 1, -24)
     c.ZIndex                 = 999
+    c.ClipsDescendants       = false
     c.Parent                 = sg
 
-    -- Stack dari bawah ke atas: VerticalAlignment Bottom + FillDirection Vertical
     local layout = Instance.new("UIListLayout")
     layout.FillDirection        = Enum.FillDirection.Vertical
     layout.HorizontalAlignment  = Enum.HorizontalAlignment.Right
