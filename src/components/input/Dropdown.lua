@@ -255,22 +255,37 @@ Section.AddDropdown = function(self, opts)
         if searchBox then searchBox.Text = "" end
     end
 
+    -- ScreenGui khusus dropdown dengan DisplayOrder lebih tinggi dari window (999)
+    local _dropSG = nil
+    local function getDropSG()
+        if _dropSG and _dropSG.Parent then return _dropSG end
+        local CoreGui = game:GetService("CoreGui")
+        local sg = Instance.new("ScreenGui")
+        sg.Name           = "MuvaUI_Dropdown"
+        sg.ResetOnSpawn   = false
+        sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        sg.DisplayOrder   = 1100  -- lebih tinggi dari window (999)
+        sg.IgnoreGuiInset = true
+        pcall(function() sg.Parent = CoreGui end)
+        _dropSG = sg
+        return sg
+    end
+
     local function openMenu()
         open = true
 
-        -- Baca posisi SEBELUM pindah parent (koordinat masih valid di layout saat ini)
+        -- Baca posisi SEBELUM pindah parent
         local absPos  = trigger.AbsolutePosition
         local absSize = trigger.AbsoluteSize
 
-        -- Pindah parent ke ScreenGui agar tidak ter-clip ScrollingFrame
-        local sg = getScreenGui(trigger)
-        if sg then menu.Parent = sg end
+        -- Parent ke ScreenGui dengan DisplayOrder tinggi agar selalu di atas window
+        menu.Parent   = getDropSG()
 
-        -- AbsolutePosition sudah include GuiInset (36px).
-        -- ScreenGui pakai IgnoreGuiInset=true jadi (0,0) = top-left layar termasuk inset.
-        -- Perlu kurangi inset agar posisi tidak double-offset.
+        -- IgnoreGuiInset=true: AbsolutePosition trigger sudah exclude inset (36px)
+        -- ScreenGui dengan IgnoreGuiInset=true: (0,0) = include inset area
+        -- Jadi perlu tambah inset.Y agar posisi sejajar
         local inset = game:GetService("GuiService"):GetGuiInset()
-        menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4 - inset.Y)
+        menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4 + inset.Y)
         menu.Size     = UDim2.fromOffset(absSize.X, 0)
 
         buildItems(nil)
@@ -286,6 +301,7 @@ Section.AddDropdown = function(self, opts)
 
     if searchBox then
         searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+            if not open then return end
             buildItems(searchBox.Text ~= "" and searchBox.Text or nil)
         end)
     end

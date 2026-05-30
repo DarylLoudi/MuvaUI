@@ -85,14 +85,20 @@ Section.AddMultiDropdown = function(self, opts)
     arrow.TextColor3             = Theme:Text(3)
     arrow.Parent                 = trigger
 
-    -- Helper: traverse up to find ScreenGui
-    local function getScreenGui(inst)
-        local p = inst
-        while p do
-            if p:IsA("ScreenGui") then return p end
-            p = p.Parent
-        end
-        return nil
+    -- ScreenGui khusus dropdown dengan DisplayOrder lebih tinggi dari window
+    local _dropSG = nil
+    local function getDropSG()
+        if _dropSG and _dropSG.Parent then return _dropSG end
+        local CoreGui = game:GetService("CoreGui")
+        local sg = Instance.new("ScreenGui")
+        sg.Name           = "MuvaUI_Dropdown"
+        sg.ResetOnSpawn   = false
+        sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        sg.DisplayOrder   = 1100
+        sg.IgnoreGuiInset = true
+        pcall(function() sg.Parent = CoreGui end)
+        _dropSG = sg
+        return sg
     end
 
     -- Menu di-parent ke ScreenGui saat open agar tidak ter-clip ScrollingFrame
@@ -291,18 +297,17 @@ Section.AddMultiDropdown = function(self, opts)
         if open then
             open = false
             menu.Visible     = false
-            menu.Parent      = card
+            menu.Parent      = card  -- kembalikan ke card
             arrow.TextColor3 = Theme:Text(3)
             trigStroke.Color = Theme:Border(1)
             Tween.fast(arrow, { Rotation = 0 })
         else
             open = true
-            -- Baca posisi SEBELUM pindah parent
             local absPos  = trigger.AbsolutePosition
             local absSize = trigger.AbsoluteSize
-            local sg = getScreenGui(trigger)
-            if sg then menu.Parent = sg end
-            menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
+            menu.Parent   = getDropSG()
+            local inset   = game:GetService("GuiService"):GetGuiInset()
+            menu.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4 + inset.Y)
             menu.Size     = UDim2.fromOffset(absSize.X, menu.AbsoluteSize.Y)
             buildMenu()
             menu.Visible     = true
