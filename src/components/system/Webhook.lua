@@ -6,6 +6,7 @@ Section.AddWebhook = function(self, opts)
     local flag = self:_registerFlag(opts.ID, opts.Default or "")
 
     local card, stroke = self:_makeCard()
+    card.Size          = UDim2.new(1, 0, 0, 0)
     card.AutomaticSize = Enum.AutomaticSize.Y
 
     local col = Instance.new("UIListLayout")
@@ -18,8 +19,8 @@ Section.AddWebhook = function(self, opts)
     titleLbl.BackgroundTransparency = 1
     titleLbl.Size                   = UDim2.new(1, 0, 0, 13)
     titleLbl.Text                   = opts.Title or "Webhook"
-    titleLbl.Font                   = Enum.Font.Gotham
-    titleLbl.TextSize               = 17
+    titleLbl.Font                   = Enum.Font.GothamMedium
+    titleLbl.TextSize               = 14
     titleLbl.TextColor3             = Theme:Text(1)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
     titleLbl.Parent                 = card

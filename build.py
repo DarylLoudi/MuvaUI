@@ -51,7 +51,7 @@ BUILD_ORDER = [
     "components/display/Paragraph.lua",
     "components/display/CodeBlock.lua",
     "components/display/Divider.lua",
-    "components/display/Tooltip.lua",
+
     "components/display/Avatar.lua",
     "components/display/Table.lua",
     "components/display/Separator.lua",
@@ -68,6 +68,9 @@ BUILD_ORDER = [
     "components/overlay/Toast.lua",
 
     # Components — System
+    "components/system/KeySystem.lua",
+    "components/system/LoadingScreen.lua",
+    "components/system/ConfigSystem.lua",
     "components/system/Webhook.lua",
 
     # Components — Feedback

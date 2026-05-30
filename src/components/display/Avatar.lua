@@ -1,8 +1,8 @@
 -- Avatar: player thumbnail atau placeholder inisial
 local Players = game:GetService("Players")
 
-local SIZE_MAP = { Small = 26, Medium = 36, Large = 48 }
-local TEXT_MAP = { Small = 10, Medium = 13, Large = 18 }
+local SIZE_MAP = { Small = 26, sm = 26, Medium = 36, md = 36, Large = 48, lg = 48 }
+local TEXT_MAP = { Small = 10, sm = 10, Medium = 13, md = 13, Large = 18, lg = 18 }
 
 Section.AddAvatar = function(self, opts)
     assert(type(opts) == "table", "AddAvatar: opts must be a table")
@@ -10,8 +10,7 @@ Section.AddAvatar = function(self, opts)
     local txsz = TEXT_MAP[opts.Size] or TEXT_MAP.Medium
 
     local card, stroke = self:_makeCard()
-    card.AutomaticSize = Enum.AutomaticSize.Y
-    card.Size = UDim2.new(1, 0, 0, 0)
+    card.Size = UDim2.new(1, 0, 0, math.max(50, sz + 20))
 
     local row = Instance.new("UIListLayout")
     row.FillDirection     = Enum.FillDirection.Horizontal
@@ -101,8 +100,8 @@ Section.AddAvatar = function(self, opts)
         lbl.BackgroundTransparency = 1
         lbl.Size                   = UDim2.new(1, 0, 0, 14)
         lbl.Text                   = opts.Label
-        lbl.Font                   = Enum.Font.Gotham
-        lbl.TextSize               = 17
+        lbl.Font                   = Enum.Font.GothamMedium
+        lbl.TextSize               = 14
         lbl.TextColor3             = Theme:Text(1)
         lbl.TextXAlignment         = Enum.TextXAlignment.Left
         lbl.Parent                 = info

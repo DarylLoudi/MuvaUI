@@ -3,6 +3,7 @@ Section.AddCodeBlock = function(self, opts)
     assert(type(opts) == "table", "AddCodeBlock: opts must be a table")
 
     local card, stroke = self:_makeCard()
+    card.Size             = UDim2.new(1, 0, 0, 0)
     card.AutomaticSize    = Enum.AutomaticSize.Y
     card.BackgroundColor3 = Theme:BG(0)
 
@@ -59,7 +60,7 @@ Section.AddCodeBlock = function(self, opts)
     code.AutomaticSize          = Enum.AutomaticSize.Y
     code.Text                   = opts.Code or ""
     code.Font                   = Enum.Font.Code
-    code.TextSize               = 17
+    code.TextSize               = 12
     code.TextColor3             = Color.fromHex("#a8c4a2")
     code.TextXAlignment         = Enum.TextXAlignment.Left
     code.TextYAlignment         = Enum.TextYAlignment.Top

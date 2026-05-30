@@ -158,7 +158,7 @@ local secDividers = tabDisplay:AddSection({ Title = "Divider & Separator" })
 
 secDividers:AddDivider()
 secDividers:AddDivider({ Label = "Section Break" })
-secDividers:AddSeparator({ Title = "Automation" })
+secDividers:AddSeparator({ Label = "Automation" })
 
 local secAvatars = tabDisplay:AddSection({ Title = "Avatar" })
 
@@ -185,7 +185,7 @@ vstack:AddToggle({ ID = "VS1", Title = "Option A", Default = false, Callback = f
 vstack:AddToggle({ ID = "VS2", Title = "Option B", Default = true,  Callback = function() end })
 
 local secSpace = tabLayout:AddSection({ Title = "Space" })
-secSpace:AddSpace({ Height = 32 })
+secSpace:AddSpace(32)
 
 local secAccordion = tabLayout:AddSection({ Title = "Accordion" })
 

@@ -1,15 +1,14 @@
 -- Dropdown: single select dengan optional search untuk large list
 Section.AddDropdown = function(self, opts)
     assert(type(opts) == "table", "AddDropdown: opts must be a table")
-    local items      = opts.Items    or {}
+    local items      = opts.Options or opts.Items or {}
     local default    = opts.Default  or (items[1] or "")
     local searchable = opts.Searchable or (#items > 10)
     local flag       = self:_registerFlag(opts.ID, default)
 
     local card, stroke = self:_makeCard()
     card.ClipsDescendants = false
-    card.AutomaticSize    = Enum.AutomaticSize.Y
-    card.Size             = UDim2.new(1, 0, 0, 0)
+    card.Size             = UDim2.new(1, 0, 0, 64)
 
     local col = Instance.new("UIListLayout")
     col.FillDirection = Enum.FillDirection.Vertical
@@ -21,8 +20,8 @@ Section.AddDropdown = function(self, opts)
     title.BackgroundTransparency = 1
     title.Size                   = UDim2.new(1, 0, 0, 13)
     title.Text                   = opts.Title or ""
-    title.Font                   = Enum.Font.Gotham
-    title.TextSize               = 17
+    title.Font                   = Enum.Font.GothamMedium
+    title.TextSize               = 14
     title.TextColor3             = Theme:Text(1)
     title.TextXAlignment         = Enum.TextXAlignment.Left
     title.Parent                 = card
@@ -55,7 +54,7 @@ Section.AddDropdown = function(self, opts)
     valLbl.Size                   = UDim2.new(1, -16, 1, 0)
     valLbl.Text                   = default
     valLbl.Font                   = Enum.Font.Gotham
-    valLbl.TextSize               = 17
+    valLbl.TextSize               = 13
     valLbl.TextColor3             = Theme:Text(2)
     valLbl.TextXAlignment         = Enum.TextXAlignment.Left
     valLbl.Parent                 = trigger
@@ -78,7 +77,7 @@ Section.AddDropdown = function(self, opts)
     menu.Position         = UDim2.new(0, 0, 1, 4)
     menu.Visible          = false
     menu.ZIndex           = 50
-    menu.ClipsDescendants = true
+    menu.ClipsDescendants = false
     menu.Parent           = trigger
 
     local menuCorner = Instance.new("UICorner")
@@ -185,7 +184,7 @@ Section.AddDropdown = function(self, opts)
                 lbl.Size                   = UDim2.new(1, -16, 1, 0)
                 lbl.Text                   = item
                 lbl.Font                   = Enum.Font.Gotham
-                lbl.TextSize               = 17
+                lbl.TextSize               = 13
                 lbl.TextColor3             = item == selected and Theme:Accent() or Theme:Text(2)
                 lbl.TextXAlignment         = Enum.TextXAlignment.Left
                 lbl.ZIndex                 = 53

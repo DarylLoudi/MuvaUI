@@ -6,6 +6,7 @@ Section.AddTag = function(self, opts)
     for _, v in ipairs(opts.Tags or {}) do table.insert(tags, v) end
 
     local card, stroke = self:_makeCard()
+    card.Size          = UDim2.new(1, 0, 0, 0)
     card.AutomaticSize = Enum.AutomaticSize.Y
 
     local col = Instance.new("UIListLayout")
@@ -18,8 +19,8 @@ Section.AddTag = function(self, opts)
         titleLbl.BackgroundTransparency = 1
         titleLbl.Size                   = UDim2.new(1, 0, 0, 13)
         titleLbl.Text                   = opts.Title
-        titleLbl.Font                   = Enum.Font.Gotham
-        titleLbl.TextSize               = 17
+        titleLbl.Font                   = Enum.Font.GothamMedium
+        titleLbl.TextSize               = 14
         titleLbl.TextColor3             = Theme:Text(1)
         titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
         titleLbl.Parent                 = card

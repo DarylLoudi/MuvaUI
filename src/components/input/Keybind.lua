@@ -7,8 +7,6 @@ Section.AddKeybind = function(self, opts)
     local flag    = self:_registerFlag(opts.ID, default)
 
     local card, stroke = self:_makeCard()
-    card.AutomaticSize = Enum.AutomaticSize.Y
-    card.Size = UDim2.new(1, 0, 0, 0)
 
     local row = Instance.new("UIListLayout")
     row.FillDirection     = Enum.FillDirection.Horizontal
@@ -31,8 +29,8 @@ Section.AddKeybind = function(self, opts)
     title.BackgroundTransparency = 1
     title.Size                   = UDim2.new(1, 0, 0, 14)
     title.Text                   = opts.Title or ""
-    title.Font                   = Enum.Font.Gotham
-    title.TextSize               = 17
+    title.Font                   = Enum.Font.GothamMedium
+    title.TextSize               = 14
     title.TextColor3             = Theme:Text(1)
     title.TextXAlignment         = Enum.TextXAlignment.Left
     title.Parent                 = info

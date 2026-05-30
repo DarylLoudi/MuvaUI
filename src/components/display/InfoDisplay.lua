@@ -18,6 +18,7 @@ Section.AddInfoDisplay = function(self, opts)
     assert(type(opts) == "table", "AddInfoDisplay: opts must be a table")
 
     local card, stroke = self:_makeCard()
+    card.Size          = UDim2.new(1, 0, 0, 0)
     card.AutomaticSize = Enum.AutomaticSize.Y
 
     local col = Instance.new("UIListLayout")

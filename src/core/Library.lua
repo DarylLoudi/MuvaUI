@@ -65,6 +65,9 @@ function Library:_spawnWindow(opts, screenGui)
             return nil
         end
         table.insert(self._windows, result)
+        if self._configSystem and ConfigSystem then
+            ConfigSystem.attach(result, self._configSystem, self.Flags)
+        end
         return result
     end
 end
@@ -85,15 +88,12 @@ end
 
 function Library:SetConfigSystem(config)
     self._configSystem = config
-    -- Config.init(config, self.Flags)
 end
 
 function Library:SaveConfig(name)
-    -- Config.save(name, self.Flags)
 end
 
 function Library:LoadConfig(name)
-    -- Config.load(name, self.Flags)
 end
 
 -- ── PATCH: wire overlay functions setelah semua variable terdefinisi ──

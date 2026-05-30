@@ -6,9 +6,10 @@ Section.AddTable = function(self, opts)
     local searchable = opts.Searchable ~= false
 
     local card, stroke = self:_makeCard()
+    card.Size             = UDim2.new(1, 0, 0, 0)
     card.AutomaticSize    = Enum.AutomaticSize.Y
     card.BackgroundColor3 = Theme:BG(0)
-    card.ClipsDescendants = true
+    card.ClipsDescendants = false
 
     -- Remove default padding from card
     for _, c in ipairs(card:GetChildren()) do

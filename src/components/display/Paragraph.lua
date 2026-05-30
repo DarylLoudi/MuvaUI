@@ -3,6 +3,7 @@ Section.AddParagraph = function(self, opts)
     assert(type(opts) == "table", "AddParagraph: opts must be a table")
 
     local card, stroke = self:_makeCard()
+    card.Size          = UDim2.new(1, 0, 0, 0)
     card.AutomaticSize = Enum.AutomaticSize.Y
 
     local col = Instance.new("UIListLayout")
@@ -16,7 +17,7 @@ Section.AddParagraph = function(self, opts)
         hdr.Size                   = UDim2.new(1, 0, 0, 14)
         hdr.Text                   = opts.Title
         hdr.Font                   = Enum.Font.GothamBold
-        hdr.TextSize               = 17
+        hdr.TextSize               = 14
         hdr.TextColor3             = Theme:Text(0)
         hdr.TextXAlignment         = Enum.TextXAlignment.Left
         hdr.Parent                 = card
@@ -28,7 +29,7 @@ Section.AddParagraph = function(self, opts)
     body.AutomaticSize          = Enum.AutomaticSize.Y
     body.Text                   = opts.Body or ""
     body.Font                   = Enum.Font.Gotham
-    body.TextSize               = 17
+    body.TextSize               = 13
     body.TextColor3             = Theme:Text(3)
     body.TextXAlignment         = Enum.TextXAlignment.Left
     body.TextYAlignment         = Enum.TextYAlignment.Top

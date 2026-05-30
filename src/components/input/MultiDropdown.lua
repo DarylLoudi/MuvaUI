@@ -1,13 +1,13 @@
 -- MultiDropdown: multi-select dengan tag chips
 Section.AddMultiDropdown = function(self, opts)
     assert(type(opts) == "table", "AddMultiDropdown: opts must be a table")
-    local items    = opts.Items   or {}
+    local items    = opts.Options or opts.Items or {}
     local defaults = opts.Default or {}
     local flag     = self:_registerFlag(opts.ID, defaults)
 
     local card, stroke = self:_makeCard()
-    card.AutomaticSize    = Enum.AutomaticSize.Y
     card.ClipsDescendants = false
+    card.Size             = UDim2.new(1, 0, 0, 64)
 
     local col = Instance.new("UIListLayout")
     col.FillDirection = Enum.FillDirection.Vertical
@@ -18,8 +18,8 @@ Section.AddMultiDropdown = function(self, opts)
     title.BackgroundTransparency = 1
     title.Size                   = UDim2.new(1, 0, 0, 13)
     title.Text                   = opts.Title or ""
-    title.Font                   = Enum.Font.Gotham
-    title.TextSize               = 17
+    title.Font                   = Enum.Font.GothamMedium
+    title.TextSize               = 14
     title.TextColor3             = Theme:Text(1)
     title.TextXAlignment         = Enum.TextXAlignment.Left
     title.Parent                 = card
@@ -69,7 +69,7 @@ Section.AddMultiDropdown = function(self, opts)
     placeholder.Size                   = UDim2.new(1, 0, 0, 18)
     placeholder.Text                   = "Select options..."
     placeholder.Font                   = Enum.Font.Gotham
-    placeholder.TextSize               = 17
+    placeholder.TextSize               = 13
     placeholder.TextColor3             = Theme:Text(4)
     placeholder.TextXAlignment         = Enum.TextXAlignment.Left
     placeholder.Name                   = "Placeholder"
@@ -241,7 +241,7 @@ Section.AddMultiDropdown = function(self, opts)
             lbl.Position               = UDim2.new(0, 20, 0, 0)
             lbl.Text                   = item
             lbl.Font                   = Enum.Font.Gotham
-            lbl.TextSize               = 17
+            lbl.TextSize               = 13
             lbl.TextColor3             = selected[item] and Theme:Accent() or Theme:Text(2)
             lbl.TextXAlignment         = Enum.TextXAlignment.Left
             lbl.ZIndex                 = 53
@@ -295,6 +295,24 @@ Section.AddMultiDropdown = function(self, opts)
     end)
 
     refreshTags()
+
+    game:GetService("UserInputService").InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and open then
+            task.defer(function()
+                local pos  = game:GetService("UserInputService"):GetMouseLocation()
+                local abs  = menu.AbsolutePosition
+                local size = menu.AbsoluteSize
+                if pos.X < abs.X or pos.X > abs.X + size.X or
+                   pos.Y < abs.Y or pos.Y > abs.Y + size.Y then
+                    open = false
+                    menu.Visible     = false
+                    arrow.TextColor3 = Theme:Text(3)
+                    trigStroke.Color = Theme:Border(1)
+                    Tween.fast(arrow, { Rotation = 0 })
+                end
+            end)
+        end
+    end)
 
     card.MouseEnter:Connect(function()
         Tween.fast(card, { BackgroundColor3 = Theme:BG(3) })

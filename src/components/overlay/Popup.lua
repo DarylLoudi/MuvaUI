@@ -61,7 +61,7 @@ function Popup.show(opts, parentWin)
     titleLbl.Size                   = UDim2.new(1, 0, 0, 14)
     titleLbl.Text                   = (style.icon .. "  " .. (opts.Title or ""))
     titleLbl.Font                   = Enum.Font.GothamBold
-    titleLbl.TextSize               = 17
+    titleLbl.TextSize               = 14
     titleLbl.TextColor3             = Theme:Text(0)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
     titleLbl.ZIndex                 = 151

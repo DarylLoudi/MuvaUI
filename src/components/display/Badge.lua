@@ -12,8 +12,6 @@ Section.AddBadge = function(self, opts)
     local colors = BADGE_COLORS[opts.Color] or BADGE_COLORS.Purple
 
     local card, stroke = self:_makeCard()
-    card.AutomaticSize = Enum.AutomaticSize.Y
-    card.Size = UDim2.new(1, 0, 0, 0)
 
     local row = Instance.new("UIListLayout")
     row.FillDirection     = Enum.FillDirection.Horizontal
@@ -26,8 +24,8 @@ Section.AddBadge = function(self, opts)
     titleLbl.BackgroundTransparency = 1
     titleLbl.Size                   = UDim2.new(1, -80, 1, 0)
     titleLbl.Text                   = opts.Title or ""
-    titleLbl.Font                   = Enum.Font.Gotham
-    titleLbl.TextSize               = 17
+    titleLbl.Font                   = Enum.Font.GothamMedium
+    titleLbl.TextSize               = 14
     titleLbl.TextColor3             = Theme:Text(1)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
     titleLbl.Parent                 = card

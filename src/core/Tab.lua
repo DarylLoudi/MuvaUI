@@ -40,6 +40,7 @@ function Tab.new(opts, contentParent, flags)
     self._stateFrame.Name                   = "StateOverlay"
     self._stateFrame.BackgroundTransparency = 1
     self._stateFrame.Size                   = UDim2.new(1, 0, 1, 0)
+    self._stateFrame.Position               = UDim2.new(0, 0, 0, 0)
     self._stateFrame.Visible                = false
     self._stateFrame.ZIndex                 = 10
     self._stateFrame.Parent                 = self._frame
@@ -106,20 +107,20 @@ function Tab:SetState(stateType, opts)
 
     -- Icon or spinner
     if stateType == "Loading" then
-        -- Rotating spinner via script
+        local spinWrap = Instance.new("Frame")
+        spinWrap.BackgroundTransparency = 1
+        spinWrap.Size                   = UDim2.fromOffset(32, 32)
+        spinWrap.Parent                 = self._stateFrame
+
         local spinner = Instance.new("ImageLabel")
         spinner.Name                    = "Spinner"
-        spinner.Size                    = UDim2.new(0, 28, 0, 28)
+        spinner.Size                    = UDim2.new(1, 0, 1, 0)
         spinner.BackgroundTransparency  = 1
-        spinner.Image                   = "rbxassetid://4965945816"  -- circle image
+        spinner.Image                   = "rbxassetid://4965945816"
         spinner.ImageColor3             = Theme:Accent()
-        spinner.Parent                  = self._stateFrame
-        -- Rotate continuously
-        local function rotateLoop()
-            local info = TweenInfo.new(0.75, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1)
-            Tween.play(spinner, { Rotation = 360 }, info)
-        end
-        rotateLoop()
+        spinner.Parent                  = spinWrap
+        Tween.play(spinner, { Rotation = 360 },
+            TweenInfo.new(0.75, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1))
     else
         local icon = STATE_ICONS[stateType]
         if icon then
@@ -172,11 +173,11 @@ function Tab:SetState(stateType, opts)
     -- Action button
     if opts.Action then
         local btn = Instance.new("TextButton")
-        btn.Size                   = UDim2.new(0, 80, 0, 24)
+        btn.Size                   = UDim2.fromOffset(90, 26)
         btn.BackgroundColor3       = color
         btn.BorderSizePixel        = 0
         btn.Text                   = opts.Action.Text or "Action"
-        btn.TextSize               = 10
+        btn.TextSize               = 11
         btn.Font                   = Enum.Font.GothamBold
         btn.TextColor3             = Color.fromHex("#ffffff")
         btn.AutoButtonColor        = false
@@ -186,10 +187,14 @@ function Tab:SetState(stateType, opts)
         btnCorner.CornerRadius = UDim.new(0, 5)
         btnCorner.Parent       = btn
 
+        btn.MouseEnter:Connect(function()
+            Tween.fast(btn, { BackgroundColor3 = Color.lighten(color, 0.08) })
+        end)
+        btn.MouseLeave:Connect(function()
+            Tween.fast(btn, { BackgroundColor3 = color })
+        end)
         btn.MouseButton1Click:Connect(function()
-            if opts.Action.Callback then
-                pcall(opts.Action.Callback)
-            end
+            if opts.Action.Callback then pcall(opts.Action.Callback) end
         end)
     end
 

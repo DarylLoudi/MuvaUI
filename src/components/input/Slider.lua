@@ -30,8 +30,8 @@ Section.AddSlider = function(self, opts)
     titleLbl.BackgroundTransparency = 1
     titleLbl.Size                   = UDim2.new(1, -50, 1, 0)
     titleLbl.Text                   = opts.Title or ""
-    titleLbl.Font                   = Enum.Font.Gotham
-    titleLbl.TextSize               = 17
+    titleLbl.Font                   = Enum.Font.GothamMedium
+    titleLbl.TextSize               = 14
     titleLbl.TextColor3             = Theme:Text(1)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
     titleLbl.Parent                 = titleRow
@@ -41,7 +41,7 @@ Section.AddSlider = function(self, opts)
     valueLbl.Size                   = UDim2.fromOffset(50, 18)
     valueLbl.Position               = UDim2.new(1, -50, 0, 0)
     valueLbl.Font                   = Enum.Font.GothamBold
-    valueLbl.TextSize               = 17
+    valueLbl.TextSize               = 14
     valueLbl.TextColor3             = Theme:Accent()
     valueLbl.TextXAlignment         = Enum.TextXAlignment.Right
     valueLbl.Parent                 = titleRow
@@ -128,8 +128,15 @@ Section.AddSlider = function(self, opts)
     end)
 
     UserInputService.InputEnded:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and dragging then
             dragging = false
+            if flag then flag:_fire(value) end
+            if opts.Callback then pcall(opts.Callback, value) end
+        end
+    end)
+
+    hitbox.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and not dragging then
             if flag then flag:_fire(value) end
             if opts.Callback then pcall(opts.Callback, value) end
         end
