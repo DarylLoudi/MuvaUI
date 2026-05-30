@@ -282,6 +282,25 @@ secTable:AddTable({
 
 print("[MuvaUI Audit] All components loaded.")
 
+task.delay(0.5, function()
+    local sg = game:GetService("CoreGui"):FindFirstChild("MuvaUI_MuvaUI")
+    if not sg then print("[DEBUG] ScreenGui not found") return end
+    local w = sg:FindFirstChild("MuvaWindow")
+    if not w then print("[DEBUG] MuvaWindow not found") return end
+    print("[DEBUG] Win BG transparency:", w.BackgroundTransparency)
+    print("[DEBUG] Win Size:", w.AbsoluteSize)
+    for i, c in ipairs(w:GetChildren()) do
+        if c:IsA("Frame") or c:IsA("ScrollingFrame") then
+            print(string.format("[DEBUG] Child[%d] %s | BG: %.0f%% transparent | Size: %s | Pos: %s",
+                i, c.Name,
+                c.BackgroundTransparency * 100,
+                tostring(c.AbsoluteSize),
+                tostring(c.AbsolutePosition)
+            ))
+        end
+    end
+end)
+
 -- Debug: print ukuran dan posisi frame-frame kritis setelah layout selesai
 task.delay(0.5, function()
     local sg = game:GetService("CoreGui"):FindFirstChild("MuvaUI_MuvaUI")

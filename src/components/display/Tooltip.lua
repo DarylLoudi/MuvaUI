@@ -34,7 +34,7 @@ local function attachTooltip(target, text)
     tipLbl.Size                   = UDim2.new(1, 0, 1, 0)
     tipLbl.Text                   = text
     tipLbl.Font                   = Enum.Font.Gotham
-    tipLbl.TextSize               = 10
+    tipLbl.TextSize               = 13
     tipLbl.TextColor3             = Theme:Text(1)
     tipLbl.TextWrapped            = false
     tipLbl.ZIndex                 = 101

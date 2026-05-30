@@ -14,7 +14,7 @@ Section.AddCheckbox = function(self, opts)
     -- Info
     local info = Instance.new("Frame")
     info.BackgroundTransparency = 1
-    info.Size                   = UDim2.new(1, -32, 0, 22)
+    info.Size                   = UDim2.new(1, -36, 0, 30)
     info.Parent                 = card
 
     local infoL = Instance.new("UIListLayout")
@@ -26,8 +26,8 @@ Section.AddCheckbox = function(self, opts)
     title.BackgroundTransparency = 1
     title.Size                   = UDim2.new(1, 0, 0, 14)
     title.Text                   = opts.Title or ""
-    title.Font                   = Enum.Font.Gotham
-    title.TextSize               = 11
+    title.Font                   = Enum.Font.GothamMedium
+    title.TextSize               = 14
     title.TextColor3             = Theme:Text(1)
     title.TextXAlignment         = Enum.TextXAlignment.Left
     title.Parent                 = info
@@ -38,15 +38,15 @@ Section.AddCheckbox = function(self, opts)
         desc.Size                   = UDim2.new(1, 0, 0, 12)
         desc.Text                   = opts.Desc
         desc.Font                   = Enum.Font.Gotham
-        desc.TextSize               = 9
-        desc.TextColor3             = Theme:Text(4)
+        desc.TextSize               = 12
+        desc.TextColor3             = Theme:Text(3)
         desc.TextXAlignment         = Enum.TextXAlignment.Left
         desc.Parent                 = info
     end
 
     -- Box
     local box = Instance.new("Frame")
-    box.Size             = UDim2.fromOffset(16, 16)
+    box.Size             = UDim2.fromOffset(20, 20)
     box.BackgroundColor3 = Theme:BG(1)
     box.BorderSizePixel  = 0
     box.LayoutOrder      = 99
@@ -66,7 +66,7 @@ Section.AddCheckbox = function(self, opts)
     check.Size                   = UDim2.new(1, 0, 1, 0)
     check.Text                   = "✓"
     check.Font                   = Enum.Font.GothamBold
-    check.TextSize               = 9
+    check.TextSize               = 12
     check.TextColor3             = Color3.new(1, 1, 1)
     check.TextTransparency       = 1
     check.Parent                 = box

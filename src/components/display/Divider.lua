@@ -27,7 +27,7 @@ Section.AddDivider = function(self, opts)
         lbl.AutomaticSize          = Enum.AutomaticSize.X
         lbl.Text                   = opts.Label:upper()
         lbl.Font                   = Enum.Font.GothamBold
-        lbl.TextSize               = 9
+        lbl.TextSize               = 12
         lbl.TextColor3             = Theme:Text(4)
         lbl.Parent                 = frame
 

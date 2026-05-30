@@ -4,7 +4,7 @@
 print("=== MuvaUI Test Start ===")
 
 -- Step 1: coba load file
-local URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/5db6c11a53136f6037abaee125e98cc46d879860/MuvaUI.lua"
+local URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/1a2587827d9953844dbfff0dfa5e3124a91de1bb/MuvaUI.lua"
 
 local ok, result = pcall(function()
     return loadstring(game:HttpGet(URL))()

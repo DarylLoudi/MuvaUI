@@ -62,7 +62,7 @@ function Dialog.show(opts, screenGui)
     titleLbl.Size                   = UDim2.new(1, 0, 0, 18)
     titleLbl.Text                   = opts.Title or "Confirm"
     titleLbl.Font                   = Enum.Font.GothamBold
-    titleLbl.TextSize               = 14
+    titleLbl.TextSize               = 17
     titleLbl.TextColor3             = Theme:Text(0)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
     titleLbl.ZIndex                 = 202
@@ -75,7 +75,7 @@ function Dialog.show(opts, screenGui)
     bodyLbl.AutomaticSize          = Enum.AutomaticSize.Y
     bodyLbl.Text                   = opts.Body or ""
     bodyLbl.Font                   = Enum.Font.Gotham
-    bodyLbl.TextSize               = 11
+    bodyLbl.TextSize               = 17
     bodyLbl.TextColor3             = Theme:Text(3)
     bodyLbl.TextXAlignment         = Enum.TextXAlignment.Left
     bodyLbl.TextWrapped            = true

@@ -17,21 +17,22 @@ Section.AddToggle = function(self, opts)
     -- Info (left, fills remaining space)
     local info = Instance.new("Frame")
     info.BackgroundTransparency = 1
-    info.Size                   = UDim2.new(1, -50, 1, 0)
+    info.Size                   = UDim2.new(1, -62, 1, 0)
     info.LayoutOrder            = 1
     info.Parent                 = card
 
     local infoLayout = Instance.new("UIListLayout")
     infoLayout.FillDirection    = Enum.FillDirection.Vertical
     infoLayout.VerticalAlignment= Enum.VerticalAlignment.Center
+    infoLayout.Padding          = UDim.new(0, 2)
     infoLayout.Parent           = info
 
     local title = Instance.new("TextLabel")
     title.BackgroundTransparency = 1
-    title.Size                   = UDim2.new(1, 0, 0, 14)
+    title.Size                   = UDim2.new(1, 0, 0, 17)
     title.Text                   = opts.Title or ""
-    title.Font                   = Enum.Font.Gotham
-    title.TextSize               = 11
+    title.Font                   = Enum.Font.GothamMedium
+    title.TextSize               = 14
     title.TextColor3             = Theme:Text(1)
     title.TextXAlignment         = Enum.TextXAlignment.Left
     title.Parent                 = info
@@ -39,18 +40,18 @@ Section.AddToggle = function(self, opts)
     if opts.Desc then
         local desc = Instance.new("TextLabel")
         desc.BackgroundTransparency = 1
-        desc.Size                   = UDim2.new(1, 0, 0, 12)
+        desc.Size                   = UDim2.new(1, 0, 0, 14)
         desc.Text                   = opts.Desc
         desc.Font                   = Enum.Font.Gotham
-        desc.TextSize               = 9
-        desc.TextColor3             = Theme:Text(4)
+        desc.TextSize               = 12
+        desc.TextColor3             = Theme:Text(3)
         desc.TextXAlignment         = Enum.TextXAlignment.Left
         desc.Parent                 = info
     end
 
-    -- Toggle track (right)
+    -- Toggle track (right) — bigger
     local track = Instance.new("Frame")
-    track.Size              = UDim2.fromOffset(34, 19)
+    track.Size              = UDim2.fromOffset(44, 24)
     track.BackgroundColor3  = Theme:BG(4)
     track.BorderSizePixel   = 0
     track.LayoutOrder       = 2
@@ -65,10 +66,10 @@ Section.AddToggle = function(self, opts)
     trackStroke.Thickness = 1
     trackStroke.Parent    = track
 
-    -- Knob
+    -- Knob — bigger
     local knob = Instance.new("Frame")
-    knob.Size             = UDim2.fromOffset(13, 13)
-    knob.Position         = UDim2.fromOffset(2, 3)
+    knob.Size             = UDim2.fromOffset(18, 18)
+    knob.Position         = UDim2.fromOffset(3, 3)
     knob.BackgroundColor3 = Color3.new(1, 1, 1)
     knob.BorderSizePixel  = 0
     knob.ZIndex           = 2
@@ -84,19 +85,19 @@ Section.AddToggle = function(self, opts)
         if val then
             if animated then
                 Tween.play(track, { BackgroundColor3 = Theme:Accent() })
-                Tween.play(knob,  { Position = UDim2.fromOffset(19, 3) })
+                Tween.play(knob,  { Position = UDim2.fromOffset(23, 3) })
             else
                 track.BackgroundColor3 = Theme:Accent()
-                knob.Position          = UDim2.fromOffset(19, 3)
+                knob.Position          = UDim2.fromOffset(23, 3)
             end
             trackStroke.Color = Theme:Accent()
         else
             if animated then
                 Tween.play(track, { BackgroundColor3 = Theme:BG(4) })
-                Tween.play(knob,  { Position = UDim2.fromOffset(2, 3) })
+                Tween.play(knob,  { Position = UDim2.fromOffset(3, 3) })
             else
                 track.BackgroundColor3 = Theme:BG(4)
-                knob.Position          = UDim2.fromOffset(2, 3)
+                knob.Position          = UDim2.fromOffset(3, 3)
             end
             trackStroke.Color = Theme:Border(1)
         end

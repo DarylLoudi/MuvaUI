@@ -27,7 +27,7 @@ Section.AddBadge = function(self, opts)
     titleLbl.Size                   = UDim2.new(1, -80, 1, 0)
     titleLbl.Text                   = opts.Title or ""
     titleLbl.Font                   = Enum.Font.Gotham
-    titleLbl.TextSize               = 11
+    titleLbl.TextSize               = 17
     titleLbl.TextColor3             = Theme:Text(1)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
     titleLbl.Parent                 = card
@@ -60,7 +60,7 @@ Section.AddBadge = function(self, opts)
     badgeLbl.Size                   = UDim2.new(1, 0, 1, 0)
     badgeLbl.Text                   = opts.Value or ""
     badgeLbl.Font                   = Enum.Font.GothamBold
-    badgeLbl.TextSize               = 9
+    badgeLbl.TextSize               = 12
     badgeLbl.TextColor3             = colors.text
     badgeLbl.Parent                 = badge
 

@@ -81,7 +81,7 @@ Section.AddTable = function(self, opts)
     countLbl.Position               = UDim2.new(searchable and 0.6 or 0, 0, 0, 0)
     countLbl.Text                   = "0 rows"
     countLbl.Font                   = Enum.Font.Gotham
-    countLbl.TextSize               = 10
+    countLbl.TextSize               = 13
     countLbl.TextColor3             = Theme:Text(3)
     countLbl.TextXAlignment         = Enum.TextXAlignment.Right
     countLbl.Parent                 = toolbar
@@ -152,7 +152,7 @@ Section.AddTable = function(self, opts)
         lbl.Size                   = UDim2.new(1, -12, 1, 0)
         lbl.Text                   = (colDef.Label or colDef.Key):upper()
         lbl.Font                   = Enum.Font.GothamBold
-        lbl.TextSize               = 9
+        lbl.TextSize               = 12
         lbl.TextColor3             = Theme:Accent()
         lbl.TextXAlignment         = Enum.TextXAlignment.Left
         lbl.Parent                 = cell
@@ -229,7 +229,7 @@ Section.AddTable = function(self, opts)
             cell.Size                   = UDim2.new(colWidth, 0, 1, 0)
             cell.LayoutOrder            = i
             cell.Font                   = i == 1 and Enum.Font.GothamBold or Enum.Font.Gotham
-            cell.TextSize               = 10
+            cell.TextSize               = 13
             cell.TextColor3             = i == 1 and Theme:Text(0) or Theme:Text(2)
             cell.TextXAlignment         = Enum.TextXAlignment.Left
             cell.TextWrapped            = false

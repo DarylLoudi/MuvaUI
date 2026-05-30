@@ -90,12 +90,12 @@ function Section:_makeCard(layoutOrder)
     card.Name                   = "Card"
     card.BackgroundColor3       = Theme:BG(2)
     card.BorderSizePixel        = 0
-    card.Size                   = UDim2.new(1, 0, 0, 38)
+    card.Size                   = UDim2.new(1, 0, 0, 50)  -- was 38, +30%
     card.LayoutOrder            = layoutOrder or #self._components + 10
     card.Parent                 = self._frame
 
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
+    corner.CornerRadius = UDim.new(0, 7)
     corner.Parent       = card
 
     local stroke = Instance.new("UIStroke")
@@ -105,10 +105,10 @@ function Section:_makeCard(layoutOrder)
     stroke.Parent           = card
 
     local pad = Instance.new("UIPadding")
-    pad.PaddingLeft   = UDim.new(0, 10)
-    pad.PaddingRight  = UDim.new(0, 10)
-    pad.PaddingTop    = UDim.new(0, 8)
-    pad.PaddingBottom = UDim.new(0, 8)
+    pad.PaddingLeft   = UDim.new(0, 12)
+    pad.PaddingRight  = UDim.new(0, 12)
+    pad.PaddingTop    = UDim.new(0, 10)
+    pad.PaddingBottom = UDim.new(0, 10)
     pad.Parent        = card
 
     return card, stroke

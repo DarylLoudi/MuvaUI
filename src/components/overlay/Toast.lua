@@ -109,7 +109,7 @@ function Toast.show(opts, screenGui)
     iconLbl.Position               = UDim2.new(0, 14, 0.5, -8)
     iconLbl.Text                   = style.icon
     iconLbl.Font                   = Enum.Font.GothamBold
-    iconLbl.TextSize               = 14
+    iconLbl.TextSize               = 15
     iconLbl.TextColor3             = color
     iconLbl.ZIndex                 = 2
     iconLbl.Parent                 = toast
@@ -122,7 +122,7 @@ function Toast.show(opts, screenGui)
     closeBtn.Position               = UDim2.new(1, -22, 0, 7)
     closeBtn.Text                   = "✕"
     closeBtn.Font                   = Enum.Font.GothamBold
-    closeBtn.TextSize               = 10
+    closeBtn.TextSize               = 13
     closeBtn.TextColor3             = Color.fromHex("#555555")
     closeBtn.ZIndex                 = 3
     closeBtn.AutoButtonColor        = false
@@ -154,8 +154,8 @@ function Toast.show(opts, screenGui)
         msgLbl.Position               = UDim2.new(0, 36, 0, 30)
         msgLbl.Text                   = opts.Body
         msgLbl.Font                   = Enum.Font.Gotham
-        msgLbl.TextSize               = 11
-        msgLbl.TextColor3             = Color.fromHex("#888888")
+        msgLbl.TextSize               = 12
+        msgLbl.TextColor3             = Color.fromHex("#999999")
         msgLbl.TextXAlignment         = Enum.TextXAlignment.Left
         msgLbl.TextWrapped            = true
         msgLbl.ZIndex                 = 2

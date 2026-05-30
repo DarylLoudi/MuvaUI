@@ -19,7 +19,7 @@ Section.AddTag = function(self, opts)
         titleLbl.Size                   = UDim2.new(1, 0, 0, 13)
         titleLbl.Text                   = opts.Title
         titleLbl.Font                   = Enum.Font.Gotham
-        titleLbl.TextSize               = 11
+        titleLbl.TextSize               = 17
         titleLbl.TextColor3             = Theme:Text(1)
         titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
         titleLbl.Parent                 = card
@@ -84,7 +84,7 @@ Section.AddTag = function(self, opts)
         lbl.AutomaticSize          = Enum.AutomaticSize.X
         lbl.Text                   = tag
         lbl.Font                   = Enum.Font.Gotham
-        lbl.TextSize               = 10
+        lbl.TextSize               = 13
         lbl.TextColor3             = Theme:Accent()
         lbl.Parent                 = frame
 

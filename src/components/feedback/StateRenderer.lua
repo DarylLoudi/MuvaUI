@@ -169,7 +169,7 @@ function StateRenderer.buildInline(parent, stateType, opts)
         body.Size                   = UDim2.new(1, -32, 0, 0)
         body.AutomaticSize          = Enum.AutomaticSize.Y
         body.Text                   = bodyText
-        body.TextSize               = 10
+        body.TextSize               = 13
         body.Font                   = Enum.Font.Gotham
         body.TextColor3             = Theme:Text(3)
         body.TextXAlignment         = Enum.TextXAlignment.Center

@@ -30,7 +30,7 @@ Section.AddSeparator = function(self, opts)
         lbl.Position               = UDim2.new(0, 8, 0, 0)
         lbl.Text                   = opts.Label:upper()
         lbl.Font                   = Enum.Font.GothamBold
-        lbl.TextSize               = 9
+        lbl.TextSize               = 12
         lbl.TextColor3             = Theme:Text(3)
         lbl.Parent                 = frame
 

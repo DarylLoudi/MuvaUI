@@ -18,12 +18,12 @@ Theme.Colors = {
     Border1     = Color.fromHex("#252528"),  -- normal
     Border2     = Color.fromHex("#2e2e36"),  -- elevated/popup
 
-    -- Text
-    Text0       = Color.fromHex("#f0f0f0"),  -- primary
-    Text1       = Color.fromHex("#e0e0e0"),  -- secondary
-    Text2       = Color.fromHex("#aaaaaa"),  -- muted
-    Text3       = Color.fromHex("#666666"),  -- disabled
-    Text4       = Color.fromHex("#444444"),  -- placeholder
+    -- Text — brightened for readability on dark bg
+    Text0       = Color.fromHex("#f5f5f5"),  -- primary (titles)
+    Text1       = Color.fromHex("#e8e8e8"),  -- secondary (labels)
+    Text2       = Color.fromHex("#c0c0c0"),  -- muted (values)
+    Text3       = Color.fromHex("#9a9a9a"),  -- descriptions (was #666 — too dark)
+    Text4       = Color.fromHex("#808080"),  -- placeholder / faint (was #444 — nearly invisible)
 
     -- Semantic
     Success     = Color.fromHex("#22c55e"),
