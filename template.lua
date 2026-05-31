@@ -5,8 +5,9 @@
 --]]
 
 -- ── Loading Screen (opsional, tampil sebelum window) ────────────
+local COMMIT = "18845c86ac9edab10781a4bda85fa60a28fc89f3"
 local MuvaUI = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/MuvaUI.lua",
+    "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/" .. COMMIT .. "/MuvaUI.lua",
     true
 ))()
 
