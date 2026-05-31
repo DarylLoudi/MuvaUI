@@ -1,6 +1,38 @@
 -- Keybind: klik lalu tekan key untuk rebind
 local UserInputService = game:GetService("UserInputService")
 
+-- Map KeyCode.Name → label pendek yang user-friendly
+local KEY_LABELS = {
+    -- Angka row atas
+    Zero = "0", One = "1", Two = "2", Three = "3", Four = "4",
+    Five = "5", Six = "6", Seven = "7", Eight = "8", Nine = "9",
+    -- Numpad
+    KeypadZero = "KP0", KeypadOne = "KP1", KeypadTwo = "KP2",
+    KeypadThree = "KP3", KeypadFour = "KP4", KeypadFive = "KP5",
+    KeypadSix = "KP6", KeypadSeven = "KP7", KeypadEight = "KP8",
+    KeypadNine = "KP9",
+    KeypadPlus = "KP+", KeypadMinus = "KP-", KeypadAsterisk = "KP*",
+    KeypadSlash = "KP/", KeypadPeriod = "KP.", KeypadEnter = "KP↵",
+    -- Modifier
+    LeftShift = "L.SHIFT", RightShift = "R.SHIFT",
+    LeftControl = "L.CTRL", RightControl = "R.CTRL",
+    LeftAlt = "L.ALT", RightAlt = "R.ALT",
+    LeftMeta = "L.WIN", RightMeta = "R.WIN",
+    -- Navigasi
+    Up = "↑", Down = "↓", Left = "←", Right = "→",
+    Home = "HOME", End = "END",
+    PageUp = "PGUP", PageDown = "PGDN",
+    Insert = "INS", Delete = "DEL",
+    -- Spesial
+    Return = "ENTER", BackSpace = "BKSP", Tab = "TAB",
+    Space = "SPACE", Escape = "ESC", CapsLock = "CAPS",
+    -- Tanda baca umum
+    Minus = "-", Equals = "=", LeftBracket = "[", RightBracket = "]",
+    BackSlash = "\\", Semicolon = ";", Quote = "'",
+    Comma = ",", Period = ".", Slash = "/",
+    Backquote = "`",
+}
+
 Section.AddKeybind = function(self, opts)
     assert(type(opts) == "table", "AddKeybind: opts must be a table")
     local default = opts.Default or Enum.KeyCode.Unknown
@@ -40,7 +72,7 @@ Section.AddKeybind = function(self, opts)
 
     local function keyName(kc)
         if kc == Enum.KeyCode.Unknown then return "NONE" end
-        return kc.Name:upper()
+        return KEY_LABELS[kc.Name] or kc.Name:upper()
     end
 
     local value    = default
