@@ -26,7 +26,7 @@ function LoadingScreen.show(config, screenGui, onDone)
     overlay.BackgroundTransparency = 0.35
     overlay.BorderSizePixel        = 0
     overlay.Size                   = UDim2.new(1, 0, 1, 0)
-    overlay.ZIndex                 = 490
+    overlay.ZIndex = 1
     overlay.Parent                 = screenGui
 
     -- Card tengah
@@ -37,7 +37,7 @@ function LoadingScreen.show(config, screenGui, onDone)
     card.AutomaticSize     = Enum.AutomaticSize.Y
     card.Position          = UDim2.new(0.5, -150, 0.5, 0)
     card.AnchorPoint       = Vector2.new(0, 0.5)
-    card.ZIndex            = 491
+    card.ZIndex = 1
     card.Parent            = overlay
 
     local cardCorner = Instance.new("UICorner")
@@ -75,7 +75,7 @@ function LoadingScreen.show(config, screenGui, onDone)
     spinnerImg.Size                   = UDim2.new(1, 0, 1, 0)
     spinnerImg.Image                  = "rbxassetid://4965945816"
     spinnerImg.ImageColor3            = Theme:Accent()
-    spinnerImg.ZIndex                 = 492
+    spinnerImg.ZIndex = 1
     spinnerImg.Parent                 = spinnerFrame
 
     -- Spin continuously
@@ -96,7 +96,7 @@ function LoadingScreen.show(config, screenGui, onDone)
     titleLbl.TextColor3             = Theme:Text(0)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Center
     titleLbl.LayoutOrder            = 2
-    titleLbl.ZIndex                 = 492
+    titleLbl.ZIndex = 1
     titleLbl.Parent                 = card
 
     -- Message
@@ -109,7 +109,7 @@ function LoadingScreen.show(config, screenGui, onDone)
     msgLbl.TextColor3             = Theme:Text(4)
     msgLbl.TextXAlignment         = Enum.TextXAlignment.Center
     msgLbl.LayoutOrder            = 3
-    msgLbl.ZIndex                 = 492
+    msgLbl.ZIndex = 1
     msgLbl.Parent                 = card
 
     -- Progress bar
@@ -123,7 +123,7 @@ function LoadingScreen.show(config, screenGui, onDone)
     track.BackgroundColor3 = Theme:BG(4)
     track.BorderSizePixel  = 0
     track.Size             = UDim2.new(1, 0, 1, 0)
-    track.ZIndex           = 492
+    track.ZIndex = 1
     track.Parent           = progressFrame
 
     local trackCorner = Instance.new("UICorner")
@@ -134,7 +134,7 @@ function LoadingScreen.show(config, screenGui, onDone)
     fill.BackgroundColor3 = Theme:Accent()
     fill.BorderSizePixel  = 0
     fill.Size             = UDim2.new(0, 0, 1, 0)
-    fill.ZIndex           = 493
+    fill.ZIndex = 1
     fill.Parent           = track
 
     local fillCorner = Instance.new("UICorner")

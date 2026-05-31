@@ -113,7 +113,7 @@ Section.AddMultiDropdown = function(self, opts)
     menu.ScrollBarThickness    = 2
     menu.ScrollBarImageColor3  = Theme:BG(4)
     menu.Visible               = false
-    menu.ZIndex                = 999
+    menu.ZIndex = 3
     menu.ClipsDescendants      = false
     menu.Parent                = card
 
@@ -301,7 +301,7 @@ Section.AddMultiDropdown = function(self, opts)
     blocker.Size                   = UDim2.new(1, 0, 1, 0)
     blocker.Text                   = ""
     blocker.AutoButtonColor        = false
-    blocker.ZIndex                 = 998
+    blocker.ZIndex = 3
     blocker.Visible                = false
     blocker.Parent                 = card
 

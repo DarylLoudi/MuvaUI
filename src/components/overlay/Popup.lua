@@ -25,7 +25,7 @@ function Popup.show(opts, parentWin)
     backdrop.BackgroundTransparency = 0.7
     backdrop.BorderSizePixel        = 0
     backdrop.Size                   = UDim2.new(1, 0, 1, 0)
-    backdrop.ZIndex                 = 180
+    backdrop.ZIndex = 1
     backdrop.Parent                 = screenGui
 
     -- Popup card — lebih kecil dari Dialog
@@ -37,7 +37,7 @@ function Popup.show(opts, parentWin)
     card.AutomaticSize          = Enum.AutomaticSize.Y
     card.Position               = UDim2.new(0.5, -150, 0.5, 12)
     card.AnchorPoint            = Vector2.new(0, 0.5)
-    card.ZIndex                 = 181
+    card.ZIndex = 1
     card.Parent                 = screenGui
 
     local cardCorner = Instance.new("UICorner")
@@ -61,7 +61,7 @@ function Popup.show(opts, parentWin)
     bodySection.Size                   = UDim2.new(1, 0, 0, 0)
     bodySection.AutomaticSize          = Enum.AutomaticSize.Y
     bodySection.LayoutOrder            = 1
-    bodySection.ZIndex                 = 182
+    bodySection.ZIndex = 1
     bodySection.Parent                 = card
 
     local bodyPad = Instance.new("UIPadding")
@@ -82,7 +82,7 @@ function Popup.show(opts, parentWin)
     titleRow.BackgroundTransparency = 1
     titleRow.Size                   = UDim2.new(1, 0, 0, 20)
     titleRow.LayoutOrder            = 1
-    titleRow.ZIndex                 = 182
+    titleRow.ZIndex = 1
     titleRow.Parent                 = bodySection
 
     local titleLayout = Instance.new("UIListLayout")
@@ -99,7 +99,7 @@ function Popup.show(opts, parentWin)
     iconLbl.TextSize               = 14
     iconLbl.TextColor3             = style.accent()
     iconLbl.TextXAlignment         = Enum.TextXAlignment.Center
-    iconLbl.ZIndex                 = 182
+    iconLbl.ZIndex = 1
     iconLbl.Parent                 = titleRow
 
     local titleLbl = Instance.new("TextLabel")
@@ -110,7 +110,7 @@ function Popup.show(opts, parentWin)
     titleLbl.TextSize               = 14
     titleLbl.TextColor3             = Theme:Text(0)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
-    titleLbl.ZIndex                 = 182
+    titleLbl.ZIndex = 1
     titleLbl.Parent                 = titleRow
 
     if opts.Body and opts.Body ~= "" then
@@ -126,7 +126,7 @@ function Popup.show(opts, parentWin)
         bodyLbl.TextWrapped            = true
         bodyLbl.LineHeight             = 1.35
         bodyLbl.LayoutOrder            = 2
-        bodyLbl.ZIndex                 = 182
+        bodyLbl.ZIndex = 1
         bodyLbl.Parent                 = bodySection
     end
 
@@ -138,14 +138,14 @@ function Popup.show(opts, parentWin)
         divLine.BorderSizePixel  = 0
         divLine.Size             = UDim2.new(1, 0, 0, 1)
         divLine.LayoutOrder      = 2
-        divLine.ZIndex           = 181
+        divLine.ZIndex = 1
         divLine.Parent           = card
 
         local btnSection = Instance.new("Frame")
         btnSection.BackgroundTransparency = 1
         btnSection.Size                   = UDim2.new(1, 0, 0, 48)
         btnSection.LayoutOrder            = 3
-        btnSection.ZIndex                 = 182
+        btnSection.ZIndex = 1
         btnSection.Parent                 = card
 
         local btnPad = Instance.new("UIPadding")
@@ -193,7 +193,7 @@ function Popup.show(opts, parentWin)
             btn.TextSize         = 11
             btn.TextColor3       = colors.text
             btn.AutoButtonColor  = false
-            btn.ZIndex           = 183
+            btn.ZIndex = 1
             btn.Parent           = btnSection
 
             local bc = Instance.new("UICorner")

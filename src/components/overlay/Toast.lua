@@ -37,7 +37,7 @@ local function getContainer(screenGui)
     c.BackgroundTransparency = 1
     c.Size                   = UDim2.new(1, 0, 1, 0)
     c.Position               = UDim2.new(0, 0, 0, 0)
-    c.ZIndex                 = 999
+    c.ZIndex = 1
     c.ClipsDescendants       = false
     c.Parent                 = sg
 
@@ -95,7 +95,7 @@ function Toast.show(opts, screenGui)
     bar.BorderSizePixel  = 0
     bar.Size             = UDim2.new(0, 3, 1, -12)
     bar.Position         = UDim2.new(0, 0, 0, 6)
-    bar.ZIndex           = 2
+    bar.ZIndex = 1
     bar.Parent           = toast
 
     local barCorner = Instance.new("UICorner")
@@ -111,7 +111,7 @@ function Toast.show(opts, screenGui)
     iconLbl.Font                   = Enum.Font.GothamBold
     iconLbl.TextSize               = 15
     iconLbl.TextColor3             = color
-    iconLbl.ZIndex                 = 2
+    iconLbl.ZIndex = 1
     iconLbl.Parent                 = toast
 
     -- Close button
@@ -124,7 +124,7 @@ function Toast.show(opts, screenGui)
     closeBtn.Font                   = Enum.Font.GothamBold
     closeBtn.TextSize               = 13
     closeBtn.TextColor3             = Color.fromHex("#555555")
-    closeBtn.ZIndex                 = 3
+    closeBtn.ZIndex = 1
     closeBtn.AutoButtonColor        = false
     closeBtn.Parent                 = toast
 
@@ -143,7 +143,7 @@ function Toast.show(opts, screenGui)
     titleLbl.TextSize               = 13
     titleLbl.TextColor3             = Color.fromHex("#f0f0f0")
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
-    titleLbl.ZIndex                 = 2
+    titleLbl.ZIndex = 1
     titleLbl.Parent                 = toast
 
     -- Body
@@ -158,7 +158,7 @@ function Toast.show(opts, screenGui)
         msgLbl.TextColor3             = Color.fromHex("#999999")
         msgLbl.TextXAlignment         = Enum.TextXAlignment.Left
         msgLbl.TextWrapped            = true
-        msgLbl.ZIndex                 = 2
+        msgLbl.ZIndex = 1
         msgLbl.Parent                 = toast
     end
 

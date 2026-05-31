@@ -87,7 +87,7 @@ Section.AddDropdown = function(self, opts)
     blocker.Position               = UDim2.new(0, 0, 0, 0)
     blocker.Text                   = ""
     blocker.AutoButtonColor        = false
-    blocker.ZIndex                 = 998
+    blocker.ZIndex = 3
     blocker.Visible                = false
     blocker.Parent                 = card
 
@@ -101,7 +101,7 @@ Section.AddDropdown = function(self, opts)
     menu.Size             = UDim2.fromOffset(200, 0)
     menu.Position         = UDim2.fromOffset(0, 0)
     menu.Visible          = false
-    menu.ZIndex           = 999
+    menu.ZIndex = 3
     menu.ClipsDescendants = false
     menu.Parent           = card
 
@@ -120,7 +120,7 @@ Section.AddDropdown = function(self, opts)
         local searchWrap = Instance.new("Frame")
         searchWrap.BackgroundTransparency = 1
         searchWrap.Size                   = UDim2.new(1, 0, 0, 32)
-        searchWrap.ZIndex                 = 1000
+        searchWrap.ZIndex = 3
         searchWrap.Parent                 = menu
 
         local sPad = Instance.new("UIPadding")
@@ -141,7 +141,7 @@ Section.AddDropdown = function(self, opts)
         sBox.TextSize          = 11
         sBox.TextColor3        = Theme:Text(0)
         sBox.ClearTextOnFocus  = false
-        sBox.ZIndex            = 1001
+        sBox.ZIndex = 3
         sBox.Parent            = searchWrap
 
         local sCorner = Instance.new("UICorner")
@@ -173,7 +173,7 @@ Section.AddDropdown = function(self, opts)
     list.AutomaticCanvasSize     = Enum.AutomaticSize.Y
     list.ScrollBarThickness      = 2
     list.ScrollBarImageColor3    = Theme:BG(4)
-    list.ZIndex                  = 1000
+    list.ZIndex = 3
     list.Parent                  = menu
 
     local listLayout = Instance.new("UIListLayout")
@@ -197,7 +197,7 @@ Section.AddDropdown = function(self, opts)
                 row.Size                   = UDim2.new(1, 0, 0, 30)
                 row.Text                   = ""
                 row.AutoButtonColor        = false
-                row.ZIndex                 = 1001
+                row.ZIndex = 3
                 row.Parent                 = list
 
                 local pad = Instance.new("UIPadding")
@@ -213,7 +213,7 @@ Section.AddDropdown = function(self, opts)
                 lbl.TextSize               = 13
                 lbl.TextColor3             = item == selected and Theme:Accent() or Theme:Text(2)
                 lbl.TextXAlignment         = Enum.TextXAlignment.Left
-                lbl.ZIndex                 = 1002
+                lbl.ZIndex = 3
                 lbl.Parent                 = row
 
                 if item == selected then
@@ -225,7 +225,7 @@ Section.AddDropdown = function(self, opts)
                     check.TextSize               = 13
                     check.Font                   = Enum.Font.GothamBold
                     check.TextColor3             = Theme:Accent()
-                    check.ZIndex                 = 1002
+                    check.ZIndex = 3
                     check.Parent                 = row
                 end
 

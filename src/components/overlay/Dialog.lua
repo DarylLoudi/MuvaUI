@@ -10,7 +10,7 @@ function Dialog.show(opts, screenGui)
     overlay.BackgroundTransparency = 0.5
     overlay.BorderSizePixel        = 0
     overlay.Size                   = UDim2.new(1, 0, 1, 0)
-    overlay.ZIndex                 = 200
+    overlay.ZIndex = 1
     overlay.Parent                 = screenGui
 
     -- Modal card
@@ -21,7 +21,7 @@ function Dialog.show(opts, screenGui)
     modal.AutomaticSize    = Enum.AutomaticSize.Y
     modal.Position         = UDim2.new(0.5, -170, 0.5, 0)
     modal.AnchorPoint      = Vector2.new(0, 0.5)
-    modal.ZIndex           = 201
+    modal.ZIndex = 1
     modal.Parent           = screenGui
 
     local modalCorner = Instance.new("UICorner")
@@ -45,7 +45,7 @@ function Dialog.show(opts, screenGui)
     bodySection.Size                   = UDim2.new(1, 0, 0, 0)
     bodySection.AutomaticSize          = Enum.AutomaticSize.Y
     bodySection.LayoutOrder            = 1
-    bodySection.ZIndex                 = 202
+    bodySection.ZIndex = 1
     bodySection.Parent                 = modal
 
     local bodyPad = Instance.new("UIPadding")
@@ -71,7 +71,7 @@ function Dialog.show(opts, screenGui)
     titleLbl.TextColor3             = Theme:Text(0)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
     titleLbl.LayoutOrder            = 1
-    titleLbl.ZIndex                 = 202
+    titleLbl.ZIndex = 1
     titleLbl.Parent                 = bodySection
 
     -- Body text
@@ -87,7 +87,7 @@ function Dialog.show(opts, screenGui)
     bodyLbl.TextWrapped            = true
     bodyLbl.LineHeight             = 1.4
     bodyLbl.LayoutOrder            = 2
-    bodyLbl.ZIndex                 = 202
+    bodyLbl.ZIndex = 1
     bodyLbl.Parent                 = bodySection
 
     -- Divider
@@ -96,7 +96,7 @@ function Dialog.show(opts, screenGui)
     div.BorderSizePixel  = 0
     div.Size             = UDim2.new(1, 0, 0, 1)
     div.LayoutOrder      = 2
-    div.ZIndex           = 202
+    div.ZIndex = 1
     div.Parent           = modal
 
     -- Buttons footer
@@ -104,7 +104,7 @@ function Dialog.show(opts, screenGui)
     btnSection.BackgroundTransparency = 1
     btnSection.Size                   = UDim2.new(1, 0, 0, 56)
     btnSection.LayoutOrder            = 3
-    btnSection.ZIndex                 = 202
+    btnSection.ZIndex = 1
     btnSection.Parent                 = modal
 
     local btnPad = Instance.new("UIPadding")
@@ -157,7 +157,7 @@ function Dialog.show(opts, screenGui)
         btn.TextSize         = 12
         btn.TextColor3       = colors.text
         btn.AutoButtonColor  = false
-        btn.ZIndex           = 203
+        btn.ZIndex = 1
         btn.Parent           = btnSection
 
         local bc = Instance.new("UICorner")

@@ -49,7 +49,7 @@ Section.AddColorPicker = function(self, opts)
     palette.Size             = UDim2.fromOffset(188, 0)
     palette.AutomaticSize    = Enum.AutomaticSize.Y
     palette.Visible          = false
-    palette.ZIndex           = 999
+    palette.ZIndex = 3
     palette.Parent           = card
 
     local palCorner = Instance.new("UICorner")
@@ -179,7 +179,7 @@ Section.AddColorPicker = function(self, opts)
         blocker.Size                   = UDim2.new(1, 0, 1, 0)
         blocker.Text                   = ""
         blocker.AutoButtonColor        = false
-        blocker.ZIndex                 = 998
+        blocker.ZIndex = 3
         blocker.Parent                 = sg
         blocker.MouseButton1Click:Connect(function() closePalette() end)
 
