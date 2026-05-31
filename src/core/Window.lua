@@ -441,17 +441,22 @@ function Window.new(opts, screenGui, flags)
         nameLabel.Text   = player.Name:sub(1, 3) .. "***"
 
         local thumbUrl = ("rbxthumb://type=AvatarHeadShot&id=%d&w=48&h=48"):format(player.UserId)
+        print("[MuvaUI] Avatar URL:", thumbUrl)
         avatarImg.Image = thumbUrl
 
         -- PreloadAsync blocks until image is ready (or fails), lalu langsung show
         local ContentProvider = game:GetService("ContentProvider")
-        pcall(function()
+        local preloadOk, preloadErr = pcall(function()
             ContentProvider:PreloadAsync({ avatarImg })
         end)
+        print("[MuvaUI] PreloadAsync ok:", preloadOk, preloadErr)
+        print("[MuvaUI] Image after preload:", avatarImg.Image)
+        print("[MuvaUI] ImageRectSize:", avatarImg.ImageRectSize)
 
         avatarLabel.Visible                = false
         avatarFrame.BackgroundTransparency = 1
         avatarImg.ImageTransparency        = 0
+        print("[MuvaUI] Avatar show done")
     end)
 
     Theme:OnAccentChanged(function(a)
