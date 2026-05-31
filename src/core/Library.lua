@@ -41,8 +41,12 @@ function Library:CreateWindow(opts)
     -- Key system — tampilkan sebelum window jika ada
     if opts.Key and KeySystem then
         KeySystem.show(opts.Key, screenGui, function()
-            self:_spawnWindow(opts, screenGui)
+            local win = self:_spawnWindow(opts, screenGui)
+            if opts.OnReady and win then
+                pcall(opts.OnReady, win)
+            end
         end)
+        return nil  -- window dibuat async, gunakan opts.OnReady
     else
         return self:_spawnWindow(opts, screenGui)
     end
