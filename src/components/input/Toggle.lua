@@ -15,43 +15,12 @@ Section.AddToggle = function(self, opts)
     layout.Parent               = card
 
     -- Info (left, fills remaining space)
-    local info = Instance.new("Frame")
-    info.BackgroundTransparency = 1
-    info.Size                   = UDim2.new(1, -62, 1, 0)
-    info.LayoutOrder            = 1
-    info.Parent                 = card
-
-    local infoLayout = Instance.new("UIListLayout")
-    infoLayout.FillDirection    = Enum.FillDirection.Vertical
-    infoLayout.VerticalAlignment= Enum.VerticalAlignment.Center
-    infoLayout.Padding          = UDim.new(0, 2)
-    infoLayout.Parent           = info
-
-    local title = Instance.new("TextLabel")
-    title.BackgroundTransparency = 1
-    title.Size                   = UDim2.new(1, 0, 0, 14)
-    title.Text                   = opts.Title or ""
-    title.Font                   = Enum.Font.GothamMedium
-    title.TextSize               = 14
-    title.TextColor3             = Theme:Text(1)
-    title.TextXAlignment         = Enum.TextXAlignment.Left
-    title.Parent                 = info
-
-    if opts.Desc then
-        local desc = Instance.new("TextLabel")
-        desc.BackgroundTransparency = 1
-        desc.Size                   = UDim2.new(1, 0, 0, 14)
-        desc.Text                   = opts.Desc
-        desc.Font                   = Enum.Font.Gotham
-        desc.TextSize               = 12
-        desc.TextColor3             = Theme:Text(3)
-        desc.TextXAlignment         = Enum.TextXAlignment.Left
-        desc.Parent                 = info
-    end
+    local info = self:_makeInfoBlock(card, opts.Title, opts.Desc, Layout.TOGGLE_RES)
+    info.LayoutOrder = 1
 
     -- Toggle track (right) — bigger
     local track = Instance.new("Frame")
-    track.Size              = UDim2.fromOffset(44, 24)
+    track.Size              = UDim2.fromOffset(Layout.TOGGLE_W, 24)
     track.BackgroundColor3  = Theme:BG(4)
     track.BorderSizePixel   = 0
     track.LayoutOrder       = 2

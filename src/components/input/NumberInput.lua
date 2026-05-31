@@ -16,26 +16,7 @@ Section.AddNumberInput = function(self, opts)
     row.Parent            = card
 
     -- Info
-    local info = Instance.new("Frame")
-    info.BackgroundTransparency = 1
-    info.Size                   = UDim2.new(1, -110, 1, 0)
-    info.Parent                 = card
-
-    local infoL = Instance.new("UIListLayout")
-    infoL.FillDirection     = Enum.FillDirection.Vertical
-    infoL.VerticalAlignment = Enum.VerticalAlignment.Center
-    infoL.Padding           = UDim.new(0, 2)
-    infoL.Parent            = info
-
-    local title = Instance.new("TextLabel")
-    title.BackgroundTransparency = 1
-    title.Size                   = UDim2.new(1, 0, 0, 14)
-    title.Text                   = opts.Title or ""
-    title.Font                   = Enum.Font.GothamMedium
-    title.TextSize               = 14
-    title.TextColor3             = Theme:Text(1)
-    title.TextXAlignment         = Enum.TextXAlignment.Left
-    title.Parent                 = info
+    local info = self:_makeInfoBlock(card, opts.Title, nil, 110)
 
     -- Controls wrapper
     local controls = Instance.new("Frame")

@@ -15,38 +15,7 @@ Section.AddKeybind = function(self, opts)
     row.Parent            = card
 
     -- Info
-    local info = Instance.new("Frame")
-    info.BackgroundTransparency = 1
-    info.Size                   = UDim2.new(1, -80, 1, 0)
-    info.Parent                 = card
-
-    local infoL = Instance.new("UIListLayout")
-    infoL.FillDirection     = Enum.FillDirection.Vertical
-    infoL.VerticalAlignment = Enum.VerticalAlignment.Center
-    infoL.Padding           = UDim.new(0, 2)
-    infoL.Parent            = info
-
-    local title = Instance.new("TextLabel")
-    title.BackgroundTransparency = 1
-    title.Size                   = UDim2.new(1, 0, 0, 14)
-    title.Text                   = opts.Title or ""
-    title.Font                   = Enum.Font.GothamMedium
-    title.TextSize               = 14
-    title.TextColor3             = Theme:Text(1)
-    title.TextXAlignment         = Enum.TextXAlignment.Left
-    title.Parent                 = info
-
-    if opts.Desc then
-        local desc = Instance.new("TextLabel")
-        desc.BackgroundTransparency = 1
-        desc.Size                   = UDim2.new(1, 0, 0, 14)
-        desc.Text                   = opts.Desc
-        desc.Font                   = Enum.Font.Gotham
-        desc.TextSize               = 12
-        desc.TextColor3             = Theme:Text(3)
-        desc.TextXAlignment         = Enum.TextXAlignment.Left
-        desc.Parent                 = info
-    end
+    local info = self:_makeInfoBlock(card, opts.Title, opts.Desc, 80)
 
     -- Key badge button
     local keyBtn = Instance.new("TextButton")
