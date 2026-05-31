@@ -42,11 +42,11 @@ function KeySystem.show(opts, screenGui, onSuccess)
         return
     end
 
-    -- Overlay gelap full screen
+    -- Overlay gelap semi-transparent
     local overlay = Instance.new("Frame")
     overlay.Name                    = "KeySystemOverlay"
     overlay.BackgroundColor3        = Color.fromHex("#0a0a0c")
-    overlay.BackgroundTransparency  = 0
+    overlay.BackgroundTransparency  = 0.3
     overlay.BorderSizePixel         = 0
     overlay.Size                    = UDim2.new(1, 0, 1, 0)
     overlay.ZIndex                  = 500
@@ -136,11 +136,11 @@ function KeySystem.show(opts, screenGui, onSuccess)
 
     local titleLbl = Instance.new("TextLabel")
     titleLbl.BackgroundTransparency = 1
-    titleLbl.Size                   = UDim2.new(1, 0, 0, 30)
-    titleLbl.Position               = UDim2.new(0, 0, 0, 14)
+    titleLbl.Size                   = UDim2.new(1, 0, 0, 32)
+    titleLbl.Position               = UDim2.new(0, 0, 0, 12)
     titleLbl.Text                   = opts.Title or "MuvaUI"
     titleLbl.Font                   = Enum.Font.GothamBold
-    titleLbl.TextSize               = 22
+    titleLbl.TextSize               = 24
     titleLbl.TextColor3             = Theme:Text(0)
     titleLbl.TextXAlignment         = Enum.TextXAlignment.Center
     titleLbl.ZIndex                 = 502
@@ -148,11 +148,11 @@ function KeySystem.show(opts, screenGui, onSuccess)
 
     local subLbl = Instance.new("TextLabel")
     subLbl.BackgroundTransparency = 1
-    subLbl.Size                   = UDim2.new(1, 0, 0, 18)
+    subLbl.Size                   = UDim2.new(1, 0, 0, 20)
     subLbl.Position               = UDim2.new(0, 0, 0, 50)
     subLbl.Text                   = "Enter your key to continue"
     subLbl.Font                   = Enum.Font.Gotham
-    subLbl.TextSize               = 11
+    subLbl.TextSize               = 13
     subLbl.TextColor3             = Theme:Text(4)
     subLbl.TextXAlignment         = Enum.TextXAlignment.Center
     subLbl.ZIndex                 = 502
@@ -182,10 +182,10 @@ function KeySystem.show(opts, screenGui, onSuccess)
     -- Label "License Key"
     local keyLabel = Instance.new("TextLabel")
     keyLabel.BackgroundTransparency = 1
-    keyLabel.Size                   = UDim2.new(1, 0, 0, 12)
+    keyLabel.Size                   = UDim2.new(1, 0, 0, 14)
     keyLabel.Text                   = "LICENSE KEY"
     keyLabel.Font                   = Enum.Font.GothamBold
-    keyLabel.TextSize               = 9
+    keyLabel.TextSize               = 11
     keyLabel.TextColor3             = Theme:Text(4)
     keyLabel.TextXAlignment         = Enum.TextXAlignment.Left
     keyLabel.LayoutOrder            = 1
@@ -234,7 +234,7 @@ function KeySystem.show(opts, screenGui, onSuccess)
     keyInput.PlaceholderColor3      = Theme:Text(4)
     keyInput.Text                   = ""
     keyInput.Font                   = Enum.Font.Code
-    keyInput.TextSize               = 11
+    keyInput.TextSize               = 14
     keyInput.TextColor3             = Theme:Text(0)
     keyInput.ClearTextOnFocus       = false
     keyInput.ZIndex                 = 503
@@ -267,10 +267,10 @@ function KeySystem.show(opts, screenGui, onSuccess)
     -- Status label (error/success)
     local statusLbl = Instance.new("TextLabel")
     statusLbl.BackgroundTransparency = 1
-    statusLbl.Size                   = UDim2.new(1, 0, 0, 14)
+    statusLbl.Size                   = UDim2.new(1, 0, 0, 16)
     statusLbl.Text                   = ""
     statusLbl.Font                   = Enum.Font.Gotham
-    statusLbl.TextSize               = 11
+    statusLbl.TextSize               = 13
     statusLbl.TextColor3             = Color.fromHex("#ef4444")
     statusLbl.TextXAlignment         = Enum.TextXAlignment.Center
     statusLbl.LayoutOrder            = 3
@@ -280,7 +280,7 @@ function KeySystem.show(opts, screenGui, onSuccess)
     -- Links row
     local linksRow = Instance.new("Frame")
     linksRow.BackgroundTransparency = 1
-    linksRow.Size                   = UDim2.new(1, 0, 0, 16)
+    linksRow.Size                   = UDim2.new(1, 0, 0, 20)
     linksRow.LayoutOrder            = 4
     linksRow.Parent                 = body
 
@@ -299,7 +299,7 @@ function KeySystem.show(opts, screenGui, onSuccess)
         btn.AutomaticSize          = Enum.AutomaticSize.X
         btn.Text                   = text
         btn.Font                   = Enum.Font.Gotham
-        btn.TextSize               = 11
+        btn.TextSize               = 13
         btn.TextColor3             = Theme:Text(4)
         btn.AutoButtonColor        = false
         btn.ZIndex                 = 502
