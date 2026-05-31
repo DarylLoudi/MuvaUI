@@ -49,26 +49,28 @@ Section.AddKeybind = function(self, opts)
     -- Info
     local info = self:_makeInfoBlock(card, opts.Title, opts.Desc, 80)
 
-    -- Key badge button
+    -- Key label button — style sama dengan value label di Slider
     local keyBtn = Instance.new("TextButton")
-    keyBtn.BackgroundColor3 = Theme:BG(1)
-    keyBtn.BorderSizePixel  = 0
-    keyBtn.Size             = UDim2.fromOffset(72, 26)
-    keyBtn.LayoutOrder      = 99
-    keyBtn.AutoButtonColor  = false
-    keyBtn.Font             = Enum.Font.GothamBold
-    keyBtn.TextSize         = 10
-    keyBtn.TextColor3       = Theme:Accent()
-    keyBtn.Parent           = card
+    keyBtn.BackgroundTransparency = 1
+    keyBtn.BorderSizePixel        = 0
+    keyBtn.Size                   = UDim2.fromOffset(68, 26)
+    keyBtn.LayoutOrder            = 99
+    keyBtn.AutoButtonColor        = false
+    keyBtn.Font                   = Layout.FONT_BOLD
+    keyBtn.TextSize               = Layout.TITLE_SIZE
+    keyBtn.TextColor3             = Theme:Accent()
+    keyBtn.TextXAlignment         = Enum.TextXAlignment.Right
+    keyBtn.Parent                 = card
+
+    -- Stroke tipis hanya saat listening
+    local keyStroke = Instance.new("UIStroke")
+    keyStroke.Color     = Theme:Accent()
+    keyStroke.Thickness = 0
+    keyStroke.Parent    = keyBtn
 
     local keyCorner = Instance.new("UICorner")
     keyCorner.CornerRadius = UDim.new(0, 5)
     keyCorner.Parent       = keyBtn
-
-    local keyStroke = Instance.new("UIStroke")
-    keyStroke.Color     = Theme:Border(1)
-    keyStroke.Thickness = 1
-    keyStroke.Parent    = keyBtn
 
     local function keyName(kc)
         if kc == Enum.KeyCode.Unknown then return "NONE" end
@@ -83,20 +85,14 @@ Section.AddKeybind = function(self, opts)
     local function setListening(state)
         listening = state
         if state then
-            keyBtn.Text        = "..."
-            keyBtn.TextColor3  = Theme:Text(0)
-            keyStroke.Color    = Theme:Accent()
-            -- pulse animation
-            local function pulse()
-                if not listening then return end
-                Tween.play(keyStroke, { Color = Theme:Accent() },
-                    TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true))
-            end
-            pulse()
+            keyBtn.Text          = "..."
+            keyBtn.TextColor3    = Theme:Text(3)
+            keyStroke.Thickness  = 1
+            keyStroke.Color      = Theme:Accent()
         else
-            keyBtn.Text       = keyName(value)
-            keyBtn.TextColor3 = Theme:Accent()
-            keyStroke.Color   = Theme:Border(1)
+            keyBtn.Text          = keyName(value)
+            keyBtn.TextColor3    = Theme:Accent()
+            keyStroke.Thickness  = 0
         end
     end
 
@@ -120,14 +116,12 @@ Section.AddKeybind = function(self, opts)
 
     keyBtn.MouseEnter:Connect(function()
         if not listening then
-            Tween.fast(keyBtn, { BackgroundColor3 = Theme:BG(3) })
-            keyStroke.Color = Theme:Accent()
+            Tween.fast(keyBtn, { TextColor3 = Color.lighten(Theme:Accent(), 0.15) })
         end
     end)
     keyBtn.MouseLeave:Connect(function()
         if not listening then
-            Tween.fast(keyBtn, { BackgroundColor3 = Theme:BG(1) })
-            keyStroke.Color = Theme:Border(1)
+            Tween.fast(keyBtn, { TextColor3 = Theme:Accent() })
         end
     end)
 
