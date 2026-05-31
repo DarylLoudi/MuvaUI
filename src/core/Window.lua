@@ -443,19 +443,15 @@ function Window.new(opts, screenGui, flags)
         local thumbUrl = ("rbxthumb://type=AvatarHeadShot&id=%d&w=48&h=48"):format(player.UserId)
         avatarImg.Image = thumbUrl
 
-        -- PreloadAsync blocks until image is ready (or fails)
+        -- PreloadAsync blocks until image is ready (or fails), lalu langsung show
         local ContentProvider = game:GetService("ContentProvider")
         pcall(function()
             ContentProvider:PreloadAsync({ avatarImg })
         end)
 
-        -- Setelah preload, cek apakah image benar-benar ter-load
-        if avatarImg.IsLoaded then
-            avatarLabel.Visible            = false
-            avatarFrame.BackgroundTransparency = 1
-            Tween.play(avatarImg, { ImageTransparency = 0 },
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out))
-        end
+        avatarLabel.Visible                = false
+        avatarFrame.BackgroundTransparency = 1
+        avatarImg.ImageTransparency        = 0
     end)
 
     Theme:OnAccentChanged(function(a)
