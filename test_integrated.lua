@@ -19,14 +19,52 @@ local MuvaUI = loadstring(game:HttpGet(
 print("[Integrated] MuvaUI loaded.")
 
 -- ── System: Loading Screen ──────────────────────────────────────
+-- Setiap step.Run() = operasi nyata (HTTP fetch, parse, dll)
+-- Progress bar maju hanya setelah operasi selesai
+-- Jika Run() error → step ditandai ✗, loading tetap lanjut (tidak crash)
+local BASE_URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/"
+
 MuvaUI:SetLoadingScreen({
     Title = "My Script",
     Steps = {
-        { Message = "Verifying license...",  Duration = 0.5 },
-        { Message = "Loading modules...",    Duration = 0.7 },
-        { Message = "Building UI...",        Duration = 0.4 },
-        { Message = "Ready!",               Duration = 0.3 },
+        {
+            Message = "Loading Main...",
+            Run = function()
+                -- Contoh: fetch modul utama dari remote
+                -- Ganti URL sesuai modul nyata kamu
+                return game:HttpGet(BASE_URL .. "MuvaUI.lua", true)
+            end,
+        },
+        {
+            Message = "Loading Teleport...",
+            Run = function()
+                -- Fetch modul teleport
+                return game:HttpGet(BASE_URL .. "modules/Teleport.lua", true)
+            end,
+        },
+        {
+            Message = "Loading Settings...",
+            Run = function()
+                -- Fetch modul settings
+                return game:HttpGet(BASE_URL .. "modules/Settings.lua", true)
+            end,
+        },
+        {
+            -- Step tanpa Run = cosmetic (delay singkat, tidak fetch)
+            Message = "Ready!",
+        },
     },
+    OnResult = function(results)
+        -- results[i] = { ok=bool, value=string|nil, err=string|nil }
+        for i, r in ipairs(results) do
+            if r.ok then
+                print(("[LoadingScreen] Step %d ✓ (%d bytes)"):format(
+                    i, r.value and #r.value or 0))
+            else
+                warn(("[LoadingScreen] Step %d ✗ — %s"):format(i, r.err or "unknown error"))
+            end
+        end
+    end,
 })
 
 -- ── System: Config System ───────────────────────────────────────
