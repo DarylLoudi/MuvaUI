@@ -24,6 +24,7 @@ BUILD_ORDER = [
     # Core (depends on util)
     "core/Flag.lua",
     "core/Theme.lua",
+    "core/Layout.lua",
 
     # Structural (depends on core)
     "core/Section.lua",
