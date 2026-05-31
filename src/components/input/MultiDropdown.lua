@@ -86,19 +86,19 @@ Section.AddMultiDropdown = function(self, opts)
     arrow.TextColor3             = Theme:Text(3)
     arrow.Parent                 = trigger
 
-    -- ScreenGui khusus dropdown dengan DisplayOrder lebih tinggi dari window
-    local _dropSG = nil
+    -- ScreenGui khusus dropdown — destroy dan recreate setiap open
     local function getDropSG()
-        if _dropSG and _dropSG.Parent then return _dropSG end
         local CoreGui = game:GetService("CoreGui")
+        for _, v in ipairs(CoreGui:GetChildren()) do
+            if v.Name == "MuvaUI_Dropdown" then pcall(function() v:Destroy() end) end
+        end
         local sg = Instance.new("ScreenGui")
         sg.Name           = "MuvaUI_Dropdown"
         sg.ResetOnSpawn   = false
         sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
         sg.DisplayOrder   = 1100
-        sg.IgnoreGuiInset = true
+        sg.IgnoreGuiInset = false
         pcall(function() sg.Parent = CoreGui end)
-        _dropSG = sg
         return sg
     end
 
@@ -294,19 +294,45 @@ Section.AddMultiDropdown = function(self, opts)
 
     local open = false
 
+    -- Blocker full-screen: di-connect SEKALI di init, bukan di dalam openMenu
+    local blocker = Instance.new("TextButton")
+    blocker.BackgroundTransparency = 1
+    blocker.BorderSizePixel        = 0
+    blocker.Size                   = UDim2.new(1, 0, 1, 0)
+    blocker.Text                   = ""
+    blocker.AutoButtonColor        = false
+    blocker.ZIndex                 = 998
+    blocker.Visible                = false
+    blocker.Parent                 = card
+
+    local _close  -- forward declare
+
+    _close = function()
+        open             = false
+        menu.Visible     = false
+        menu.Parent      = card
+        blocker.Visible  = false
+        blocker.Parent   = card
+        arrow.TextColor3 = Theme:Text(3)
+        trigStroke.Color = Theme:Border(1)
+        Tween.fast(arrow, { Rotation = 0 })
+    end
+
+    -- Blocker connected once at init
+    blocker.MouseButton1Click:Connect(function() _close() end)
+
     trigger.MouseButton1Click:Connect(function()
         if open then
-            open = false
-            menu.Visible     = false
-            menu.Parent      = card  -- kembalikan ke card
-            arrow.TextColor3 = Theme:Text(3)
-            trigStroke.Color = Theme:Border(1)
-            Tween.fast(arrow, { Rotation = 0 })
+            _close()
         else
             open = true
-            local absPos  = trigger.AbsolutePosition
+            local sg      = getDropSG()
+            local absPos  = trigger.AbsolutePosition  -- baca SEBELUM reparent
             local absSize = trigger.AbsoluteSize
-            menu.Parent   = getDropSG()
+
+            blocker.Parent  = sg
+            blocker.Visible = true
+            menu.Parent     = sg
 
             local screenW  = workspace.CurrentCamera.ViewportSize.X
             local screenH  = workspace.CurrentCamera.ViewportSize.Y
@@ -315,12 +341,11 @@ Section.AddMultiDropdown = function(self, opts)
 
             local menuX = absPos.X
             if menuX + menuW > screenW then menuX = screenW - menuW - 4 end
-
             local menuY = absPos.Y + absSize.Y + 4
             if menuY + estMenuH > screenH then menuY = absPos.Y - estMenuH - 4 end
 
-            menu.Position = UDim2.fromOffset(menuX, menuY)
-            menu.Size     = UDim2.fromOffset(menuW, 0)
+            menu.Position    = UDim2.fromOffset(menuX, menuY)
+            menu.Size        = UDim2.fromOffset(menuW, 0)
             buildMenu()
             menu.Visible     = true
             arrow.TextColor3 = Theme:Accent()
@@ -330,25 +355,6 @@ Section.AddMultiDropdown = function(self, opts)
     end)
 
     refreshTags()
-
-    game:GetService("UserInputService").InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and open then
-            task.defer(function()
-                local pos  = game:GetService("UserInputService"):GetMouseLocation()
-                local abs  = menu.AbsolutePosition
-                local size = menu.AbsoluteSize
-                if pos.X < abs.X or pos.X > abs.X + size.X or
-                   pos.Y < abs.Y or pos.Y > abs.Y + size.Y then
-                    open = false
-                    menu.Visible     = false
-                    menu.Parent      = card
-                    arrow.TextColor3 = Theme:Text(3)
-                    trigStroke.Color = Theme:Border(1)
-                    Tween.fast(arrow, { Rotation = 0 })
-                end
-            end)
-        end
-    end)
 
     card.MouseEnter:Connect(function()
         Tween.fast(card, { BackgroundColor3 = Theme:BG(3) })
