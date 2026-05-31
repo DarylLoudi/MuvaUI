@@ -56,9 +56,9 @@ function KeySystem.show(opts, screenGui, onSuccess)
     local card = Instance.new("Frame")
     card.BackgroundColor3  = Color.fromHex("#141416")
     card.BorderSizePixel   = 0
-    card.Size              = UDim2.fromOffset(320, 0)
+    card.Size              = UDim2.fromOffset(400, 0)
     card.AutomaticSize     = Enum.AutomaticSize.Y
-    card.Position          = UDim2.new(0.5, -160, 0.5, 0)
+    card.Position          = UDim2.new(0.5, -200, 0.5, 0)
     card.AnchorPoint       = Vector2.new(0, 0.5)
     card.ZIndex            = 501
     card.Parent            = overlay
@@ -237,6 +237,8 @@ function KeySystem.show(opts, screenGui, onSuccess)
     keyInput.TextSize               = 14
     keyInput.TextColor3             = Theme:Text(0)
     keyInput.ClearTextOnFocus       = false
+    keyInput.TextTruncate           = Enum.TextTruncate.AtEnd
+    keyInput.ClipsDescendants       = true
     keyInput.ZIndex                 = 503
     keyInput.Parent                 = inputWrap
 
@@ -360,7 +362,7 @@ function KeySystem.show(opts, screenGui, onSuccess)
                 Tween.play(card, { Position = UDim2.new(0.5, -152, 0.5, 0) },
                     TweenInfo.new(0.05, Enum.EasingStyle.Linear))
                 task.delay(0.05, function()
-                    Tween.play(card, { Position = UDim2.new(0.5, -160, 0.5, 0) },
+                    Tween.play(card, { Position = UDim2.new(0.5, -200, 0.5, 0) },
                         TweenInfo.new(0.05, Enum.EasingStyle.Linear))
                 end)
             end)
@@ -384,10 +386,10 @@ function KeySystem.show(opts, screenGui, onSuccess)
     end)
 
     -- Animate in
-    card.Position = UDim2.new(0.5, -160, 0.5, 20)
+    card.Position = UDim2.new(0.5, -200, 0.5, 20)
     card.BackgroundTransparency = 1
     Tween.play(card, {
         BackgroundTransparency = 0,
-        Position = UDim2.new(0.5, -160, 0.5, 0),
+        Position = UDim2.new(0.5, -200, 0.5, 0),
     }, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out))
 end
