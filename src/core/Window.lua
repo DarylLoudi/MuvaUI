@@ -21,7 +21,7 @@ function Window.new(opts, screenGui, flags)
     win.BackgroundTransparency = 1
     win.BorderSizePixel  = 0
     win.Size     = UDim2.fromOffset(opts.Size and opts.Size.X or 680, opts.Size and opts.Size.Y or 480)
-    win.Position = UDim2.fromOffset(80, 80)
+    win.Position = UDim2.fromOffset(80, 44)
     win.ClipsDescendants = false
     win.Parent   = screenGui
     self._win    = win
