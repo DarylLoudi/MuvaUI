@@ -415,24 +415,26 @@ function Window.new(opts, screenGui, flags, tier)
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.BackgroundTransparency = 1
-    nameLabel.Size = UDim2.new(1, 0, 0, 17)
-    nameLabel.Text = "User"
-    nameLabel.Font = Enum.Font.GothamBold
-    nameLabel.TextSize   = 14
-    nameLabel.TextColor3 = Color.fromHex("#e0e0e0")
+    nameLabel.Size        = UDim2.new(1, 0, 0, 17)
+    nameLabel.Text        = "User"
+    nameLabel.Font        = Enum.Font.GothamBold
+    nameLabel.TextSize    = 14
+    nameLabel.TextColor3  = Color.fromHex("#e0e0e0")
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-    nameLabel.Parent = nameColumn
+    nameLabel.LayoutOrder = 1
+    nameLabel.Parent      = nameColumn
 
     -- Default "Player" text (tanpa badge)
     local roleLabel = Instance.new("TextLabel")
     roleLabel.BackgroundTransparency = 1
-    roleLabel.Size = UDim2.new(1, 0, 0, 14)
-    roleLabel.Text = "Player"
-    roleLabel.Font = Enum.Font.Gotham
-    roleLabel.TextSize   = 12
-    roleLabel.TextColor3 = Color.fromHex("#444444")
+    roleLabel.Size        = UDim2.new(1, 0, 0, 14)
+    roleLabel.Text        = "Player"
+    roleLabel.Font        = Enum.Font.Gotham
+    roleLabel.TextSize    = 12
+    roleLabel.TextColor3  = Color.fromHex("#444444")
     roleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    roleLabel.Parent = nameColumn
+    roleLabel.LayoutOrder = 2
+    roleLabel.Parent      = nameColumn
 
     -- Badge frame untuk tier (hidden by default) — border kotak di sekeliling text
     local tierBadge = Instance.new("Frame")
@@ -440,6 +442,7 @@ function Window.new(opts, screenGui, flags, tier)
     tierBadge.Size                   = UDim2.fromOffset(0, 14)
     tierBadge.AutomaticSize          = Enum.AutomaticSize.X
     tierBadge.Visible                = false
+    tierBadge.LayoutOrder            = 2
     tierBadge.Parent                 = nameColumn
 
     local tierBadgePad = Instance.new("UIPadding")
