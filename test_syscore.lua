@@ -10,7 +10,7 @@
     - Window akan muncul dengan tab Config otomatis dari ConfigSystem
 --]]
 
-local COMMIT = "37f463453605b64958ba0f34cba478db520f4beb"
+local COMMIT = "60bad5000d1bf1fe24cfc62702c5ce8f84041e65"
 local MuvaUI = loadstring(game:HttpGet(
     "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/" .. COMMIT .. "/MuvaUI.lua",
     true
