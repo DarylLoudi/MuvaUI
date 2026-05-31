@@ -5,7 +5,7 @@ Window.__index = Window
 local UserInputService = game:GetService("UserInputService")
 local Players          = game:GetService("Players")
 
-function Window.new(opts, screenGui, flags)
+function Window.new(opts, screenGui, flags, tier)
     local self = setmetatable({}, Window)
     self._flags = flags; self._tabs = {}; self._activeTab = nil; self._opts = opts
 
@@ -433,6 +433,32 @@ function Window.new(opts, screenGui, flags)
     roleLabel.TextXAlignment = Enum.TextXAlignment.Left
     roleLabel.Parent = nameColumn
 
+    local roleStroke = Instance.new("UIStroke")
+    roleStroke.Color     = Color3.new(1, 1, 1)
+    roleStroke.Thickness = 0
+    roleStroke.Parent    = roleLabel
+
+    local TIER_STYLES = {
+        Freemium = { text = "Freemium", color = Color.fromHex("#60a5fa"), glow = 1.5 },
+        Premium  = { text = "Premium",  color = Color.fromHex("#a855f7"), glow = 1.5 },
+    }
+
+    local function applyTierStyle(t)
+        local style = t and TIER_STYLES[t]
+        if style then
+            roleLabel.Text       = style.text
+            roleLabel.TextColor3 = style.color
+            roleStroke.Color     = style.color
+            roleStroke.Thickness = style.glow
+        else
+            roleLabel.Text       = "Player"
+            roleLabel.TextColor3 = Color.fromHex("#444444")
+            roleStroke.Thickness = 0
+        end
+    end
+
+    applyTierStyle(tier)
+
     task.spawn(function()
         local ok, player = pcall(function() return Players.LocalPlayer end)
         if not (ok and player) then return end
@@ -441,22 +467,16 @@ function Window.new(opts, screenGui, flags)
         nameLabel.Text   = player.Name:sub(1, 3) .. "***"
 
         local thumbUrl = ("rbxthumb://type=AvatarHeadShot&id=%d&w=48&h=48"):format(player.UserId)
-        print("[MuvaUI] Avatar URL:", thumbUrl)
         avatarImg.Image = thumbUrl
 
-        -- PreloadAsync blocks until image is ready (or fails), lalu langsung show
         local ContentProvider = game:GetService("ContentProvider")
-        local preloadOk, preloadErr = pcall(function()
+        pcall(function()
             ContentProvider:PreloadAsync({ avatarImg })
         end)
-        print("[MuvaUI] PreloadAsync ok:", preloadOk, preloadErr)
-        print("[MuvaUI] Image after preload:", avatarImg.Image)
-        print("[MuvaUI] ImageRectSize:", avatarImg.ImageRectSize)
 
         avatarLabel.Visible                = false
         avatarFrame.BackgroundTransparency = 1
         avatarImg.ImageTransparency        = 0
-        print("[MuvaUI] Avatar show done")
     end)
 
     Theme:OnAccentChanged(function(a)
