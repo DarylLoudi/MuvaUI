@@ -36,21 +36,21 @@ function Library:CreateWindow(opts)
 
     -- Key system — tampilkan sebelum window jika ada
     if opts.Key and KeySystem then
-        KeySystem.show(opts.Key, screenGui, function()
-            local win = self:_spawnWindow(opts, screenGui)
+        KeySystem.show(opts.Key, screenGui, function(tier)
+            local win = self:_spawnWindow(opts, screenGui, tier)
             if opts.OnReady and win then
                 pcall(opts.OnReady, win)
             end
         end)
-        return nil  -- window dibuat async, gunakan opts.OnReady
+        return nil
     else
-        return self:_spawnWindow(opts, screenGui)
+        return self:_spawnWindow(opts, screenGui, nil)
     end
 end
 
-function Library:_spawnWindow(opts, screenGui)
+function Library:_spawnWindow(opts, screenGui, tier)
     local function buildWindow()
-        local ok, result = pcall(function() return Window.new(opts, screenGui, self.Flags) end)
+        local ok, result = pcall(function() return Window.new(opts, screenGui, self.Flags, tier) end)
         if not ok then
             warn("[MuvaUI] Window.new failed: " .. tostring(result))
             return nil
