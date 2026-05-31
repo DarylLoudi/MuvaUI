@@ -100,25 +100,25 @@ function ConfigSystem.attach(win, config, flags)
             local infoLayout = Instance.new("UIListLayout")
             infoLayout.FillDirection     = Enum.FillDirection.Vertical
             infoLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-        infoLayout.Padding          = UDim.new(0, 2)
+        infoLayout.Padding          = UDim.new(0, Layout.GAP_INFO)
             infoLayout.Parent            = info
 
             local nameLbl = Instance.new("TextLabel")
             nameLbl.BackgroundTransparency = 1
-            nameLbl.Size                   = UDim2.new(1, 0, 0, 16)
+            nameLbl.Size                   = UDim2.new(1, 0, 0, Layout.TITLE_SIZE)
             nameLbl.Text                   = slot.Name or ("Config " .. i)
-            nameLbl.Font                   = Enum.Font.GothamMedium
-            nameLbl.TextSize               = 13
+            nameLbl.Font                   = Layout.FONT_TITLE
+            nameLbl.TextSize               = Layout.VALUE_SIZE
             nameLbl.TextColor3             = Theme:Text(1)
             nameLbl.TextXAlignment         = Enum.TextXAlignment.Left
             nameLbl.Parent                 = info
 
             local metaLbl = Instance.new("TextLabel")
             metaLbl.BackgroundTransparency = 1
-            metaLbl.Size                   = UDim2.new(1, 0, 0, 13)
+            metaLbl.Size                   = UDim2.new(1, 0, 0, Layout.DESC_SIZE)
             metaLbl.Text                   = "Last saved: " .. (slot.SavedAt or "never")
-            metaLbl.Font                   = Enum.Font.Gotham
-            metaLbl.TextSize               = 11
+            metaLbl.Font                   = Layout.FONT_BODY
+            metaLbl.TextSize               = Layout.DESC_SIZE
             metaLbl.TextColor3             = Theme:Text(4)
             metaLbl.TextXAlignment         = Enum.TextXAlignment.Left
             metaLbl.Parent                 = info
