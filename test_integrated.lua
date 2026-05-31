@@ -1,79 +1,70 @@
 --[[
-    MuvaUI — Integrated Template Test
-    Menggabungkan: KeySystem + LoadingScreen + ConfigSystem + semua komponen template
-
-    KEY VALID: MUVA-TEST-1234-5678
+    MuvaUI — Integrated Template
+    Flow lengkap: KeySystem → LoadingScreen → Window
 
     Flow:
-    1. KeySystem muncul → masukkan key
-    2. LoadingScreen muncul → progress bar steps
-    3. Window muncul dengan semua tab + tab Config otomatis dari ConfigSystem
---]]
+    1. KeySystem muncul → user masukkan key
+    2. LoadingScreen muncul → setiap step = operasi nyata yang user definisikan
+    3. Window muncul dengan semua tab
 
-local COMMIT = "15c18c3bc810f66069f70ef01687ae35dbf7926c"
-local MuvaUI = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/" .. COMMIT .. "/MuvaUI.lua",
-    true
-))()
+    ─────────────────────────────────────────────────────────────
+    CARA PAKAI LOADING SCREEN:
 
-print("[Integrated] MuvaUI loaded.")
+    Setiap step harus punya Run() yang berisi operasi nyata kamu.
+    Library tidak tahu modul apa yang kamu pakai — kamu yang mengisi.
 
--- ── System: Loading Screen ──────────────────────────────────────
--- Setiap step.Run() = operasi nyata (HTTP fetch, parse, dll)
--- Progress bar maju hanya setelah operasi selesai
--- Jika Run() error → step ditandai ✗, loading tetap lanjut (tidak crash)
-local BASE_URL = "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/"
-
-MuvaUI:SetLoadingScreen({
-    Title = "My Script",
-    Steps = {
-        {
-            Message = "Loading Main...",
-            Run = function()
-                -- Contoh: fetch modul utama dari remote
-                -- Ganti URL sesuai modul nyata kamu
-                return game:HttpGet(BASE_URL .. "MuvaUI.lua", true)
-            end,
-        },
+    Contoh pola yang benar:
         {
             Message = "Loading Teleport...",
             Run = function()
-                -- Fetch modul teleport
-                return game:HttpGet(BASE_URL .. "modules/Teleport.lua", true)
+                -- fetch dan jalankan modul kamu sendiri
+                local src = game:HttpGet("https://raw.githubusercontent.com/.../Teleport.lua", true)
+                loadstring(src)()
             end,
         },
-        {
-            Message = "Loading Settings...",
-            Run = function()
-                -- Fetch modul settings
-                return game:HttpGet(BASE_URL .. "modules/Settings.lua", true)
-            end,
-        },
-        {
-            -- Step tanpa Run = cosmetic (delay singkat, tidak fetch)
-            Message = "Ready!",
-        },
+
+    Jangan isi Run() dengan URL yang tidak exist.
+    Kalau tidak ada operasi nyata untuk step itu, hapus Run-nya
+    (step tanpa Run = cosmetic delay singkat saja).
+    ─────────────────────────────────────────────────────────────
+
+    KEY VALID: MUVA-TEST-1234-5678
+--]]
+
+local MuvaUI = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/main/MuvaUI.lua",
+    true
+))()
+
+-- ── Loading Screen ───────────────────────────────────────────────
+-- Dijalankan SETELAH key valid, SEBELUM window muncul.
+-- Setiap step.Run() = operasi nyata yang kamu definisikan sendiri.
+-- Library tidak tahu modul apa yang kamu pakai — kamu yang mengisi Run().
+--
+-- Contoh step dengan operasi nyata:
+--   {
+--       Message = "Loading Teleport...",
+--       Run = function()
+--           local src = game:HttpGet("https://raw.githubusercontent.com/YOU/REPO/main/Teleport.lua", true)
+--           loadstring(src)()
+--       end,
+--   },
+--
+-- Step tanpa Run = cosmetic delay singkat (tidak fetch apapun).
+-- Hapus step yang tidak punya operasi nyata — jangan biarkan Run() fetch URL yang tidak exist.
+MuvaUI:SetLoadingScreen({
+    Title = "My Script",
+    Steps = {
+        -- Ganti ini dengan fetch modul nyata kamu:
+        { Message = "Initializing..." },
+        { Message = "Building UI..."  },
+        { Message = "Ready!"          },
     },
-    OnResult = function(results)
-        -- results[i] = { ok=bool, value=string|nil, err=string|nil }
-        for i, r in ipairs(results) do
-            if r.ok then
-                print(("[LoadingScreen] Step %d ✓ (%d bytes)"):format(
-                    i, r.value and #r.value or 0))
-            else
-                warn(("[LoadingScreen] Step %d ✗ — %s"):format(i, r.err or "unknown error"))
-            end
-        end
-    end,
 })
 
--- ── System: Config System ───────────────────────────────────────
-MuvaUI:SetConfigSystem({
-    File  = "integrated_configs.json",
-    Slots = 5,
-})
-
--- ── Window + Key System ─────────────────────────────────────────
+-- ── Key System ───────────────────────────────────────────────────
+-- Tampil pertama sebelum loading screen dan window.
+-- Jika key sudah tersimpan di file → langsung skip ke loading screen.
 MuvaUI:CreateWindow({
     Title    = "My Script",
     SubTitle = "by MuvaUI",
@@ -81,7 +72,7 @@ MuvaUI:CreateWindow({
 
     Key = {
         Keys      = { "MUVA-TEST-1234-5678" },
-        SaveFile  = "integrated_key.json",
+        SaveFile  = "mykey.json",
         Title     = "My Script",
         GetKeyUrl = "https://github.com/DarylLoudi/MuvaUI",
         Discord   = "https://discord.gg/",
@@ -89,7 +80,8 @@ MuvaUI:CreateWindow({
     },
 
     OnReady = function(win)
-        print("[Integrated] Window ready. Building all tabs...")
+        -- Window sudah muncul, semua modul sudah ter-load
+        -- Bangun tab kamu di sini
 
         -- ════════════════════════════════════════════════════════
         -- TAB 1: INPUT
@@ -125,7 +117,6 @@ MuvaUI:CreateWindow({
 
         local secColor = tabInput:AddSection({ Title = "ColorPicker" })
         secColor:AddColorPicker({ ID="AccentColor", Title="Accent Color", Desc="Pick a color from presets", Default=Color3.fromRGB(168,85,247), Callback=function(c)
-            print("[ColorPicker] →", math.floor(c.R*255), math.floor(c.G*255), math.floor(c.B*255))
             MuvaUI:SetAccent(c)
         end })
 
@@ -145,11 +136,11 @@ MuvaUI:CreateWindow({
                 { Key="Status",   Value="Online", Badge="Green"  },
             },
         })
-        task.delay(3, function() infoObj:SetRow("Gold","12,999 G") print("[InfoDisplay] Gold updated") end)
+        task.delay(3, function() infoObj:SetRow("Gold","12,999 G") end)
 
         local secProgress = tabDisplay:AddSection({ Title = "ProgressBar" })
         local progressObj = secProgress:AddProgressBar({ Title="XP Progress", Min=0, Max=100, Value=35 })
-        task.delay(2, function() progressObj:SetValue(72) print("[ProgressBar] Updated: 72%") end)
+        task.delay(2, function() progressObj:SetValue(72) end)
 
         local secBadge = tabDisplay:AddSection({ Title = "Badge" })
         secBadge:AddBadge({ Title="Server Rank",   Color="Purple", Value="VIP"      })
@@ -181,15 +172,12 @@ MuvaUI:CreateWindow({
         local secHStack = tabLayout:AddSection({ Title = "Actions" })
         local hstack = secHStack:AddHStack({})
         hstack:AddButton({ Title="Execute", Style="Default", Width=85, Callback=function()
-            print("[HStack] Execute")
             MuvaUI:Notify({Title="Executed", Body="Script running", Type="success", Duration=3})
         end })
         hstack:AddButton({ Title="Pause", Style="Warn", Width=85, Callback=function()
-            print("[HStack] Pause")
             MuvaUI:Notify({Title="Paused", Body="Script paused", Type="warn", Duration=2})
         end })
         hstack:AddButton({ Title="Stop", Style="Danger", Width=85, Callback=function()
-            print("[HStack] Stop")
             MuvaUI:Notify({Title="Stopped", Body="Scripts stopped", Type="error", Duration=3})
         end })
 
@@ -201,7 +189,6 @@ MuvaUI:CreateWindow({
         local secButtons = tabLayout:AddSection({ Title = "Button Styles" })
         for _, style in ipairs({"Default","Danger","Success","Warn","Ghost"}) do
             secButtons:AddButton({ Title=style, Style=style, Callback=function()
-                print("[Button]", style)
                 MuvaUI:Notify({Title=style.." Button", Body="Callback fired", Type="info", Duration=2})
             end })
         end
@@ -214,62 +201,43 @@ MuvaUI:CreateWindow({
         local secToast = tabOverlay:AddSection({ Title = "Toast" })
         for _, t in ipairs({"success","error","warn","info"}) do
             secToast:AddButton({ Title="Toast: "..t, Style="Default", Callback=function()
-                print("[Toast]", t)
                 MuvaUI:Notify({Title=t:sub(1,1):upper()..t:sub(2), Body="This is a "..t.." notification", Type=t, Duration=3})
             end })
         end
 
         local secDialog = tabOverlay:AddSection({ Title = "Dialog" })
         secDialog:AddButton({ Title="Open Dialog", Style="Default", Callback=function()
-            print("[Dialog] Opening")
             win:Dialog({
                 Title="Confirm Action", Body="Are you sure you want to stop all scripts?",
                 Buttons={
                     { Text="Confirm", Style="Danger", Callback=function()
-                        print("[Dialog] Confirmed")
                         MuvaUI:Notify({Title="Confirmed", Body="Action executed", Type="success", Duration=2})
                     end },
-                    { Text="Cancel", Style="Ghost", Callback=function() print("[Dialog] Cancelled") end },
+                    { Text="Cancel", Style="Ghost", Callback=function() end },
                 },
             })
         end })
 
         local secPopup = tabOverlay:AddSection({ Title = "Popup" })
         secPopup:AddButton({ Title="Success Popup", Style="Success", Callback=function()
-            print("[Popup] Success")
             win:Popup({ Style="Success", Title="Action Complete", Body="Your script ran successfully.",
-                Buttons={{ Text="OK", Callback=function() print("[Popup] OK") end }} })
+                Buttons={{ Text="OK", Callback=function() end }} })
         end })
         secPopup:AddButton({ Title="Warn Popup", Style="Warn", Callback=function()
-            print("[Popup] Warn")
             win:Popup({ Style="Warn", Title="Warning", Body="This action may be risky.", Buttons={
-                { Text="Continue", Callback=function() print("[Popup] Continue") end },
-                { Text="Cancel",   Callback=function() print("[Popup] Cancel")   end },
+                { Text="Continue", Callback=function() end },
+                { Text="Cancel",   Callback=function() end },
             }})
         end })
 
         -- ════════════════════════════════════════════════════════
-        -- TAB 5: WEBHOOK
-        -- ════════════════════════════════════════════════════════
-        local tabWebhook = win:AddTab({ Title = "Webhook" })
-        tabWebhook:AddSection({ Title = "Discord Integration" }):AddWebhook({
-            ID="DiscordWH", Title="Discord Webhook",
-            Placeholder="https://discord.com/api/webhooks/...",
-            Callback=function(url, valid)
-                print("[Webhook] URL:", url, "| Valid:", valid)
-                if valid then MuvaUI:Notify({Title="Webhook Saved", Body="Connection configured", Type="success", Duration=2}) end
-            end,
-        })
-
-        -- ════════════════════════════════════════════════════════
-        -- TAB 6: SETTINGS
+        -- TAB 5: SETTINGS
         -- ════════════════════════════════════════════════════════
         local tabSettings = win:AddTab({ Title = "Settings" })
 
         local secApp = tabSettings:AddSection({ Title = "Appearance" })
         secApp:AddColorPicker({ ID="ThemeAccent", Title="Accent Color", Desc="Changes UI accent globally",
             Default=Color3.fromRGB(168,85,247), Callback=function(c)
-                print("[Settings] Accent →", math.floor(c.R*255), math.floor(c.G*255), math.floor(c.B*255))
                 MuvaUI:SetAccent(c)
             end })
         secApp:AddSlider({ ID="UIOpacity", Title="UI Opacity", Min=50, Max=100, Step=5, Default=100, Suffix="%",
@@ -284,19 +252,11 @@ MuvaUI:CreateWindow({
             Options={"English","Indonesian","Spanish","Portuguese"}, Default="English",
             Callback=function(v) print("[Settings] Language →", v) end })
 
-        -- Tab Config otomatis ditambah oleh ConfigSystem di atas
-        print("[Integrated] ✓ Semua tab built.")
-        print("[Integrated] ✓ KeySystem — OK")
-        print("[Integrated] ✓ LoadingScreen — OK")
-        print("[Integrated] ✓ ConfigSystem — cek tab Config")
-
         MuvaUI:Notify({
-            Title    = "Integrated Test Ready",
-            Body     = "Semua sistem + komponen aktif",
+            Title    = "Ready",
+            Body     = "Semua sistem aktif",
             Type     = "success",
-            Duration = 4,
+            Duration = 3,
         })
     end,
 })
-
-print("[Integrated] Menunggu key... (MUVA-TEST-1234-5678)")
