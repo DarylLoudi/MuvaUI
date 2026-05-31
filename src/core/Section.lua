@@ -19,7 +19,7 @@ function Section.new(opts, parentFrame, flags)
     local layout = Instance.new("UIListLayout")
     layout.FillDirection  = Enum.FillDirection.Vertical
     layout.SortOrder      = Enum.SortOrder.LayoutOrder
-    layout.Padding        = UDim.new(0, 4)
+    layout.Padding        = UDim.new(0, Layout.GAP_CARD)
     layout.Parent         = self._frame
 
     -- Section separator header
@@ -90,12 +90,12 @@ function Section:_makeCard(layoutOrder)
     card.Name                   = "Card"
     card.BackgroundColor3       = Theme:BG(2)
     card.BorderSizePixel        = 0
-    card.Size                   = UDim2.new(1, 0, 0, 40)
+    card.Size                   = UDim2.new(1, 0, 0, Layout.CARD_H)
     card.LayoutOrder            = layoutOrder or #self._components + 10
     card.Parent                 = self._frame
 
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 7)
+    corner.CornerRadius = UDim.new(0, Layout.CARD_RADIUS)
     corner.Parent       = card
 
     local stroke = Instance.new("UIStroke")
@@ -105,13 +105,56 @@ function Section:_makeCard(layoutOrder)
     stroke.Parent           = card
 
     local pad = Instance.new("UIPadding")
-    pad.PaddingLeft   = UDim.new(0, 12)
-    pad.PaddingRight  = UDim.new(0, 12)
-    pad.PaddingTop    = UDim.new(0, 8)
-    pad.PaddingBottom = UDim.new(0, 8)
+    pad.PaddingLeft   = UDim.new(0, Layout.PAD_X)
+    pad.PaddingRight  = UDim.new(0, Layout.PAD_X)
+    pad.PaddingTop    = UDim.new(0, Layout.PAD_Y)
+    pad.PaddingBottom = UDim.new(0, Layout.PAD_Y)
     pad.Parent        = card
 
     return card, stroke
+end
+
+-- Helper: frame info vertikal (title + desc opsional) dengan token standar
+-- reserveRight: lebar yang dikurangi dari info.Size (default Layout.TOGGLE_RES)
+-- returns: info, titleLbl, descLbl (descLbl nil jika tidak ada desc)
+function Section:_makeInfoBlock(parent, titleText, descText, reserveRight)
+    local reserve = reserveRight or Layout.TOGGLE_RES
+
+    local info = Instance.new("Frame")
+    info.BackgroundTransparency = 1
+    info.Size                   = UDim2.new(1, -reserve, 1, 0)
+    info.Parent                 = parent
+
+    local infoL = Instance.new("UIListLayout")
+    infoL.FillDirection     = Enum.FillDirection.Vertical
+    infoL.VerticalAlignment = Enum.VerticalAlignment.Center
+    infoL.Padding           = UDim.new(0, Layout.GAP_INFO)
+    infoL.Parent            = info
+
+    local titleLbl = Instance.new("TextLabel")
+    titleLbl.BackgroundTransparency = 1
+    titleLbl.Size                   = UDim2.new(1, 0, 0, Layout.TITLE_SIZE)
+    titleLbl.Text                   = titleText or ""
+    titleLbl.Font                   = Layout.FONT_TITLE
+    titleLbl.TextSize               = Layout.TITLE_SIZE
+    titleLbl.TextColor3             = Theme:Text(1)
+    titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
+    titleLbl.Parent                 = info
+
+    local descLbl = nil
+    if descText then
+        descLbl = Instance.new("TextLabel")
+        descLbl.BackgroundTransparency = 1
+        descLbl.Size                   = UDim2.new(1, 0, 0, Layout.DESC_SIZE)
+        descLbl.Text                   = descText
+        descLbl.Font                   = Layout.FONT_BODY
+        descLbl.TextSize               = Layout.DESC_SIZE
+        descLbl.TextColor3             = Theme:Text(3)
+        descLbl.TextXAlignment         = Enum.TextXAlignment.Left
+        descLbl.Parent                 = info
+    end
+
+    return info, titleLbl, descLbl
 end
 
 -- ── COMPONENT REGISTRATION ──────────────────────────────────
