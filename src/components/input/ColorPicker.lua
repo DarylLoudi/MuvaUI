@@ -350,7 +350,8 @@ Section.AddColorPicker = function(self, opts)
     local function isCardVisible()
         local p = card.Parent
         while p do
-            if not p.Visible then return false end
+            local ok, visible = pcall(function() return p.Visible end)
+            if ok and visible == false then return false end
             p = p.Parent
         end
         return true
