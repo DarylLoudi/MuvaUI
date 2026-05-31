@@ -71,12 +71,26 @@ MuvaUI:CreateWindow({
     Version  = "v1.0.0",
 
     Key = {
-        Keys      = { "MUVA-TEST-1234-5678" },
+        Keys      = { "MUVA-TEST-FREE-0001", "MUVA-TEST-PREM-0001" },
         SaveFile  = "mykey.json",
         Title     = "My Script",
         GetKeyUrl = "https://github.com/DarylLoudi/MuvaUI",
         Discord   = "https://discord.gg/",
         Support   = "https://discord.gg/",
+
+        -- OnValidated dipanggil setelah key lolos validasi Keys list.
+        -- Gunakan ini untuk fetch tier dari server kamu.
+        -- Return string tier: "Freemium", "Premium", atau nil (default "Player").
+        OnValidated = function(key)
+            -- Di script nyata, ganti dengan HttpGet ke server kamu:
+            --   local res = game:HttpGet("https://yourserver.com/tier?key=" .. key, true)
+            --   return game:GetService("HttpService"):JSONDecode(res).tier
+            if key:find("PREM") then
+                return "Premium"
+            else
+                return "Freemium"
+            end
+        end,
     },
 
     OnReady = function(win)
