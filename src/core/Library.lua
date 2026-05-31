@@ -26,7 +26,7 @@ function Library:CreateWindow(opts)
     screenGui.Name                  = "MuvaUI_" .. (opts.Title or "Window")
     screenGui.ResetOnSpawn          = false
     screenGui.ZIndexBehavior        = Enum.ZIndexBehavior.Sibling
-    screenGui.DisplayOrder          = 999
+    screenGui.DisplayOrder          = 7
     screenGui.IgnoreGuiInset        = true
 
     -- Executor environment: parent ke CoreGui

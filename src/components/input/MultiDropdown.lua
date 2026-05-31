@@ -96,7 +96,7 @@ Section.AddMultiDropdown = function(self, opts)
         sg.Name           = "MuvaUI_Dropdown"
         sg.ResetOnSpawn   = false
         sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        sg.DisplayOrder   = 1100
+        sg.DisplayOrder   = 9
         sg.IgnoreGuiInset = false
         pcall(function() sg.Parent = CoreGui end)
         return sg
