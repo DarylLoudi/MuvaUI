@@ -415,6 +415,7 @@ function Window.new(opts, screenGui, flags, tier)
     nameColumnLayout.Parent = nameColumn
 
     local nameLabel = Instance.new("TextLabel")
+    nameLabel.Name                   = "NameLabel"
     nameLabel.BackgroundTransparency = 1
     nameLabel.Size        = UDim2.new(1, 0, 0, 17)
     nameLabel.Text        = "User"
@@ -427,6 +428,7 @@ function Window.new(opts, screenGui, flags, tier)
 
     -- Default "Player" text (tanpa badge)
     local roleLabel = Instance.new("TextLabel")
+    roleLabel.Name                   = "RoleLabel"
     roleLabel.BackgroundTransparency = 1
     roleLabel.Size        = UDim2.new(1, 0, 0, 14)
     roleLabel.Text        = "Player"
@@ -439,11 +441,12 @@ function Window.new(opts, screenGui, flags, tier)
 
     -- Badge frame untuk tier (hidden by default) — border kotak di sekeliling text
     local tierBadge = Instance.new("Frame")
+    tierBadge.Name                   = "TierBadge"
     tierBadge.BackgroundTransparency = 1
     tierBadge.Size                   = UDim2.fromOffset(0, 14)
     tierBadge.AutomaticSize          = Enum.AutomaticSize.X
     tierBadge.Visible                = false
-    tierBadge.LayoutOrder            = 2
+    tierBadge.LayoutOrder            = 3
     tierBadge.Parent                 = nameColumn
 
     local tierBadgePad = Instance.new("UIPadding")
