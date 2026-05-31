@@ -380,14 +380,28 @@ function Window.new(opts, screenGui, flags)
     avatarCorner.CornerRadius = UDim.new(1, 0)
     avatarCorner.Parent = avatarFrame
 
+    -- ImageLabel untuk avatar headshot — load via rbxthumb://
+    local avatarImg = Instance.new("ImageLabel")
+    avatarImg.BackgroundTransparency = 1
+    avatarImg.Size                   = UDim2.new(1, 0, 1, 0)
+    avatarImg.Image                  = ""
+    avatarImg.ScaleType              = Enum.ScaleType.Crop
+    avatarImg.ImageTransparency      = 1
+    avatarImg.Parent                 = avatarFrame
+
+    local avatarImgCorner = Instance.new("UICorner")
+    avatarImgCorner.CornerRadius = UDim.new(1, 0)
+    avatarImgCorner.Parent       = avatarImg
+
+    -- Fallback: initial huruf (tampil saat avatar belum/gagal load)
     local avatarLabel = Instance.new("TextLabel")
     avatarLabel.BackgroundTransparency = 1
-    avatarLabel.Size = UDim2.new(1, 0, 1, 0)
-    avatarLabel.Text = "?"
-    avatarLabel.Font = Enum.Font.GothamBold
+    avatarLabel.Size       = UDim2.new(1, 0, 1, 0)
+    avatarLabel.Text       = "?"
+    avatarLabel.Font       = Enum.Font.GothamBold
     avatarLabel.TextSize   = 14
     avatarLabel.TextColor3 = Color3.new(1, 1, 1)
-    avatarLabel.Parent = avatarFrame
+    avatarLabel.Parent     = avatarFrame
 
     local nameColumn = Instance.new("Frame")
     nameColumn.BackgroundTransparency = 1
@@ -421,10 +435,33 @@ function Window.new(opts, screenGui, flags)
 
     task.spawn(function()
         local ok, player = pcall(function() return Players.LocalPlayer end)
-        if ok and player then
-            avatarLabel.Text = player.Name:sub(1, 1):upper()
-            nameLabel.Text   = player.Name:sub(1, 3) .. "***"
-        end
+        if not (ok and player) then return end
+
+        avatarLabel.Text = player.Name:sub(1, 1):upper()
+        nameLabel.Text   = player.Name:sub(1, 3) .. "***"
+
+        -- Load avatar headshot via rbxthumb URI
+        local thumbUrl = ("rbxthumb://type=AvatarHeadShot&id=%d&w=48&h=48"):format(player.UserId)
+        avatarImg.Image = thumbUrl
+
+        -- Tunggu sampai image berhasil load, lalu fade in dan sembunyikan fallback
+        local loaded = false
+        avatarImg:GetPropertyChangedSignal("ImageRectSize"):Connect(function()
+            if not loaded and avatarImg.ImageRectSize ~= Vector2.zero then
+                loaded = true
+                avatarLabel.Visible = false
+                avatarFrame.BackgroundTransparency = 1
+                Tween.play(avatarImg, { ImageTransparency = 0 },
+                    TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out))
+            end
+        end)
+
+        -- Fallback timeout: jika 5 detik tidak load, tetap tampilkan initial
+        task.delay(5, function()
+            if not loaded then
+                avatarImg.Image = ""
+            end
+        end)
     end)
 
     Theme:OnAccentChanged(function(a)
