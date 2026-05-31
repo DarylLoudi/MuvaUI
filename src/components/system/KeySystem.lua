@@ -24,7 +24,12 @@ function KeySystem.show(opts, screenGui, onSuccess)
 
     local saved = readSavedKey(saveFile)
     if saved and validKeys[saved:upper()] then
-        onSuccess()
+        local tier = nil
+        if opts.OnValidated then
+            local ok, result = pcall(opts.OnValidated, saved:upper())
+            if ok then tier = result end
+        end
+        onSuccess(tier)
         return
     end
 
@@ -275,7 +280,12 @@ function KeySystem.show(opts, screenGui, onSuccess)
                 }, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out))
                 task.delay(0.3, function()
                     pcall(function() card:Destroy() end)
-                    onSuccess()
+                    local tier = nil
+                    if opts.OnValidated then
+                        local ok, result = pcall(opts.OnValidated, key)
+                        if ok then tier = result end
+                    end
+                    onSuccess(tier)
                 end)
             end)
         else
