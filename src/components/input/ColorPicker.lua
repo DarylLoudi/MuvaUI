@@ -1,10 +1,9 @@
--- ColorPicker: HSV picker dengan hue bar, hex input, dan preset swatches
-local UserInputService = game:GetService("UserInputService")
-
+-- ColorPicker: preset swatch palette (tanpa slider/hue bar)
 local PRESETS = {
-    "#A855F7","#8B5CF6","#6366F1","#3B82F6","#06B6D4",
-    "#22C55E","#EAB308","#F97316","#EF4444","#EC4899",
-    "#F43F5E","#14B8A6","#FFFFFF","#A1A1AA","#52525B","#27272A",
+    "#A855F7","#8B5CF6","#6366F1","#3B82F6","#06B6D4","#22C55E",
+    "#EAB308","#F97316","#EF4444","#EC4899","#F43F5E","#14B8A6",
+    "#FFFFFF","#D4D4D8","#A1A1AA","#71717A","#52525B","#27272A",
+    "#FDE68A","#BBF7D0","#BAE6FD","#E9D5FF","#FECACA","#FED7AA",
 }
 
 Section.AddColorPicker = function(self, opts)
@@ -43,23 +42,12 @@ Section.AddColorPicker = function(self, opts)
     pvStroke.Thickness = 2
     pvStroke.Parent    = previewBtn
 
-    -- Helper: get ScreenGui
-    local function getScreenGui(inst)
-        local p = inst
-        while p do
-            if p:IsA("ScreenGui") then return p end
-            p = p.Parent
-        end
-        return nil
-    end
-
-    -- Palette popup
+    -- Palette popup — hanya preset grid
     local palette = Instance.new("Frame")
     palette.BackgroundColor3 = Theme:BG(3)
     palette.BorderSizePixel  = 0
-    palette.Size             = UDim2.fromOffset(220, 0)
+    palette.Size             = UDim2.fromOffset(188, 0)
     palette.AutomaticSize    = Enum.AutomaticSize.Y
-    palette.Position         = UDim2.fromOffset(0, 0)
     palette.Visible          = false
     palette.ZIndex           = 999
     palette.Parent           = card
@@ -80,214 +68,76 @@ Section.AddColorPicker = function(self, opts)
     palPad.PaddingBottom = UDim.new(0, 10)
     palPad.Parent        = palette
 
-    local palCol = Instance.new("UIListLayout")
-    palCol.FillDirection = Enum.FillDirection.Vertical
-    palCol.Padding       = UDim.new(0, 8)
-    palCol.Parent        = palette
+    -- Grid swatches
+    local grid = Instance.new("Frame")
+    grid.BackgroundTransparency = 1
+    grid.Size                   = UDim2.new(1, 0, 0, 0)
+    grid.AutomaticSize          = Enum.AutomaticSize.Y
+    grid.Parent                 = palette
 
-    -- ── HUE BAR ─────────────────────────────────────────────
-    local hueBar = Instance.new("Frame")
-    hueBar.BackgroundColor3 = Color3.new(1, 0, 0)
-    hueBar.BorderSizePixel  = 0
-    hueBar.Size             = UDim2.new(1, 0, 0, 12)
-    hueBar.ZIndex           = 61
-    hueBar.Parent           = palette
+    local gridLayout = Instance.new("UIGridLayout")
+    gridLayout.CellSize    = UDim2.fromOffset(26, 26)
+    gridLayout.CellPadding = UDim2.fromOffset(5, 5)
+    gridLayout.Parent      = grid
 
-    -- Gradient across hue
-    local hueGrad = Instance.new("UIGradient")
-    hueGrad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0,   Color3.fromHSV(0,   1, 1)),
-        ColorSequenceKeypoint.new(0.17, Color3.fromHSV(0.17,1, 1)),
-        ColorSequenceKeypoint.new(0.33, Color3.fromHSV(0.33,1, 1)),
-        ColorSequenceKeypoint.new(0.5,  Color3.fromHSV(0.5, 1, 1)),
-        ColorSequenceKeypoint.new(0.67, Color3.fromHSV(0.67,1, 1)),
-        ColorSequenceKeypoint.new(0.83, Color3.fromHSV(0.83,1, 1)),
-        ColorSequenceKeypoint.new(1,   Color3.fromHSV(0,   1, 1)),
-    })
-    hueGrad.Rotation = 90
-    hueGrad.Parent   = hueBar
+    local value = default
+    local selectedStroke = nil  -- track swatch terpilih
 
-    local hueCorner = Instance.new("UICorner")
-    hueCorner.CornerRadius = UDim.new(1, 0)
-    hueCorner.Parent       = hueBar
-
-    local hueThumb = Instance.new("Frame")
-    hueThumb.BackgroundColor3 = Color3.new(1, 1, 1)
-    hueThumb.BorderSizePixel  = 0
-    hueThumb.Size             = UDim2.fromOffset(12, 12)
-    hueThumb.Position         = UDim2.new(0, 0, 0, 0)
-    hueThumb.ZIndex           = 62
-    hueThumb.Parent           = hueBar
-
-    local htCorner = Instance.new("UICorner")
-    htCorner.CornerRadius = UDim.new(1, 0)
-    htCorner.Parent       = hueThumb
-
-    -- ── HEX INPUT + APPLY ───────────────────────────────────
-    local hexRow = Instance.new("Frame")
-    hexRow.BackgroundTransparency = 1
-    hexRow.Size                   = UDim2.new(1, 0, 0, 26)
-    hexRow.ZIndex                 = 61
-    hexRow.Parent                 = palette
-
-    local hexRowL = Instance.new("UIListLayout")
-    hexRowL.FillDirection     = Enum.FillDirection.Horizontal
-    hexRowL.VerticalAlignment = Enum.VerticalAlignment.Center
-    hexRowL.Padding           = UDim.new(0, 6)
-    hexRowL.Parent            = hexRow
-
-    local hexBox = Instance.new("TextBox")
-    hexBox.BackgroundColor3  = Theme:BG(1)
-    hexBox.BorderSizePixel   = 0
-    hexBox.Size              = UDim2.new(1, -60, 1, 0)
-    hexBox.Text              = Color.toHex(default)
-    hexBox.PlaceholderText   = "#RRGGBB"
-    hexBox.Font              = Enum.Font.Code
-    hexBox.TextSize          = 11
-    hexBox.TextColor3        = Theme:Text(0)
-    hexBox.ClearTextOnFocus  = false
-    hexBox.ZIndex            = 62
-    hexBox.Parent            = hexRow
-
-    local hexCorner = Instance.new("UICorner")
-    hexCorner.CornerRadius = UDim.new(0, 5)
-    hexCorner.Parent       = hexBox
-
-    local hexStroke = Instance.new("UIStroke")
-    hexStroke.Color     = Theme:Border(1)
-    hexStroke.Thickness = 1
-    hexStroke.Parent    = hexBox
-
-    local hexPad = Instance.new("UIPadding")
-    hexPad.PaddingLeft  = UDim.new(0, 7)
-    hexPad.PaddingRight = UDim.new(0, 7)
-    hexPad.Parent       = hexBox
-
-    local applyBtn = Instance.new("TextButton")
-    applyBtn.BackgroundColor3 = Theme:Accent()
-    applyBtn.BorderSizePixel  = 0
-    applyBtn.Size             = UDim2.fromOffset(52, 26)
-    applyBtn.Text             = "Apply"
-    applyBtn.Font             = Enum.Font.GothamBold
-    applyBtn.TextSize         = 10
-    applyBtn.TextColor3       = Color3.new(1, 1, 1)
-    applyBtn.AutoButtonColor  = false
-    applyBtn.ZIndex           = 62
-    applyBtn.Parent           = hexRow
-
-    local applyCorner = Instance.new("UICorner")
-    applyCorner.CornerRadius = UDim.new(0, 5)
-    applyCorner.Parent       = applyBtn
-
-    -- ── PRESETS GRID ────────────────────────────────────────
-    local presetsGrid = Instance.new("Frame")
-    presetsGrid.BackgroundTransparency = 1
-    presetsGrid.Size                   = UDim2.new(1, 0, 0, 0)
-    presetsGrid.AutomaticSize          = Enum.AutomaticSize.Y
-    presetsGrid.ZIndex                 = 61
-    presetsGrid.Parent                 = palette
-
-    local presetsLayout = Instance.new("UIGridLayout")
-    presetsLayout.CellSize    = UDim2.fromOffset(22, 22)
-    presetsLayout.CellPadding = UDim2.fromOffset(4, 4)
-    presetsLayout.Parent      = presetsGrid
+    local function selectColor(c, hex, swStroke)
+        value = c
+        previewBtn.BackgroundColor3 = c
+        -- reset stroke swatch sebelumnya
+        if selectedStroke then
+            selectedStroke.Thickness = 0
+        end
+        selectedStroke = swStroke
+        if selectedStroke then
+            selectedStroke.Color     = Color3.new(1, 1, 1)
+            selectedStroke.Thickness = 2
+        end
+        if flag then flag:_fire(c) end
+        if opts.Callback then pcall(opts.Callback, c) end
+    end
 
     for _, hex in ipairs(PRESETS) do
         local sw = Instance.new("TextButton")
         sw.BackgroundColor3 = Color.fromHex(hex)
         sw.BorderSizePixel  = 0
-        sw.Size             = UDim2.fromOffset(22, 22)
+        sw.Size             = UDim2.fromOffset(26, 26)
         sw.Text             = ""
         sw.AutoButtonColor  = false
         sw.ZIndex           = 62
-        sw.Parent           = presetsGrid
+        sw.Parent           = grid
 
         local swCorner = Instance.new("UICorner")
-        swCorner.CornerRadius = UDim.new(0, 4)
+        swCorner.CornerRadius = UDim.new(0, 5)
         swCorner.Parent       = sw
 
+        local swStroke = Instance.new("UIStroke")
+        swStroke.Thickness = 0
+        swStroke.Parent    = sw
+
+        -- Mark default sebagai terpilih
+        if Color.toHex(default):lower() == hex:lower() then
+            selectedStroke           = swStroke
+            swStroke.Color           = Color3.new(1, 1, 1)
+            swStroke.Thickness       = 2
+        end
+
         sw.MouseButton1Click:Connect(function()
-            hexBox.Text = hex
-            local c = Color.fromHex(hex)
-            previewBtn.BackgroundColor3 = c
-            if flag then flag:_fire(c) end
-            if opts.Callback then pcall(opts.Callback, c) end
+            selectColor(Color.fromHex(hex), hex, swStroke)
         end)
 
         sw.MouseEnter:Connect(function()
-            Tween.fast(sw, { Size = UDim2.fromOffset(24, 24) })
+            Tween.fast(sw, { Size = UDim2.fromOffset(28, 28) })
         end)
         sw.MouseLeave:Connect(function()
-            Tween.fast(sw, { Size = UDim2.fromOffset(22, 22) })
+            Tween.fast(sw, { Size = UDim2.fromOffset(26, 26) })
         end)
     end
 
-    -- ── STATE ───────────────────────────────────────────────
-    local value    = default
-    local hue      = 0
-    local dragging = false
-
-    -- Update hue from color
-    hue = Color3.toHSV(default)
-
-    local function updateHueThumb(h)
-        hueThumb.Position = UDim2.new(h, -6, 0, 0)
-    end
-    updateHueThumb(hue)
-
-    local function applyHex(hex)
-        hex = hex:gsub("#", "")
-        if #hex ~= 6 then return end
-        local ok, c = pcall(Color.fromHex, "#" .. hex)
-        if not ok then return end
-        value = c
-        previewBtn.BackgroundColor3 = c
-        hue = Color3.toHSV(c)
-        updateHueThumb(hue)
-        if flag then flag:_fire(c) end
-        if opts.Callback then pcall(opts.Callback, c) end
-    end
-
-    applyBtn.MouseButton1Click:Connect(function()
-        applyHex(hexBox.Text)
-        palette.Visible = false
-    end)
-
-    hexBox.FocusLost:Connect(function(enter)
-        if enter then applyHex(hexBox.Text) end
-    end)
-
-    -- Hue bar drag
-    local hueDragging = false
-
-    hueBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            hueDragging = true
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if hueDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local abs  = hueBar.AbsolutePosition.X
-            local size = hueBar.AbsoluteSize.X
-            hue = math.clamp((input.Position.X - abs) / size, 0, 1)
-            updateHueThumb(hue)
-            value = Color3.fromHSV(hue, 1, 1)
-            previewBtn.BackgroundColor3 = value
-            hexBox.Text = Color.toHex(value)
-        end
-    end)
-
-    UserInputService.InputEnded:Connect(function(input)
-        if hueDragging and input.UserInputType == Enum.UserInputType.MouseButton1 then
-            hueDragging = false
-            if flag then flag:_fire(value) end
-            if opts.Callback then pcall(opts.Callback, value) end
-        end
-    end)
-
-    -- Toggle palette open/close
-    local open = false
+    -- Open / close palette
+    local open   = false
     local _palSG = nil
 
     local function closePalette()
@@ -323,7 +173,6 @@ Section.AddColorPicker = function(self, opts)
         pcall(function() sg.Parent = CoreGui end)
         _palSG = sg
 
-        -- Blocker full-screen untuk close on outside click
         local blocker = Instance.new("TextButton")
         blocker.BackgroundTransparency = 1
         blocker.BorderSizePixel        = 0
@@ -336,7 +185,7 @@ Section.AddColorPicker = function(self, opts)
 
         palette.Parent = sg
 
-        local palW    = 220
+        local palW    = 188
         local screenW = workspace.CurrentCamera.ViewportSize.X
         local posX    = absPos.X - palW - 6
         if posX < 0 then posX = absPos.X + absSize.X + 6 end
@@ -346,7 +195,7 @@ Section.AddColorPicker = function(self, opts)
         palette.Visible  = true
     end
 
-    -- Auto-close saat tab berganti — cek parent ScrollingFrame visibility
+    -- Auto-close saat tab berganti
     local function isCardVisible()
         local p = card.Parent
         while p do
@@ -358,9 +207,7 @@ Section.AddColorPicker = function(self, opts)
     end
 
     game:GetService("RunService").Heartbeat:Connect(function()
-        if open and not isCardVisible() then
-            closePalette()
-        end
+        if open and not isCardVisible() then closePalette() end
     end)
 
     previewBtn.MouseButton1Click:Connect(function()
@@ -385,15 +232,10 @@ Section.AddColorPicker = function(self, opts)
         stroke.Color = Theme:Border(0)
     end)
 
-    Theme:OnAccentChanged(function(accent)
-        applyBtn.BackgroundColor3 = accent
-    end)
-
     if flag then
         flag:OnChanged(function(v)
             value = v
             previewBtn.BackgroundColor3 = v
-            hexBox.Text = Color.toHex(v)
         end)
     end
 
