@@ -56,36 +56,8 @@ Section.AddButton = function(self, opts)
 
     -- Info (optional desc)
     if opts.Desc then
-        local info = Instance.new("Frame")
-        info.BackgroundTransparency = 1
-        info.Size                   = UDim2.new(1, -90, 1, 0)
-        info.Parent                 = card
-
-        local infoL = Instance.new("UIListLayout")
-        infoL.FillDirection     = Enum.FillDirection.Vertical
-        infoL.VerticalAlignment = Enum.VerticalAlignment.Center
-    infoL.Padding           = UDim.new(0, 2)
-        infoL.Parent            = info
-
-        local titleLbl = Instance.new("TextLabel")
-        titleLbl.BackgroundTransparency = 1
-        titleLbl.Size                   = UDim2.new(1, 0, 0, 14)
-        titleLbl.Text                   = opts.Title or ""
-        titleLbl.Font                   = Enum.Font.GothamMedium
-        titleLbl.TextSize               = 14
-        titleLbl.TextColor3             = Theme:Text(1)
-        titleLbl.TextXAlignment         = Enum.TextXAlignment.Left
-        titleLbl.Parent                 = info
-
-        local descLbl = Instance.new("TextLabel")
-        descLbl.BackgroundTransparency = 1
-        descLbl.Size                   = UDim2.new(1, 0, 0, 12)
-        descLbl.Text                   = opts.Desc
-        descLbl.Font                   = Enum.Font.Gotham
-        descLbl.TextSize               = 12
-        descLbl.TextColor3             = Theme:Text(3)
-        descLbl.TextXAlignment         = Enum.TextXAlignment.Left
-        descLbl.Parent                 = info
+        local info = self:_makeInfoBlock(card, opts.Title, opts.Desc, 90)
+        info.LayoutOrder = 1
     end
 
     -- Button

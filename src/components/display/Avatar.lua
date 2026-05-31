@@ -99,10 +99,10 @@ Section.AddAvatar = function(self, opts)
 
         local lbl = Instance.new("TextLabel")
         lbl.BackgroundTransparency = 1
-        lbl.Size                   = UDim2.new(1, 0, 0, 14)
+        lbl.Size                   = UDim2.new(1, 0, 0, Layout.TITLE_SIZE)
         lbl.Text                   = opts.Label
-        lbl.Font                   = Enum.Font.GothamMedium
-        lbl.TextSize               = 14
+        lbl.Font                   = Layout.FONT_TITLE
+        lbl.TextSize               = Layout.TITLE_SIZE
         lbl.TextColor3             = Theme:Text(1)
         lbl.TextXAlignment         = Enum.TextXAlignment.Left
         lbl.Parent                 = info
