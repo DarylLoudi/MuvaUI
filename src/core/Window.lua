@@ -411,6 +411,7 @@ function Window.new(opts, screenGui, flags, tier)
     local nameColumnLayout = Instance.new("UIListLayout")
     nameColumnLayout.FillDirection     = Enum.FillDirection.Vertical
     nameColumnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    nameColumnLayout.SortOrder         = Enum.SortOrder.LayoutOrder
     nameColumnLayout.Parent = nameColumn
 
     local nameLabel = Instance.new("TextLabel")
