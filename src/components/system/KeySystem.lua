@@ -42,15 +42,9 @@ function KeySystem.show(opts, screenGui, onSuccess)
         return
     end
 
-    -- Overlay gelap semi-transparent
-    local overlay = Instance.new("Frame")
-    overlay.Name                    = "KeySystemOverlay"
-    overlay.BackgroundColor3        = Color.fromHex("#0a0a0c")
-    overlay.BackgroundTransparency  = 0.3
-    overlay.BorderSizePixel         = 0
-    overlay.Size                    = UDim2.new(1, 0, 1, 0)
-    overlay.ZIndex                  = 500
-    overlay.Parent                  = screenGui
+    -- Tidak ada full-screen overlay agar Roblox CoreGui (menu game) tetap accessible.
+    -- Card langsung di-parent ke screenGui.
+    local overlay = nil  -- tidak dipakai, tapi dijaga agar tidak error di closeDialog
 
     -- Card tengah
     local card = Instance.new("Frame")
@@ -60,8 +54,8 @@ function KeySystem.show(opts, screenGui, onSuccess)
     card.AutomaticSize     = Enum.AutomaticSize.Y
     card.Position          = UDim2.new(0.5, -200, 0.5, 0)
     card.AnchorPoint       = Vector2.new(0, 0.5)
-    card.ZIndex            = 501
-    card.Parent            = overlay
+    card.ZIndex            = 10
+    card.Parent            = screenGui
 
     local cardCorner = Instance.new("UICorner")
     cardCorner.CornerRadius = UDim.new(0, 14)
@@ -346,10 +340,11 @@ function KeySystem.show(opts, screenGui, onSuccess)
             statusLbl.Text = "✓ Key valid! Loading..."
             saveKey(saveFile, key)
             task.delay(0.8, function()
-                Tween.play(overlay, { BackgroundTransparency = 1 },
-                    TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out))
-                task.delay(0.35, function()
-                    overlay:Destroy()
+                Tween.play(card, { BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, -200, 0.5, -10) },
+                    TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out))
+                task.delay(0.3, function()
+                    pcall(function() card:Destroy() end)
                     onSuccess()
                 end)
             end)
