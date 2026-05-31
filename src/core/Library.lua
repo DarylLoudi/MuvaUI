@@ -87,6 +87,66 @@ function Library:SetLoadingScreen(config)
     self._loadingConfig = config
 end
 
+function Library:SetBackground(opts)
+    -- Buat ScreenGui background terpisah, DisplayOrder lebih rendah dari window
+    local Players   = game:GetService("Players")
+    local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    -- Hapus background lama jika ada
+    local existing = playerGui:FindFirstChild("MuvaUI_Background")
+    if existing then existing:Destroy() end
+
+    local bgGui = Instance.new("ScreenGui")
+    bgGui.Name           = "MuvaUI_Background"
+    bgGui.ResetOnSpawn   = false
+    bgGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    bgGui.DisplayOrder   = 1   -- di bawah window (5) dan Roblox menu
+    bgGui.IgnoreGuiInset = false
+    bgGui.Parent         = playerGui
+
+    -- Base dark background
+    local base = Instance.new("Frame")
+    base.BackgroundColor3 = Color.fromHex("#07070a")
+    base.BorderSizePixel  = 0
+    base.Size             = UDim2.new(1, 0, 1, 0)
+    base.Parent           = bgGui
+
+    -- Purple glow kiri-bawah
+    local glowBL = Instance.new("ImageLabel")
+    glowBL.BackgroundTransparency = 1
+    glowBL.Size                   = UDim2.fromOffset(600, 600)
+    glowBL.Position               = UDim2.new(0, -150, 1, -450)
+    glowBL.Image                  = "rbxassetid://6015897843"  -- radial gradient white
+    glowBL.ImageColor3            = Color.fromHex("#7c3aed")
+    glowBL.ImageTransparency      = 0.55
+    glowBL.ScaleType              = Enum.ScaleType.Stretch
+    glowBL.Parent                 = base
+
+    -- Purple glow kanan-atas
+    local glowTR = Instance.new("ImageLabel")
+    glowTR.BackgroundTransparency = 1
+    glowTR.Size                   = UDim2.fromOffset(500, 500)
+    glowTR.Position               = UDim2.new(1, -350, 0, -200)
+    glowTR.Image                  = "rbxassetid://6015897843"
+    glowTR.ImageColor3            = Color.fromHex("#a855f7")
+    glowTR.ImageTransparency      = 0.65
+    glowTR.ScaleType              = Enum.ScaleType.Stretch
+    glowTR.Parent                 = base
+
+    -- Subtle vignette (gelap di pinggir)
+    local vignette = Instance.new("ImageLabel")
+    vignette.BackgroundTransparency = 1
+    vignette.Size                   = UDim2.new(1, 0, 1, 0)
+    vignette.Image                  = "rbxassetid://6015897843"
+    vignette.ImageColor3            = Color3.new(0, 0, 0)
+    vignette.ImageTransparency      = 0.3
+    vignette.ScaleType              = Enum.ScaleType.Stretch
+    vignette.Rotation               = 180
+    vignette.Parent                 = base
+
+    self._bgGui = bgGui
+end
+
 function Library:SetConfigSystem(config)
     self._configSystem = config
 end
