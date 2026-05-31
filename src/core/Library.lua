@@ -21,22 +21,18 @@ function Library:CreateWindow(opts)
         end
     end)
 
-    -- Buat ScreenGui di CoreGui (aman dari character reset)
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name                  = "MuvaUI_" .. (opts.Title or "Window")
-    screenGui.ResetOnSpawn          = false
-    screenGui.ZIndexBehavior        = Enum.ZIndexBehavior.Sibling
-    screenGui.DisplayOrder          = 5
-    screenGui.IgnoreGuiInset        = false
+    screenGui.Name             = "MuvaUI_" .. (opts.Title or "Window")
+    screenGui.ResetOnSpawn     = false
+    screenGui.ZIndexBehavior   = Enum.ZIndexBehavior.Sibling
+    screenGui.DisplayOrder     = 5
+    screenGui.IgnoreGuiInset   = false
 
-    -- Executor environment: parent ke CoreGui
-    local ok = pcall(function()
-        screenGui.Parent = CoreGui
-    end)
-    if not ok then
-        -- Fallback ke PlayerGui jika CoreGui tidak bisa
-        screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-    end
+    -- Parent ke PlayerGui — PlayerGui selalu di bawah Roblox CoreGui system menu
+    -- Ini memastikan Roblox menu (Esc) selalu di atas MuvaUI
+    local Players = game:GetService("Players")
+    local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+    screenGui.Parent = playerGui
 
     -- Key system — tampilkan sebelum window jika ada
     if opts.Key and KeySystem then
