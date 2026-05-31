@@ -49,16 +49,7 @@ function Library:CreateWindow(opts)
 end
 
 function Library:_spawnWindow(opts, screenGui)
-    if self._loadingConfig and LoadingScreen then
-        LoadingScreen.show(self._loadingConfig, screenGui, function()
-            local ok, result = pcall(function() return Window.new(opts, screenGui, self.Flags) end)
-            if not ok then
-                warn("[MuvaUI] Window.new failed: " .. tostring(result))
-            else
-                table.insert(self._windows, result)
-            end
-        end)
-    else
+    local function buildWindow()
         local ok, result = pcall(function() return Window.new(opts, screenGui, self.Flags) end)
         if not ok then
             warn("[MuvaUI] Window.new failed: " .. tostring(result))
@@ -69,6 +60,16 @@ function Library:_spawnWindow(opts, screenGui)
             ConfigSystem.attach(result, self._configSystem, self.Flags)
         end
         return result
+    end
+
+    if self._loadingConfig and LoadingScreen then
+        LoadingScreen.show(self._loadingConfig, screenGui, function()
+            buildWindow()
+        end)
+        -- Loading screen aktif: return nil (script harus pakai callback pattern)
+        return nil
+    else
+        return buildWindow()
     end
 end
 

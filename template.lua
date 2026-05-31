@@ -12,15 +12,16 @@ local MuvaUI = loadstring(game:HttpGet(
 
 print("[MuvaUI] Library loaded.")
 
--- ── System: Loading Screen ──────────────────────────────────────
-MuvaUI:SetLoadingScreen({
-    Title = "My Script",
-    Steps = {
-        { Message = "Initializing...",   Duration = 0.6 },
-        { Message = "Loading modules...", Duration = 0.8 },
-        { Message = "Almost ready...",    Duration = 0.4 },
-    },
-})
+-- ── System: Loading Screen (opsional — uncomment untuk aktifkan) ─
+-- CATATAN: Jika LoadingScreen aktif, gunakan pola callback bukan linear script.
+-- MuvaUI:SetLoadingScreen({
+--     Title = "My Script",
+--     Steps = {
+--         { Message = "Initializing...",    Duration = 0.6 },
+--         { Message = "Loading modules...", Duration = 0.8 },
+--         { Message = "Almost ready...",    Duration = 0.4 },
+--     },
+-- })
 
 -- ── System: Config System ───────────────────────────────────────
 -- Tab "Config" akan ditambah otomatis ke window

@@ -19,11 +19,11 @@ function LoadingScreen.show(config, screenGui, onDone)
         { Message = "Almost ready...",         Duration = 0.4 },
     }
 
-    -- Overlay full screen
+    -- Overlay semi-transparent (bukan full blackout)
     local overlay = Instance.new("Frame")
     overlay.Name                   = "LoadingScreenOverlay"
     overlay.BackgroundColor3       = Color.fromHex("#0a0a0c")
-    overlay.BackgroundTransparency = 0
+    overlay.BackgroundTransparency = 0.35
     overlay.BorderSizePixel        = 0
     overlay.Size                   = UDim2.new(1, 0, 1, 0)
     overlay.ZIndex                 = 490
