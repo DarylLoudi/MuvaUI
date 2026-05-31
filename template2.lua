@@ -4,7 +4,7 @@
     Copy-paste dan sesuaikan untuk script Anda sendiri.
 --]]
 
-local COMMIT = "10a1044a957241c2a8b89ff267993152d17c5b53"
+local COMMIT = "c067914b67ef04a1511a7c5a7f7eb68b5b240b81"
 local MuvaUI = loadstring(game:HttpGet(
     "https://raw.githubusercontent.com/DarylLoudi/MuvaUI/" .. COMMIT .. "/MuvaUI.lua",
     true
